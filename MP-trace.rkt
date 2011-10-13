@@ -118,7 +118,7 @@
    ; Rewrite machine rules to one rule on the new expression state -- done
    ; Rewrite expression rules to see the new member of expression state -- done
    ; Rewrite the wait rules to distinguish on ⊥ for wait-send and aid for wait-receive
-   ;;;; Simplify to have a single "wait" command in grammar
+   ;;;; Simplify to have a single "wait" command in grammar -- done (sortof)
    ;;;; Use the extra state member to track through the lookups and final match
    (--> (h eta aid-map ep-send-calls ep-recv-calls  
            (thread_0 ... 
@@ -143,58 +143,58 @@
    lang
    #:domain expr-state
    
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ x status k smt)
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status k smt)
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ x status k smt)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ v status k smt)
         "Lookup Variable"
         (where v (h-lookup h (eta-lookup eta x))))
    
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ (op e_0 e) status k smt)
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ e_0 status (op * e -> k) smt)
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ (op e_0 e) status k smt)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ e_0 status (op * e -> k) smt)
         "Expr l-operand")
-   (--> (h eta aid-map  ep-send-calls ep-recv-calls aid-⊥ v status (op * e -> k) smt)
-        (h eta aid-map  ep-send-calls ep-recv-calls aid-⊥ e status (op v * -> k) smt)
+   (--> (h eta aid-map  ep-send-calls ep-recv-calls ⊥ v status (op * e -> k) smt)
+        (h eta aid-map  ep-send-calls ep-recv-calls ⊥ e status (op v * -> k) smt)
         "Expr r-operand")
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v_r status (op v_l * -> k) smt)
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v_res status k smt)
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ v_r status (op v_l * -> k) smt)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ v_res status k smt)
         "Binary Operation Eval"
         (where v_res (apply-op op v_l v_r)))
    
    
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ (assume e) status k
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ (assume e) status k
            (defs (any ...)))
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ e status (assume * -> k )
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ e status (assume * -> k )
            (defs (e any ...)))
         "Assume Pull Out Expr")
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status (assume * -> k) smt)
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status_pr k smt)
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ v status (assume * -> k) smt)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ v status_pr k smt)
         "Assume Cmd"
         (where status_pr (check-assume v status)))
    
    ;;Negate expression and add it to the SMT assertions.
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ (assert e) status k
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ (assert e) status k
            (defs (any ...)))
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ e status (assert * -> k)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ e status (assert * -> k)
            (defs ((not e) any ...)))
         "Assert Pull Out Expr")
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status (assert * -> k) smt)
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status_pr k smt)
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ v status (assert * -> k) smt)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ v status_pr k smt)
         "Assert Eval"
         (where status_pr (check-assert v status)))
    
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ (x := e) status k
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ (x := e) status k
            (defs (any ...)))
-        (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ e status (x := * -> k)
+        (h eta aid-map ep-send-calls ep-recv-calls ⊥ e status (x := * -> k)
            (defs ((= x e) any ...)))
         "Assign Pull Out Expr")
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status (x := * -> k) smt)
-        (h_pr eta aid-map ep-send-calls ep-recv-calls aid-⊥ v status k smt)
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ v status (x := * -> k) smt)
+        (h_pr eta aid-map ep-send-calls ep-recv-calls ⊥ v status k smt)
         "Assign Expr"
         (where h_pr (h-extend* h [(eta-lookup eta x) -> v])))
    
    ;;Adds sendi cmd to aid-map and ep-send-calls. - VALIDATED
-   (--> (h eta ([aid_x ep_x] ...) ep-send-calls ep-recv-calls aid-⊥ 
+   (--> (h eta ([aid_x ep_x] ...) ep-send-calls ep-recv-calls ⊥ 
            (sendi aid src dst x ploc number) status k ((any_d ...) (any_a ...)))
-        (h eta ([aid src] [aid_x ep_x] ...) ep-send-calls_pr ep-recv-calls aid-⊥
+        (h eta ([aid src] [aid_x ep_x] ...) ep-send-calls_pr ep-recv-calls ⊥
            true status k ((any_0 any_d ...) (any_1 any_a ...)))
         "Sendi Cmd x -> v"
         (where v (h-lookup h (eta-lookup eta x)))
@@ -203,9 +203,9 @@
         (where ep-send-calls_pr (add-send ep-send-calls [aid -> src dst v])))
    
    ;;Adds recvi cmd to aid-map and ep-recv-calls. - VALIDATED
-   (--> (h eta ([aid_x ep_x] ...) ep-send-calls ep-recv-calls aid-⊥
+   (--> (h eta ([aid_x ep_x] ...) ep-send-calls ep-recv-calls ⊥
            (recvi aid dst x ploc) status k ((any_d ...) (any_a ...)))
-        (h eta ([aid dst] [aid_x ep_x] ...) ep-send-calls ep-recv-calls_pr aid-⊥ 
+        (h eta ([aid dst] [aid_x ep_x] ...) ep-send-calls ep-recv-calls_pr ⊥ 
            true status k ((any_0 any_d ...) (any_1 any_a ...)))
         "Recvi Cmd0"
         (where ep-recv-calls_pr (add-recv ep-recv-calls [aid -> dst x]))
@@ -231,21 +231,21 @@
    
    ;;Take the send out of aid-map VALIDATED
    (--> (h eta ([aid_x ep_x] ... [aid_s src_0] [aid_y ep_y] ...)
-           ep-send-calls ep-recv-calls aid-⊥
+           ep-send-calls ep-recv-calls ⊥
            (wait aid_r aid_s) status
            (match * [aid_r0 -> dst_r x_r] -> k) smt)
         (h eta ([aid_x ep_x] ... [aid_y ep_y] ...)
-           ep-send-calls_pr ep-recv-calls aid-⊥
+           ep-send-calls_pr ep-recv-calls ⊥
            (wait aid_r aid_s) status
            (match [aid_s0 -> src_0 dst_r v_s] [aid_r0 -> dst_r x_r] -> k) smt)
         "Recvi Wait Cmd 1"
         (where (ep-send-calls_pr [aid_s0 -> v_s]) (get-send ep-send-calls src_0 dst_r)))
    
    ;;Then we do the match
-   (--> (h eta aid-map ep-send-calls ep-recv-calls aid-⊥ (wait aid_r aid_s) 
+   (--> (h eta aid-map ep-send-calls ep-recv-calls ⊥ (wait aid_r aid_s) 
            status (match [aid_s0 -> src dst v] [aid_r0 -> dst x] -> k)
            (defs (any_a ...)))
-        (h_pr eta aid-map ep-send-calls ep-recv-calls aid-⊥ true 
+        (h_pr eta aid-map ep-send-calls ep-recv-calls ⊥ true 
               status_pr k 
               (defs ((MATCH aid_r0 aid_s0) any_a ...)))
         "Recvi Wait Cmd 2"

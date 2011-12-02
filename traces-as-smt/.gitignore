@@ -1,0 +1,13 @@
+*.log
+*.aux
+*.make
+*.temp
+*.bbl
+*.blg
+*.d
+*.fls
+*.pdf
+*.*~
+dirt
+*.dvi
+ence

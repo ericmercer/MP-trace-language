@@ -1,0 +1,571 @@
+\newsavebox{\boxSMTa}
+\begin{lrbox}{\boxSMTa}
+\begin{minipage}[c]{0.4\linewidth}
+\begin{alltt}
+(HB rcvA rcvB)
+(HB rcvB assume)
+(HB assume assert)
+(HB rcvC snd3)
+(HB snd1 snd2)
+
+(MATCH rcvA snd1)
+(MATCH rcvB snd3)
+(MATCH rcvC snd2)
+
+(assume (> b 0))
+(assert (not (= a 4)))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxSMTb}
+\begin{lrbox}{\boxSMTb}
+\begin{minipage}[c]{0.4\linewidth}
+\begin{alltt}
+(HB rcvA rcvB)
+(HB rcvB assume)
+(HB assume assert)
+(HB rcvC snd3)
+(HB snd1 snd2)
+
+(MATCH rcvA snd3)
+(MATCH rcvB snd1)
+(MATCH rcvC snd2)
+
+(assume (> b 0))
+(assert (not (= a 4)))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxSMTc}
+\begin{lrbox}{\boxSMTc}
+\begin{minipage}[c]{0.4\linewidth}
+\begin{alltt}
+(HB rcvA rcvB)
+(HB rcvB assume)
+(HB assume assert)
+(HB rcvC snd3)
+(HB snd1 snd2)
+
+(or (MATCH rcvA snd1)
+    (MATCH rcvA snd3))
+(or (MATCH rcvB snd1)
+    (MATCH rcvB snd3))
+(MATCH rcvC snd2)
+
+(ne rcvA rcvB)
+
+(assume (> b 0))
+(assert (not (= a 4)))
+
+
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+
+%%---------------------------------------------------------------------------
+%%% Start --- SMT Machine reductions
+\begin{figure}
+\mprset{flushleft}
+\scalebox{0.75}{
+\begin{mathpar}
+% (--> (h eta aid-map ep-send-calls ep-recv-calls  
+%           (thread_0 ... 
+%            ([ploc_0 (wait aid_r)] [ploc_1 cmd_1] [ploc_2 cmd_2] ...)
+%            thread_2 ...)
+%           ([ploc_0 aid_s] trace-entry_1 ...) status smt)
+%        (h_pr eta_pr aid-map_pr ep-send-calls_pr ep-recv-calls_pr 
+%              (thread_0 ... ([ploc_1 cmd_1] [ploc_2 cmd_2]...) thread_2 ...)
+%              (trace-entry_1 ...) status_pr smt_prpr)
+%        "Machine Step on Wait"
+%        (where (h_pr eta_pr aid-map_pr ep-send-calls_pr ep-recv-calls_pr
+%                     e status_pr ret smt_pr)
+%               ,(apply-reduction-relation** expr-reductions
+%                                            (term (h eta aid-map ep-send-calls
+%                                                     ep-recv-calls (wait aid_r aid_s)
+%                                                     status ret smt))))
+%        (where smt_prpr (add-po smt_pr ploc_0 ploc_1)))
+\inferrule[Machine Step on Wait]{
+  (h~\eta~\aidmap~\epsnd~\eprcv~(\wait~\aid_r~\aid_s)~\status~\ret)~\reduceK{e}~
+  (h_p~\eta_p~\aidmap_p~\epsnd_p~\eprcv_p~e~\status_p~\ret)
+}{
+  (h~\eta~\aidmap~\epsnd~\eprcv~
+           (\thread_0~\ldots~
+            ([\ploc_0~(\wait~\aid_r)]~[\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\ldots)~\thread_2~\ldots)~
+           ([\ploc_0~\aid_s]~\traceentry_1~\ldots)~\status) \reduce{m} \\\\
+  (h_p~\eta_p~\aidmap_p~\epsnd_p~\eprcv_r~
+              (\thread_0~\ldots~([\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\dots)~\thread_2~\dots)~
+              (\traceentry_1~\dots)~\status_p)
+}
+\and
+%  (--> (h eta aid-map ep-send-calls ep-recv-calls  
+%           (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] [ploc_2 cmd_2] ...) thread_2 ...)
+%           (ploc_0 trace-entry_1 ...) status smt)
+%        (h_pr eta_pr aid-map_pr ep-send-calls_pr ep-recv-calls_pr
+%              (thread_0 ... ([ploc_1 cmd_1] [ploc_2 cmd_2] ...) thread_2 ...)
+%              (trace-entry_1 ...) status_pr smt_prpr)
+%        "Machine Step"
+%        (where (h_pr eta_pr aid-map_pr ep-send-calls_pr ep-recv-calls_pr 
+%                     e status_pr ret smt_pr)
+%               ,(apply-reduction-relation** expr-reductions
+%                                            (term (h eta aid-map ep-send-calls
+%                                                     ep-recv-calls 
+%                                                     cmd_0 status ret smt))))
+%        (where smt_prpr (add-po smt_pr ploc_0 ploc_1)))
+\inferrule[Machine Step]{
+  (h~\eta~\aidmap~\epsnd~\eprcv~\cmd_0~\status~\ret~\smt)~\reduceK{e}~
+  (h_p~\eta_p~\aidmap_p~\epsnd_p~\eprcv_p~e~\status_p~\ret~\smt_\mathit{p0}) \\
+  \smt_\mathit{p1} =  \mathrm{addHB}(\smt_\mathit{p0}~\ploc_0~\ploc_1)
+}{
+  (h~\eta~\aidmap~\epsnd~\eprcv~
+           (\thread_0~\ldots~
+            ([\ploc_0~\cmd_0)]~[\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\ldots)~\thread_2~\ldots)~
+           (\ploc_0~\traceentry_1~\ldots)~\status~\smt) \reduce{m} \\\\
+  (h_p~\eta_p~\aidmap_p~\epsnd_p~\eprcv_r~
+              (\thread_0~\ldots~([\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\dots)~\thread_2~\dots)~
+              (\traceentry_1~\dots)~\status_p~\smt_\mathit{p1})
+}
+\end{mathpar}}
+\caption{Machine Reductions to build the SMT model of a trace language program ($\reduce{\mathrm{m-smt}}$)}
+\label{fig:machine}
+\end{figure}
+
+
+\begin{figure}
+\scalebox{0.75}{%
+\mprset{flushleft}
+\begin{mathpar}
+%(--> (h eta aid-map ep-send-calls ep-recv-calls  x status k smt)
+%        (h eta aid-map ep-send-calls ep-recv-calls  v status k smt)
+%        "Lookup Variable"
+%        (where v (h-lookup h (eta-lookup eta x))))
+\inferrule[Variable Lookup]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ x\ \status\ k)\ \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ h(\eta(x))\ \status\ k )
+}
+\hspace*{60pt}
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  (op e_0 e) status k smt)
+%        (h eta aid-map ep-send-calls ep-recv-calls  e_0 status (op * e -> k) smt)
+%        "Expr l-operand")
+\inferrule[Left Operand]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\op\ e_0\ e)\ \status\ k) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e_0\ \status\ (\op\ *\ e \rightarrow k))
+}
+\and
+%   (--> (h eta aid-map  ep-send-calls ep-recv-calls  v status (op * e -> k) smt)
+%        (h eta aid-map  ep-send-calls ep-recv-calls  e status (op v * -> k) smt)
+%        "Expr r-operand")
+\inferrule[Right Operand]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \status\ (\op\ *\ e \rightarrow k)) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\op\ v\ *\ \rightarrow k))
+}
+\hspace*{20pt}
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  v_r status (op v_l * -> k) smt)
+%        (h eta aid-map ep-send-calls ep-recv-calls  v_res status k smt)
+%        "Binary Operation Eval"
+%        (where v_res (apply-op op v_l v_r)))
+\inferrule[Binary Operation]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v_r\ \status\ (\op\ v_l\ * \rightarrow k)) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \applyop(v_l, v_r)\ \status\ k)
+}
+\and   
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  (assume e) status k
+%           (defs (any ...)))
+%        (h eta aid-map ep-send-calls ep-recv-calls  e status (assume * -> k )
+%           (defs (e any ...)))
+%        "Assume Pull Out Expr")
+\inferrule[Assume Expressions Evaluation]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assume\ e)\ \status\ k) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assume\ * \rightarrow k))
+}
+\hspace*{22pt}
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  v status (assume * -> k) smt)
+%        (h eta aid-map ep-send-calls ep-recv-calls  v status_pr k smt)
+%        "Assume Cmd"
+%        (where status_pr (check-assume v status)))
+\inferrule[Assume Command]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \status\ (\assume\ * \rightarrow k)) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \checkassume(v, s)\ k)
+}
+\and
+%   ;;Negate expression and add it to the SMT assertions.
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  (assert e) status k
+%           (defs (any ...)))
+%        (h eta aid-map ep-send-calls ep-recv-calls  e status (assert * -> k)
+%           (defs ((not e) any ...)))
+%        "Assert Pull Out Expr")
+\inferrule[Assert Expressions Evaluation]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assert\ e)\ \status\ k) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assert\ * \rightarrow k))
+}
+\hspace*{22pt}
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  v status (assert * -> k) smt)
+%        (h eta aid-map ep-send-calls ep-recv-calls  v status_pr k smt)
+%        "Assert Eval"
+%        (where status_pr (check-assert v status)))
+\inferrule[Assert Command]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \status\ (\assert\ * \rightarrow k)) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \checkassert(v, s)\ k)
+}
+\and
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  (x := e) status k
+%           (defs (any ...)))
+%        (h eta aid-map ep-send-calls ep-recv-calls  e status (x := * -> k)
+%           (defs ((= x e) any ...)))
+%        "Assign Pull Out Expr")
+\inferrule[Assign Expressions Evaluation]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (x\ :=\ e)\ \status\ k) \reduce{e} \\\\
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (x\ :=\ * \rightarrow k))
+}
+\hspace*{22pt}
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  v status (x := * -> k) smt)
+%        (h_pr eta aid-map ep-send-calls ep-recv-calls  v status k smt)
+%        "Assign Expr"
+%        (where h_pr (h-extend* h [(eta-lookup eta x) -> v])))
+\inferrule[Assign Command]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \status\ (x\ :=\ *\ \rightarrow k)) \reduce{e} \\\\
+  ([h \mid \eta(x) \mapsto v]\ \eta\ \aidmap\ \epsnd\ \eprcv\ v\ \status\ k)
+}
+\and
+%   ;;Adds sendi cmd to aid-map and ep-send-calls. - VALIDATED
+%   (--> (h eta ([aid_x ep_x] ...) ep-send-calls ep-recv-calls 
+%           (sendi aid src dst x ploc number) status k ((any_d ...) (any_a ...)))
+%        (h eta ([aid src] [aid_x ep_x] ...) ep-send-calls_pr ep-recv-calls 
+%           true status k ((any_0 any_d ...) (any_1 any_a ...)))
+%        "Sendi Cmd x -> v"
+%        (where v (h-lookup h (eta-lookup eta x)))
+%        (where any_0 (define aid :: send))
+%        (where any_1 (make-send aid src dst x ploc number))
+%        (where ep-send-calls_pr (add-send ep-send-calls [aid -> src dst v])))
+\inferrule[Sndi Command]{
+  ([\aid_1\ v_1]\ \ldots) = \epsnd(\dst)(\src) \\ \epsnd_p = [\epsnd \mid \dst \mapsto [\epsnd(\dst) \mid \src \mapsto ([\aid_0\ h(\eta(x))]\ [\aid_1\ v_1]\ \ldots)]]
+}{
+  (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ 
+     (\sendi\ \aid_0\ \src\ \dst\ x)\ \status\ k) \reduce{e}
+  (h\ \eta\ ([\aid_0\ \src]\ [\aid\ \ep]\ \ldots)\ \epsnd_p\ \eprcv\ \true\ \status\ k)
+}
+\and
+%   ;;Adds recvi cmd to aid-map and ep-recv-calls. - VALIDATED
+%   (--> (h eta ([aid_x ep_x] ...) ep-send-calls ep-recv-calls
+%           (recvi aid dst x ploc) status k ((any_d ...) (any_a ...)))
+%        (h eta ([aid dst] [aid_x ep_x] ...) ep-send-calls ep-recv-calls_pr 
+%           true status k ((any_0 any_d ...) (any_1 any_a ...)))
+%        "Recvi Cmd0"
+%        (where ep-recv-calls_pr (add-recv ep-recv-calls [aid -> dst x]))
+%        (where any_0 (define aid :: recv))
+%        (where any_1 (make-recv aid dst x ploc)))
+\inferrule[Rcvi Command]{
+  ([\aid_1\ x_1]\ \ldots) = \eprcv(\dst) \\ 
+   \eprcv_p = [\eprcv \mid \dst \mapsto ([\aid_0\ x_0]\ [\aid_1\ x_1]\ \ldots)]
+}{
+  (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ (\recvi\ \aid_0\ \dst\ x_0)\ \status\ k) \reduce{e}
+  (h\ \eta\ ([\aid_0\ \dst]\ [\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv_p\ \true\ \status\ k)
+}
+\and
+%   ;;Eat the send wait. - VALIDATED
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls  (wait aid) status k smt)
+%        (h eta aid-map ep-send-calls ep-recv-calls  true status k smt)
+%        "Eat Sendi Wait")
+\inferrule[Wait (sndi) Command]{}{
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\wait\ \aid)\ \status\ k) \reduce{e}
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ true\ \status\ k)
+}
+\and
+%   ;;Take the recv out of aid-map. - VALIDATED
+%   (--> (h eta ([aid_x ep_x] ... [aid_r dst_0] [aid_y ep_y] ...) 
+%           ep-send-calls ep-recv-calls 
+%           (wait aid_r aid_s) status k 
+%           ((any_d ...) (any_a ...)))
+%        (h eta ([aid_x ep_x] ... [aid_y ep_y] ...)
+%           ep-send-calls ep-recv-calls_pr
+%           (wait aid_r aid_s) status (match * [aid_r0 -> dst_0 x_r] -> k) 
+%           ((any_d ...) (any_a ...)))
+%        "Recvi Wait Cmd 0"
+%        (where (ep-recv-calls_pr [aid_r0 -> x_r]) (get-recv ep-recv-calls dst_0)))
+% Note:
+% We do need multiple rules to pull things out of the action list; though
+% I will combine the last two rules into one rule.
+\inferrule[Wait (rcvi)--get receive action]{
+    ([\aid\ x]\ \ldots\ [\aid_0\ x_0]) = \eprcv(\dst) \\ \eprcv_p = [\eprcv \mid \dst \mapsto ([\aid\ x]\ \ldots)] 
+}{
+  (h\ \eta\ ([\aid_x\ \ep_x]\ \ldots\ [\aid_r\ \dst]\ [\aid_y\ \ep_y]\ \ldots)\ 
+     \epsnd\ \eprcv\ (\wait\ \aid_r\ \aid_s)\ \status\ k) \reduce{e} \\\\
+  (h\ \eta\ ([\aid_x\ \ep_x]\ \ldots\ [\aid_y\ \ep_y]\ \ldots)\ 
+      \epsnd\ \eprcv_p\ (\wait\ \aid_r\ \aid_s)\ \status\ (\match\ *\ [\aid_0 \rightarrow \dst\ x_0] \rightarrow k))
+}
+\and
+%   ;;Take the send out of aid-map VALIDATED
+%   (--> (h eta ([aid_x ep_x] ... [aid_s src_0] [aid_y ep_y] ...)
+%           ep-send-calls ep-recv-calls
+%           (wait aid_r aid_s) status
+%           (match * [aid_r -> dst_r x_r] -> k) smt)
+%        (h eta ([aid_x ep_x] ... [aid_y ep_y] ...)
+%           ep-send-calls_pr ep-recv-calls
+%           (wait aid_r aid_s) status
+%           (match [aid_s0 -> src_0 dst_r v_s] [aid_r -> dst_r x_r] -> k) smt)
+%        "Recvi Wait Cmd 1"
+%        (where (ep-send-calls_pr [aid_s0 -> v_s]) (get-send ep-send-calls src_0 dst_r)))
+\inferrule[Wait (rcvi)]{
+  ([\aid\ v]\ \ldots\ [\aid_1\ v_1]) = \epsnd(\dst)(\src) \\ 
+  \epsnd_p = [\epsnd \mid \dst \mapsto [\epsnd(\dst) \mid \src \mapsto ([\aid\ v]\ \ldots)]] \\
+  h_p = [h \mid \eta(x) \mapsto v_1] \\ 
+  \status_p = \matchl(\aid_r, \aid_0, \aid_s, \aid_1, s)
+}{
+  (h\ \eta\ ([\aid_x\ \ep_x]\ \ldots\ [\aid_s\ \src]\ [\aid_y\ \ep_y]\ \ldots)\ 
+     \epsnd\ \eprcv\ (\wait\ \aid_r\ \aid_s)\ \status\ 
+     (\match\ *\ [\aid_0 \rightarrow \dst\ x] \rightarrow k)) \reduce{e} \\\\
+  (h_p\ \eta\ ([\aid_x\ \ep_x]\ \ldots\ [\aid_y\ \ep_y]\ \ldots)\ 
+     \epsnd_p\ \eprcv\ \true\ \status_p\ k)
+}
+\and
+%   ;;Then we do the match
+%   (--> (h eta aid-map ep-send-calls ep-recv-calls (wait aid_r aid_s) 
+%           status (match [aid_s0 -> src dst v] [aid_r0 -> dst x] -> k)
+%           (defs (any_a ...)))
+%        (h_pr eta aid-map ep-send-calls ep-recv-calls true 
+%              status_pr k 
+%              (defs ((MATCH aid_r0 aid_s0) any_a ...)))
+%        "Recvi Wait Cmd 2"
+%        (where h_pr (h-extend* h [(eta-lookup eta x) -> v]))
+%        (where status_pr ,(if (and (equal? (term aid_r) (term aid_r0)) 
+%                                   (equal? (term aid_s) (term aid_s0))) 
+%                              (term status) (term error))))
+% Merged into the above rule (Wait (RCVI))
+%}
+\end{mathpar}}
+\caption{Expression Reductions ($\reduce{e}$)}
+\label{fig:expression}
+\end{figure}
+%%% END --- SMT Machine reductions
+%%---------------------------------------------------------------------------
+
+\section{SMT Model}\label{sec:smt}
+
+The next step, after formally defining the operational semantics of our trace
+language, was to formally define a translation from the trace language into an
+SMT problem that would correctly model the original execution trace. We
+achieved this by building on the same framework that we constructed to execute
+the semantics that we defined for our trace language. In addition to executing
+the semantic meaning of the trace language, we modified our system so that it
+would also produce a correlating SMT problem for a given execution trace.
+
+The SMT problem that we form is made of various free variables, bound
+variables, and logical asserations. For example, we could define an SMT problem
+that includes the bound variable A and B with their assignments of A=1 and B=2,
+a free variable C, and an assertion that A + B = C. Feeding this into an SMT
+solver would produce a result showing that the problem is satisfiable if C=3.
+Alternatively, we could use alter the problem so that B is also a free
+variable. Feeding this problem into an SMT solver would produce any number of
+results showing values for B and C, such that B = C-1. 
+
+\begin{figure}
+\begin{center}
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}[c]{ccc}
+\scalebox{0.68}{\usebox{\boxSMTa}} &
+\scalebox{0.68}{\usebox{\boxSMTb}} &
+\scalebox{0.68}{\usebox{\boxSMTc}} \\
+(a) & (b) & (c)
+\end{tabular}
+\end{center}
+
+\caption{SMT problems. (a) SMT problem based on the first trace. (b) SMT
+problem based on a second trace. (c) SMT problem built from the preceding two
+problems.}
+
+\label{fig:smts}
+\end{figure}
+
+\figref{fig:smts} contains three SMT problems. The first two are created from
+two different executions of the same trace. The third SMT problem is a
+combination of the first two. As you can see in the figure, the combined SMT
+problem is very similar to the first two. The only difference is the way in
+which the possible match pairs are described. The first two SMT problems
+represent specific traces, so each match pair is explicitly defined. The third
+SMT problem allows behaviors from either of the first two problems, so it
+defines its match pairs such that $\mathrm{rcvA}$ and $\mathrm{rcvB}$ can match
+with either $\mathrm{snd1}$ or $\mathrm{snd3}$. This also requires the addition
+of the $\mathrm{ne}$ function that asserts that $\mathrm{rcvA}$ and
+$\mathrm{rcvB}$ do not match with the same send operation. We will now explain
+the various data structures and functions from the SMT problems in more depth.
+
+\begin{equation}
+\mathrm{HB}(a,b) \equiv \left\{ \begin{array}{rl}
+  \mathit{true} & \mathrm{if}\ a < b \\
+  \mathit{false} & \mathrm{otherwise}\ 
+\end{array}
+\right .
+\end{equation}
+
+The HB function represents a happens-before relationship between two events. It
+takes two events $a$ and $b$ as parameters, such that $a,b \in \mathbb{N}$. This
+function creates a constraint such that the first event must be less than the
+second event, indicating that the first event occurs before the second event.
+This function is used to assert the program order of statements within the same
+thead, and also to assert that, for any matched pair, that the send operation
+occurs before the receive. 
+
+\begin{equation}
+\mathrm{MATCH}(R,S) \equiv \left\{ 
+\begin{array}{rl}
+  \mathit{true} & \mathrm{if}\ M = I~\wedge \\
+  & E_r = E_s~\wedge \\
+  & V_r = V_s~\wedge \\
+  & \mathrm{HB}(T_s,T_r) \\
+  \mathit{false} & \mathrm{otherwise}\ 
+\end{array}
+\right . \\
+\end{equation}
+
+The $\mathrm{MATCH}$ function takes two four-tuples as parameters. The first tuple
+represents the a receive operation, and the second represents a send operation.
+The two tuples are evalueted to see whether or not the two operations could
+conceivably be matched.  The receive tuple, $R$, is defined as $R =
+(M,E_r,V_r,T_r)$ such that $M,E_r,V_r,T_r \in \mathbb{N}$. $M$ represents a
+free variable that is used to define a match pair. The variable must be equal
+to the corresponding value in a send tuple in order for the two operations to
+be matched. $E_r$ represents the end point of the receive operation. $V_r$
+reprensents the the value received by the receive operation. $T_r$ represents
+the program order of the receive operation.
+
+The second tuple $S$ represents a send operation that is defined as $S =
+(I,E_r,V_r,T_r)$ such that $I,E_r,V_r,T_r \in \mathbb{N}$. $I$ is a unique
+assigned value that identifies each send operation. $E_r$ represents that end
+point that is being sent a message. $V_r$ contains the value being sent, and
+$T_r$ represents the program order of the receive operation.
+
+The MATCH function creates a number of constraints that represent the pairing
+of the specified send and receive operations. This function asserts that the
+destination endpoint of the send operation is the same as the endpoint used by
+the receive operation, that the value sent by the send operation is the same
+value received by the receive operation, that the send operation occurs before
+the receive operation, and that the ``match'' value in the recveive tuple is
+equal to the ``id'' value in the send tuple, which indicates that the receiver
+operation is paired with only this send operation.
+
+\begin{equation}
+\mathrm{ne}(a,b) \equiv \left\{ \begin{array}{rl}
+  \mathit{true} & \mathrm{if}\ M_a \not = M_b \\
+  \mathit{false} & \mathrm{otherwise}\ 
+\end{array}
+\right .
+\end{equation}
+
+The ne function is used to assert that no two receive operations are matched
+with the same send operation. The parameters for this function are two receive
+tuples. An assertion is made that the values of their ``match'' fields, $M$,
+are not equal. This shows that they are paired with two different send
+operations.
+
+The first five statments in each SMT problem in \figref{fig:smts} uses the
+$\mathrm{HB}$ function to assert the program order of each thread as defined by
+the CTP. The last two lines of each problem contain $\mathrm{assume}$ and
+$\mathrm{assert}$ statments. The $\mathrm{assume}$ statement is created by
+asserting any branch conditions that we encountered in the trace. As was stated
+earlier, this prevents the SMT solver from finding any solutions that are not
+consistent with the program's control flow. The $\mathrm{assert}$ statement is
+created by negating any assertions that were made in the original program. This
+creates an SMT problem that will only be satisfiable if an assertion violation
+can be found.
+
+The rest of the SMT problems deals with defining match pairs. In the first two
+SMT problems the match pairs are taken straight from their traces. In order to
+combine these possible match pairs and create the third SMT problem, we can
+find the union of all send operations that could possibly match with each
+receive operation. For each receive operation, we assert a MATCH between any
+one of the send operations in the set of all operations that the receive could
+be matched with. In order to make sure that no two receive operations are
+matched with the same send operation, we also create an $\mathrm{ne}$ function
+call for each pair of receive statments who have a non-empty intersection
+between their sets of possible matching send operations. 
+
+The evaluation syntax for the machine reductions to build the SMT
+model of a trace language program are largely those of the regular machine
+reductions with a few changes below
+\[
+\cfgstart
+\cfgrule{mstate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\  
+  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{ctp}\ \cfgnt{\trace}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
+%  (expr-state (h eta aid-map ep-send-calls ep-recv-calls e status k smt))
+\cfgrule{estate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\  
+  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{e}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
+%  (smt (defs asrts))
+\cfgrule{\smt}{\lp\cfgnt{defs}~\cfgnt{constraints}\rp}
+%  (defs (any ...))
+\cfgrule{defs}{\lp\cfgnt{any}~$\ldots$\rp}
+%  (constraints (any ...))
+\cfgrule{constraints}{\lp\cfgnt{any}~$\ldots$\rp}
+\cfgend
+\]
+The new syntax adds an \textit{smt} member to the \textit{mstate}
+and \textit{estate} where the ``\cfgnt{any}'' term in \textit{defs}
+and \textit{constraints} matches any structure.  The lists will
+be filled with definitions, HB entries, MATCH entries, \texttt{ne}
+entries, etc. as defined by the SMT machine reductions.
+
+There are several support functions for the SMT machine reductions.  The function $\mathrm{addHB}(((\mathit{any}_d ...)\ (\mathit{any}_c ...))\ \ploc_0\ \ploc_1)$ adds program location to the definition list and adds a happens before relation
+\[
+ \equiv \\
+   (((\mathtt{define \ploc_0 :: int}) \mathit{any}_d ...)((\mathtt{HB \ploc_0 \ploc_1}) \mathit{any}_c ...))
+\]
+
+\begin{definition}
+A machine state $(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \cfgnt{ctp}\ \trace\ \status\ k)$ is smt-enabled if it is well formed.  The SMT problem is taken from the final SMT reduced state:
+\[\begin{array}{l}
+        (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \cfgnt{ctp}\ \trace\ \status\ k\ (()()))  \reduceK{\mathrm{m-smt}} \\
+ (h_p\ \eta_p\ \aidmap_p\ \epsnd_p\ \eprcv_p\ \cfgnt{ctp}_p\ \trace_p\ \status_p\ k_p\ \mathrm{smt}) 
+ \end{array}\]  
+For convenience, we define the function
+$\mathrm{smt}($m$) \mapsto \{\cfgt{SAT},\cfgt{UNSAT}\}$
+to return the status of the SMT problem in the final state of $m$.
+\end{definition}
+
+\begin{lemma}
+For a well-formed machine state $m$
+\[
+\mathrm{status}(m) = \cfgt{failure} \iff \mathrm{smt}(m) = \cfgt{satisfiable}
+\]
+\end{lemma}
+\begin{proof}
+The Proof relies on the operational semantics in that each rule that adds
+something to the SMT is trivially shown to be equivalent to the
+trace-language action.  If the trace-language only represents a single
+trace, then by implication, the SMT problem only encodes a single
+trace.  Key is the one-to-one mapping between the trace-language
+operations and the SMT constructs.
+\end{proof}
+
+\begin{theorem}
+My Lemma
+\end{theorem}
+\begin{proof}
+Proof
+\end{proof}
+
+\subsection{Outline}
+
+SMT model is created from an extension to the operational semantics of the
+trace language.  The semantics generate an SMT for a single trace.  The key
+observation is that the SMT does not change for different traces on the same
+CTP except for the specified match pairs.  This observation leads to the main
+result that we can over-approximate the match pair sets and use the
+trance-language in a refinement loop.
+
+Add a figure showing the encoding of two traces for the example system.   Put the two traces next to each other.  Use the ones from LaDefense.pptx
+\begin{itemize}
+\item Define upfront MATCH, HB, and the data structure definitions (anything boiler plate)
+\item Focusing on one trace, give the new reductions for assert and assume referencing directly the line number in the trace where these statements appear. 
+\item Give the new reductions for WAITI-rcv to define a match pair.  Again reference the line number in the figure for clarity.  
+\item Add the full semantics to the appendix and give the reference here.
+\item Lemma 1: we can encode a single trace.  
+\item Examine the second trace.  Note the only difference is seen in the MATCH pairs.
+\item Define the combinator operation that combines two SMT encodings for a common CTP
+\item Lemma 2: we can encode multiple traces into a single SMT problem.  Proof by induction.  Base case is a single trace.  Trivially established by Lemma 1.  Induction is assume you have correctly encoded n-traces, and you are adding a new trace (i.e., a new set of match pairs) to the encoding using your combinator operation.  
+\item Suppose we an answer function that given a MP set and a CTP returns either success or failure with a trace.  
+\item Define the main theorem for the paper (slide 68 in LaDefense.pptx).  Generalize to arbitrary sets.  Proof by induction.  Base case is a single trace in $\mathrm{mp}_1$ so $\mathrm{mp}_1 \subseteq \mathrm{mp}_1$.  Proof is trivial since $\mathrm{answer}(\mathrm{mp}_1)$ does not change.  Inductive step is $mathrm{mp}_n \subseteq \mathrm{mp}_n+1$.   Assume $\mathrm{mp}_n$ give the correct answer.  Argue on the lattice and the operational semantics for each rule that touches the status.  You have to reference in the proof every rule that updates the status!
+\end{itemize}
+
+
+

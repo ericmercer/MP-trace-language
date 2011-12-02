@@ -1,0 +1,16 @@
+%% Commands For the syntax EBNF
+\newcommand{\cfgnt}[1]{\emph{#1}}
+\newcommand{\cfgq}[1]{\texttt{#1}}
+\newcommand{\cfgt}[1]{\textbf{#1}}
+\newcommand{\cfglhs}[1]{\cfgnt{#1} & $::=$}
+\newcommand{\cfgrule}[2]{\cfglhs{#1} & #2 \\}
+\newcommand{\cfgor}{\textbar\ }
+\newcommand{\cfgstart}{\begin{tabular}{r@{\hspace{1mm}}r@{\hspace{2mm}}l}}
+\newcommand{\cfgend}{\end{tabular}}
+\newcommand{\cfgline}[1]{ ~ && #1 \\ }
+\newcommand{\cfglinetab}[1]{ ~ && \hspace{1cm} #1 \\ }
+\newcommand{\cfgorline}[1]{ ~ & \cfgor & #1 \\ }
+\newcommand{\lp}{\cfgq{(}}
+\newcommand{\rp}{\cfgq{)}}
+\newcommand{\lb}{\cfgq{[}}
+\newcommand{\rb}{\cfgq{]}}

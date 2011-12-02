@@ -1,0 +1,73 @@
+% This is LLNCS.DEM the demonstration file of
+% the LaTeX macro package from Springer-Verlag
+% for Lecture Notes in Computer Science,
+% version 2.4 for LaTeX2e as of 16. April 2010
+%
+\documentclass{llncs}
+%
+\usepackage{comment}
+\usepackage{mathpartir}
+\usepackage{listings}
+\usepackage{alltt}
+\usepackage{graphicx}
+\usepackage{amssymb}
+
+%%
+%% STANDARD SMC CUSTOMIZATION
+
+% This is my comments.  The color and text style means it
+% came from Eric Mercer.
+% I am including 2 versions:
+%   a) includes my comments in the final document
+%   b) excludes my comments in the final document
+\usepackage{color}
+\definecolor{egmcolor}{rgb}{1.0,0.0,0.722}
+\newcommand*{\egm}[1]%
+%%
+%% a)
+{\textcolor{egmcolor}{\noindent\textbf{[egm:~}\textit{#1}]}}
+%%
+% Other things...
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\defref}[1]{Definition~\ref{#1}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
+
+%
+\begin{document}
+%
+\pagestyle{headings}  % switches on printing of running heads%
+%
+\title{Proving MCAPI Executions are Correct}
+\subtitle{Applying SMT Technology to Message Passing}
+%\titlerunning{SMT for MCAPI Executions}
+
+\author{Yu Huang \and Eric Mercer \and Jay McCarthy \thanks{Special thanks to Christopher Fischer, formally at BYU and now at Amazon}}
+%\authorrunning{Y.~Huang \and E.~Mercer \and J.~McCarthy}
+\institute{Brigham Young University \\
+            \email{\{yuHuang,egm,jay\}@byu.edu}}
+
+\maketitle
+
+% Macros for specifying the trace-language
+\input{ebnf}
+
+%
+%
+\begin{abstract}
+\input{abstract}
+\keywords{Abstraction, refinement, SMT, message passing}
+\end{abstract}
+%
+\input{introduction}
+\input{example}
+\input{trace-lang}
+\input{smt-model}
+\input{precise}
+\input{related-work}
+\input{conclusion}
+\input{future-work}
+
+\bibliographystyle{splncs03}
+\bibliography{../bib/paper}
+\end{document}

@@ -1,0 +1,318 @@
+% ---------------------------------------------------------------------
+% Save boxes for the various figures in the example section
+% ---------------------------------------------------------------------
+\newsavebox{\boxTZero}
+\begin{lrbox}{\boxTZero}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+   00 initialize(NODE_0,&v,&s);
+   01 ep0 = create_endpoint(PORT_0,&s);
+
+04 02 msg_recv_i(ep0,A,sizeof(A),&rcvA,&s);
+05 03 wait(&rcvA,&size,&s,MCAPI_INF);
+06 04 a = atoi(A);
+
+11 05 msg_recv_i(ep0,B,sizeof(B),&rcvB,&s);
+12 06 wait(&rcvB,&size,&status,MCAPI_INF);
+13 07 b = atoi(B);
+
+14 08 if (b > 0)
+15 09    assert(a == 4);
+
+   10 finalize(&s);
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxATZero}
+\begin{lrbox}{\boxATZero}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+08 00        (00 (rcvi rcvA 0 a))
+09 (01 snd3) (01 (wait rcvA))
+              
+10 02        (02 (rcvi rcvB 0 b))
+11 (03 snd1) (03 (wait rcvB))
+
+12 04        (04 (assume (> b 0)))
+13 05        (05 (assert (= a 4)))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxTOne}
+\begin{lrbox}{\boxTOne}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+   00 initialize(NODE_1,&v,&s);
+   01 ep1 = create_endpoint(PORT_1,&s);
+   02 ep0 = get_endpoint(NODE_0,PORT_0,&s);
+
+07 03 msg_recv_i(ep1,C,sizeof(C),&rcvC,&s);
+08 04 wait(&rcvC,&size,&s,INF);
+
+09 05 msg_send_i(ep1,ep0,"1",2,N,&snd3,&s);
+10 06 wait(&snd3,&size,&s,MCAPI_INF);
+
+   07 finalize(&s);
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxATOne}
+\begin{lrbox}{\boxATOne}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+04 01        (01 (rcvi rcvC 1 c))
+05 (02 snd2) (02 (wait rcvC))
+
+06 03        (03 (sndi snd3 1 0 0x1))
+07 04        (wait snd3)
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxTTwo}
+\begin{lrbox}{\boxTTwo}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+   00 initialize(NODE_2,&v,&s);
+   01 t2 = create_endpoint(PORT_2,&s);
+   02 t0 = get_endpoint(NODE_0,PORT_0,&s);
+   03 t1 = get_endpoint(NODE_1,PORT_1,&s);
+
+00 04 msg_send_i(ep2,ep0,"4",2,N,&snd1,&s);
+01 05 wait(&snd1,&size,&status,MCAPI_INF);
+
+02 06 msg_send_i(ep2,ep1,"Go",3,N,&snd2,&s);
+03 07 wait(&snd2,&size,&status,MCAPI_INF);
+   08 
+   09 finalize(&s);
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxATTwo}
+\begin{lrbox}{\boxATTwo}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+00 00        (00 (sndi snd1 2 0 0x4))
+01 01        (01 (wait snd1))
+
+02 02        (02 (sndi snd2 2 1 0x476f00))
+03 03        (03 (wait snd2))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxMP}
+\begin{lrbox}{\boxMP}
+\begin{minipage}[c]{0.2\linewidth}
+\begin{alltt}
+(rcvA snd1)
+(rcvA snd3)
+
+(rcvB snd1)
+(rcvB snd3)
+
+(rcvC snd2)
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+
+\newsavebox{\boxSMT}
+\begin{lrbox}{\boxSMT}
+\begin{minipage}[c]{0.4\linewidth}
+\begin{alltt}
+(HB rcvA_loc rcvB_loc)
+(HB rcvB_loc assume_loc)
+(HB assume_loc assert_loc)
+(HB rcvC_loc snd3_loc)
+(HB snd1_loc snd2_loc)
+
+(or (MATCH rcvA snd3)
+    (MATCH rcvA snd1))
+(or (MATCH rcvB  snd1)
+    (MATCH rcvB snd3))
+(ne rcvA rcvB)
+
+(MATCH rcvC snd2)
+
+(assume (> b 0))
+(assert (not (= a 4)))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+% ---------------------------------------------------------------------
+% END Save boxes 
+% ---------------------------------------------------------------------
+
+\section{Example}
+
+It is a challenge to explain intended behavior in simple scenarios
+consisting of a handful of calls when dealing with concurrency. Consider
+the MCAPI program in the top of \figref{fig:mcapi} that includes three
+tasks that use send (\texttt{mcapi\_msg\_send\_i}) and receive
+(\texttt{mcapi\_msg\_recv\_i}) calls to communicate with each other.
+Line numbers appear in the second column for each task, and the
+declarations of the local variables are omitted for space. Picking up
+the scenario just after the endpoints are defined, lines \texttt{02}
+and \texttt{05} of task 0 receive two messages on the endpoint
+\textit{ep0} in variables $A$ and $B$ which are
+converted to integer values and stored in variables $a$ and
+$b$ on lines \texttt{04} and \texttt{07}; task 1 receives one
+message on endpoint \textit{ep1} in variable \textit{C} on line
+\texttt{03} and then sends the message \textit{``1''} on line \texttt{05} to
+\textit{ep0}; and finally, task 2 sends messages \textit{``4''} and \textit{``Go''} on
+lines \texttt{04} and \texttt{06} to endpoints \textit{ep0} and
+\textit{ep1} respectively. Task 0 has additional code (lines \texttt{08} -
+\texttt{10}) to assert properties of the values in $a$ and
+$b$. The \texttt{mcapi\_wait} calls block until the associated
+send or receive buffer is able to be used. Given the scenario, we
+might ask the question: \emph{``What are the possible values of
+\texttt{a} and \texttt{b} after the scenario completes?''}
+
+Intuitively, variable \textit{a} should contain $4$ and variable
+\textit{b} should contain $1$ since task 2 must first send message \textit{``4''}
+to \textit{ep0} before it can send message \textit{``Go''} to \textit{ep1};
+consequently, task 1 is then able to send message \textit{``1''} to
+\textit{ep0}. At the end of execution the assertion on line \texttt{12}
+of task 0 holds and no error is found. Such intuition is a valid
+program execution, and the sequential trace (ignoring endpoint creation)
+is given in the first column for each
+task in \figref{fig:mcapi} starting on line \texttt{04} of task 2. This single sequential execution is not sufficient to prove correctness
+however because of concurrency as other valid traces may exist. How
+to test those other traces is the question answered in this paper.
+
+A single execution through a concurrent program can be understood as a
+concurrent trace program (CTP) which is a trace divided into its
+concurrent components including the requisite control flow on which
+the trace is valid \cite{wang:fse09}. The CTP for the trace indicated
+in the first column of each task in \figref{fig:mcapi} is shown in
+the bottom of the same figure. The CTP is more abstract than the
+original C code, and line numbers are now grouped in each command, but it retains sufficient details to reason about
+other possible executions. The assume statement on line \texttt{05}
+of task 0 preserves the control flow of the original trace. In other
+words, any alternative trace on the CTP is only valid if the assume
+statement holds; otherwise, such an execution belongs to a different
+path through the program. An SMT solver is used to enumerate the
+possible valid executions in an effort to find one that violates the
+assertion on line \texttt{05} of the CTP for our example.
+
+The novelty of the SMT encoding in this paper is its use of match
+pairs rather than the state-based or order-based encoding of prior
+work. A match pair is the coupling of a receive to a particular send.
+\figref{fig:smt}(a) is the set of possible match pairs for the CTP in
+the bottom of \figref{fig:mcapi} for our running example. The set
+admits, for example, that \texttt{rcvA} can be matched with either
+\texttt{snd1} or \texttt{snd2}. The SMT encoding in this paper asks
+the SMT solver to resolve the match pairs for the system. 
+
+Prior SMT models of MCAPI program executions implicitly compute
+match-pairs by adding possible happens-before relations on sends and
+receives with the conditions under which those orderings are
+valid. The SMT solver is then asked to resolve the happens-before
+relation by choosing specific orders of send and receives. Match-pair
+encoding, as presented in this work, though it has the same
+computational complexity as order based encoding (you still need to
+figure out match pairs on endpoints), is simpler to reason about
+directly rather than implicitly through orders, results in
+significantly fewer terms in the SMT problem, and does not restrict
+out possible matches in non-blocking actions--the order based encoding
+misses valid traces.
+
+\figref{fig:smt}(b) is the stylized SMT encoding for the CTP from our running
+example. Not shown are the definitions for \texttt{rcvA}, \texttt{rcvB}, etc.
+that are not novel to our solution but are records that group the various
+parameters for the respective send and receive calls with an event term to
+encode order. In our simple example, the send definitions only have the event
+term unconstrained. Receive definitions leave the event term, match-pair, and final
+value of the receive variable unconstrained. All of these unconstrained variables must
+be resolved by the SMT solver. The variables ending in ``\_loc'' represent the
+event variables for the correspoding MCAPI operations. The \texttt{HB} terms
+encodes constraints on the event variables to enforce program order as it
+appears in each task of the CTP. For example, by program order, \texttt{rcvA}
+happens before \texttt{rcvB} as shown in \figref{fig:smt}(b). Similarly,
+\texttt{rcvB} happens before the assume statement. Any assignment to event
+variables must comply with program order constraints.
+
+The \texttt{MATCH} terms in \figref{fig:smt}(b) add constraints
+requisite with the specified match pair: the send and
+receive endpoints must be the same, the send value must appear in the
+receive variable, the send and receive events must be ordered
+appropriately, and the two events must be matched together. For
+example, matching \texttt{rcvA} with \texttt{snd3} forces the variable
+$a$ to have the value 1. The \texttt{MATCH} function encodes this
+relationship. The \texttt{ne} term prevents the SMT solver from
+finding solutions that use conflicting match pairs. In our example,
+the \texttt{ne} term precludes \texttt{rcvA} and \texttt{rcvB} from
+matching to the same send. The assume prevents the SMT solver from
+finding solutions that are not consistent with control flow, so any
+solution that has $b \leq 0$ is infeasible. Finally, the assert is negated
+as the goal is to find schedules that violate the property. In our
+example, the interest is in solutions the resolve in $a \neq 4$.
+
+The SMT encoding in \figref{fig:smt}(b) can be given to any preferred SMT
+solver and a satisfying assignment is a feasible execution that violates an
+assertion. For the example in \figref{fig:mcapi} such an execution does exist.
+The MCAPI natural language description states that the send operation
+\emph{``returns once the buffer can be reused by the application."}. As such,
+the return of the send only implies a copy-out of the message buffer
+and not a delivery to the intended endpoint; thus, an additional
+program execution places the value $1$ in variable $a$ and the value
+$4$ in variable $b$. The first column of each task in the bottom
+of the figure gives the sequential program order of each statement for the error trace, and the
+second column indicates the chosen match pair where appropriate. For example,
+step \texttt{09} of the trace (found in task 0) indicates
+that the wait command on \texttt{rcvA} in line \texttt{01} matches with \texttt{snd3}.  Conversations with the
+MCAPI designers confirm the intended behavior of the API to include
+both program executions of the scenario. To date, there have been
+three published verification and analysis tools purpose-built for
+MCAPI that omit this less intuitive program
+execution~\cite{sharma:fmcad09,elwakil:padtad10,elwakil:atva10}.
+
+Finally, since the computation of match-pairs is expensive to do
+precisely, our solution includes the ability to overapproximate the
+match-pair set, and then validate satisfying assignments from the SMT
+solver to see if they use only feasible match pairs. Such validation
+is accomplished by creating a model of the MCAPI library with full
+operational semantics. The model is able to detect bad match pairs in
+a given program trace. The bad match-pairs can be omitted from the SMT
+encoding and the SMT solver re-run to see if another solution exists.
+The framework provides a CEGAR loop for MCAPI trace verification. The
+remainder of this paper details our MCAPI trace model, encoding, and
+an algorithm to compute a precise match pair set.
+
+\begin{figure*}
+\begin{center}
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}[t]{c|c|c}
+Task 0 & Task 1 & Task 2 \\
+\hline
+\scalebox{0.5}{\usebox{\boxTZero}} &
+\scalebox{0.5}{\usebox{\boxTOne}}  &
+\scalebox{0.5}{\usebox{\boxTTwo}}  \\
+& & \\
+\hline
+\scalebox{0.5}{\usebox{\boxATZero}} &
+\scalebox{0.5}{\usebox{\boxATOne}}  &
+\scalebox{0.5}{\usebox{\boxATTwo}}  
+\end{tabular}
+\end{center}
+\caption{Two versions and traces of the same concurrent system with the top using MCAPI and the bottom using the trace language abstraction derived from the execution order in the first column of the program in the top.}
+\label{fig:mcapi}
+\end{figure*}
+
+\begin{figure}
+\begin{center}
+\setlength{\tabcolsep}{25pt}
+\begin{tabular}[c]{cc}
+\scalebox{0.7}{\usebox{\boxMP}} &
+\scalebox{0.7}{\usebox{\boxSMT}} \\ \\
+(a) & (b)
+\end{tabular}
+\end{center}
+\caption{A match-pair set and SMT encoding of the system in bottom half of \figref{fig:mcapi}. (a) The match pairs based on end-points. (b) The SMT encoding where \texttt{HB} creates a \emph{happens-before} constraint, \emph{MATCH} creates a match-pair constraint, and \emph{ne} creates a constraint to preclude the use of conflicting match pairs.}
+\label{fig:smt}
+\end{figure}

@@ -21,8 +21,9 @@
   (move-list ((dst src) ... ⊥))
   (move-⊥ move-list
           ⊥)
-  (trace-entry (ploc move-⊥))
   (trace (trace-entry ...))
+  (trace-entry (ploc move-⊥))
+
   (e (op e e)
      cmd ;; Fix semantics to always return a value for a cmd (default value) (< (wait aid) (x := e)) allowed?
      x
@@ -67,7 +68,7 @@
        ⊥)
   (q ([aid -> v-⊥] ...))
   (q-set mt 
-         q-set [dst -> q])
+         (q-set [dst -> q]))
   
   ; Map of aid -> ep 
   (aid-map ((aid ep) ... ))
@@ -87,8 +88,8 @@
           error)     ;impossible to execute
   
   (machine-state (h eta aid-map pending-s pending-r q-set ctp trace status smt))
-  (queue-state (pending-s q-set (src,dst) status))
-  (expr-state (h eta aid-map pending-s pending-r q-set push-move-⊥ e status k smt))
+  (queue-state (pending-s q-set move-⊥ status))
+  (expr-state (h eta aid-map pending-s pending-r q-set e status k smt))
   (k ret
      (assert * -> k)
      (assume * -> k)
@@ -138,7 +139,7 @@
               (thread_0 ... ([ploc_1 cmd_1] ... ⊥) thread_2 ...)
               (trace-entry_1 ...) status_prpr smt_prpr)
         "Machine Step for queue movement"
-        (where (pending-s_pr q-set_pr ⊥ status_pr)
+        (where (pending-s_pr q-set_pr move-⊥_pr status_pr)
                ,(apply-reduction-relation** queue-reductions
                                             (term (pending-s q-set move-⊥ status))))
        ; "Machine Step"
@@ -158,8 +159,8 @@
    lang
    #:domain queue-state
    
-   (--> (pending-s q-set ((src dst) (src_0 dst_0) ... ⊥) status)
-        (pending-s_pr q-set_pr ((src_0 dst_0) ... ⊥) status_pr)
+   (--> (pending-s q-set ((dst src) (dst_0 src_0) ... ⊥) status)
+        (pending-s_pr q-set_pr ((dst_0 src_0) ... ⊥) status_pr)
         "Process queue movement"
         (where (pending-s_pr aid v status_pr) (remove-send src dst pending-s status))
         (where q-set_pr (add-send-pr dst aid v q-set status_pr)))
@@ -243,7 +244,7 @@
    (--> (h eta aid-map pending-s pending-r q-set (wait aid) status k smt)
         (h eta aid-map pending-s pending-r q-set true status k smt)
         "Sendi Wait Cmd"
-        (where (find-recv aid) 'false))
+        (where false (find-recv pending-r aid) ))
    
    ;;Match on the receive wait
    ;; TODO: add the last structure to the state and update the smt problem and last as
@@ -262,25 +263,18 @@
    (--> (h eta aid-map pending-s pending-r q-set (wait aid_r) 
            status k (defs (any_a ...)))
         (h_pr eta aid-map_pr pending-s pending-r_pr q-set_pr true 
-              status_prpr k
-              (defs ((HB (select aid-⊥_s-last match_po) (select aid_s match_po))
-                     (MATCH aid_r aid_s) any_a ...)))
+              status_pr k
+              (defs ((MATCH aid_r aid_s) any_a ...)))
+;        (h eta aid-map_0 pending-s pending-r q-set true 
+;              status k
+;              (defs ((MATCH aid_r ) any_a ...)))
         "Recvi Wait Cmd"
-        (where (find-recv aid_r) 'true)
-        (where (aid-map_0 dst_r) (get-ep aid-map aid_r))
-        ;; get recv and corresponding send command, mark each send in front of the destination send (by set variable "mark" to 1)
+            ;; get recv and corresponding send command, mark each send in front of the destination send (by set variable "mark" to 1)
+        (where true (find-recv pending-r aid_r) )
+        (where (aid-map_0 dst_r) (get-ep aid-map aid_r)) 
         (where (h_pr aid_s pending-r_pr q-set_pr status_pr) 
-               (get-mark-remove h eta aid-map pending-r q-set dst_r aid_r status))
-        
-        
-        
-;        (where (pending-r_pr [aid_r0 -> x_r]) (get-recv pending-r dst_r))
-;        (where (aid-map_pr src_s) (get-ep aid-map_0 aid_s))
-;        (where (pending-s_pr [aid_s0 -> v_s]) (get-send pending-s src_s dst_r))
-;        (where h_pr (h-extend* h [(eta-lookup eta x_r) -> v_s]))
-;        
-;        (where (last_pr aid-⊥_s-last) (get-last-send/replace last src_s dst_r aid_s))
-        
+               (get-mark-remove h eta pending-r q-set dst_r aid_r status))
+        (where (aid-map_pr src_s) (get-ep aid-map_0 aid_s))
         )
    ))
 
@@ -374,8 +368,9 @@
 ;return the size of a set
 (define (get-size set)
   (match set
-    ['mt 0]
-    [`(,s [,key -> ,v]) (+ 1 (get-size s))]))
+    [`() 0]
+    [`([,key -> ,v]) 1]
+    [`(,s [,key -> ,v]) (+ 1 (get-size (list s)))]))
 
 ;;Finds [key -> value] in set, and returns value
 (define (get-value set key)
@@ -384,10 +379,20 @@
     [`(,s [,k -> ,value]) (if (equal? k key) value (get-value s key))]))
 
 ; get the key given a value for the set
-(define (get-key set value)
+(define (get-key set key)
   (match set
     ['mt 'null]
-    [`(,s [,key -> ,v]) (if (equal? v value) key (get-key s value))]))
+    [`(,s [,ep -> ,rset]) 
+     (let ([res (get-key-pr rset key)]) 
+       (if (equal? res 'null) (get-key s key) res))]
+    ;[`(,s [,ep -> `(,rset [,rkey -> ,var])]) 'null]
+    ))
+
+(define (get-key-pr rset key)
+  (match rset
+    [`() 'null]
+    [`([,rkey -> ,var]) (if (equal? rkey key) rkey 'null)]
+    [`(,s [,rkey -> ,var]) (if (equal? rkey key) rkey (get-key-pr (list s) key))]))
 
 ;;Finds [key -> value] and modifies to [key -> v] or makes new entry,
 ;;then returns the new set
@@ -398,52 +403,13 @@
      (if (equal? k key) `(,s [,k -> ,v]) 
          (list (set-value s key v) `[,k -> ,value]))]))
 
+
 ;remove the first item in the set
 (define (remove-first set)
   (match set
-    ['mt `mt]
-    [`(,s [,k ->,value]) `(,s ,k ,value)]))
+    [`(,s [,k ->,value]) `((,s) ,k ,value)]
+    [`([,k -> ,value]) `(,empty ,k ,value)]))
 
-
-;(define-metafunction lang
-;  mark-get-value : send-set recv-set aid h eta status -> (send-set recv-set aid h status)
-;  [(mark-get-value send-set recv-set aid h eta status)
-;  ,(match `(,(term send-set) ,(term recv-set)) 
-;    [`('mt 'mt) `(,(term send-set) ,(term recv-set) 'null ,(term h) (term error))]
-;    [`(`(,s [,aid_s -> (,v ,mark)]) `(,r [,aid_r -> ,x]))
-;       (if(equal? (term status) (term error))
-;          `(,(term send-set) ,(term recv-set) 'null ,(term h) (term error)) 
-;          (if (equal? aid_r (term aid))
-;              (if (equal? mark 1)
-;               `(,s ,r ,aid_s ,(term h) ,(term status))
-;               `(,s ,r ,aid_s ,(term (h-extend* h [(eta-lookup eta x) -> v])) ,(term status))
-;               )
-;            (let ([res (mark-get-value s r aid h eta status)])
-;                (if (equals? mark 1)
-;                    `(,(list (car res) `[,aid_s -> (,v ,mark)]) ,(list (cadr res) `[,aid_r -> ,x]) ,(caddr res) ,(cadddr res) ,(car(cddddr res)))
-;                    `(,(list (car res) `[,aid_s -> (,v 1)]) ,(list (cadr res) `[,aid_r -> ,x]) ,(caddr res) ,(h-extend* (cadddr res) [(eta-lookup eta x) -> v]) ,(car(cddddr res)))
-;                    ))
-;           ))])])
-
-
-;get the destination send command from the send-set, and mark all the visited sends. 
-(define (mark-get-value send-set recv-set aid h eta status)
-  (match `(,send-set ,recv-set) 
-    [`('mt 'mt) `(,send-set ,recv-set 'null ,h 'error)]
-    [`(`(,s [,aid_s -> (,v ,mark)]) `(,r [,aid_r -> ,x]))
-       (if(equal? status 'error)
-          `(,send-set ,recv-set 'null ,h 'error) 
-          (if (equal? aid_r aid)
-              (if (equal? mark 1)
-               `(,s ,r ,aid_s ,h ,status)
-               `(,s ,r ,aid_s ,(term (h-extend* h [(eta-lookup eta x) -> v])) ,status)
-               )
-            (let ([res (mark-get-value s r aid h eta status)])
-                (if (equal? mark 1)
-                    `(,(list (car res) `[,aid_s -> (,v ,mark)]) ,(list (cadr res) `[,aid_r -> ,x]) ,(caddr res) ,(cadddr res) ,(car(cddddr res)))
-                    `(,(list (car res) `[,aid_s -> (,v 1)]) ,(list (cadr res) `[,aid_r -> ,x]) ,(caddr res) ,(term (h-extend* (cadddr res) [(eta-lookup eta x) -> v])) ,(car(cddddr res)))
-                    ))
-           ))]))
 
 
 (define-metafunction lang
@@ -472,12 +438,12 @@
 
 ;if aid is in pending-r, return true; otherwise, return false
 (define-metafunction lang
-  find-recv : aid -> bool
-  [(find-recv aid)
+  find-recv : pending-r aid -> bool
+  [(find-recv pending-r aid)
    ,(let ([res (get-key (term pending-r) (term aid))])
       (if (equal? res 'null)
-          'false
-          'true))]) 
+          (term false)
+          (term true)))]) 
 
 (define-metafunction lang
   add-recv : pending-r (aid -> dst x) -> pending-r
@@ -491,33 +457,65 @@
 
 ;add send to q-set
 (define-metafunction lang
-  add-send-pr : q-set (aid -> dst v) status -> q-set
-  [(add-send-pr q-set (aid -> dst v) status)
+  add-send-pr :  dst aid v q-set status -> q-set
+  [(add-send-pr dst aid v q-set status)
    ,(if (equal?  (term status) (term error)) 
         (term q-set)
         (let ([send-set (get-value (term q-set) (term dst))])
           (if (or (equal? send-set 'null) (empty? send-set))
               (set-value (term q-set) (term dst)
-                         (list `(,(term aid) -> (,(term v) 0))))
+                         (list `(,(term aid) -> ,(term v))))
               (set-value (term q-set) (term dst)
-                         (my-append send-set `(,(term aid) -> (,(term v) 0)))))))])
+                         (my-append send-set `(,(term aid) -> ,(term v)))))))])
+
+
+;get the destination send command from the send-set, and mark all the visited sends. 
+(define-metafunction lang
+  mark-get-value : send-set recv-set aid h eta status -> (send-set recv-set aid h status)
+  [(mark-get-value send-set recv-set aid h eta status)
+   ,(match `(,(term send-set) ,(term recv-set))
+      [`(() ()) `(,(term send-set) ,(term recv-set) 'null ,(term h) (term error))]
+      [`(([,aid_s -> ,v ]) ([,aid_r -> ,x]))
+     (if(equal? (term status) (term error))
+          `(,(term send-set) ,(term recv-set) 'null ,(term h) ,(term error)) 
+          (if (equal? aid_r (term aid))
+              (if (equal? v (term ⊥))
+               `(() () ,aid_s ,(term h) ,(term status))
+               `(() () ,aid_s  ,(term (h-extend*  h [(eta-lookup eta ,x) -> ,v])) ,(term status))
+               )
+            `(,(term send-set) ,(term recv-set) 'null ,(term h) ,(term error))
+           ))]
+      [`((,s [,aid_s -> ,v ]) (,r [,aid_r -> ,x]))
+       (if(equal? (term status) (term error))
+          `(,(term send-set) ,(term recv-set) 'null ,(term h) ,(term error)) 
+          (if (equal? aid_r (term aid))
+              (if (equal? v (term ⊥))
+               `(,(list s) ,(list r) ,aid_s ,(term h) ,(term status))
+               `(,(list s) ,(list r) ,aid_s  ,(term (h-extend*  h [(eta-lookup eta ,x) -> ,v])) ,(term status))
+               )
+            (let ([res (term (mark-get-value ,(list s) ,(list r) aid h eta status))])
+                (if (equal? v (term ⊥))
+                    `(,(append (car res) `([,aid_s -> ,(term ⊥) ])) ,(append (cadr res) `([,aid_r -> ,x])) ,(caddr res) ,(cadddr res) ,(car(cddddr res)))
+                    `(,(append (car res) `([,aid_s -> ,(term ⊥) ])) ,(append (cadr res) `([,aid_r -> ,x])) ,(caddr res) ,(term (h-extend* ,(cadddr res) [(eta-lookup eta ,x) -> ,v])) ,(car(cddddr res)))
+                    ))
+           ))]
+      )])
 
 ;get the matched send given dst and the recv command, remove them from pending-r and q-set, and mark all the visited sends.
 (define-metafunction lang
-  get-mark-remove : h eta aid-map pending-r q-set dst aid status -> (h aid pending-r q-set status)
-  [(get-mark-remove aid-map pending-r q-set dst aid status)
+  get-mark-remove : h eta pending-r q-set dst aid status -> (h aid pending-r q-set status)
+  [(get-mark-remove h eta pending-r q-set dst aid status)
    ,(let ([recv-set (get-value (term pending-r) (term dst))])
       (let ([send-set (get-value (term q-set) (term dst))])
-      (if (or (equal? (get-size (term recv-set)) 0) (equal? (get-size (term send-set)) 0))
+      (if (or (equal? (get-size recv-set) 0) (equal? (get-size send-set) 0))
         `(,(term h) 'null ,(term pending-r) ,(term q-set) ,(term error))
-        (if (equal? (get-size (term recv-set)) (get-size (term send-set)))
-            (let ([res (mark-get-value (term send-set) (term recv-set) (term aid) (term h) (term eta) (term status))])
+        (if (equal? (get-size  recv-set) (get-size  send-set))
+            (let ([res (term (mark-get-value ,send-set ,recv-set aid h eta status))])
               (if (equal? (car(cddddr res)) (term error))
                   `(,(term h) 'null ,(term pending-r) ,(term q-set) ,(term error))
-                  `(,(cadddr res) ,(caddr res) ,(cadr res) ,(car res) ,(car(cddddr res)))))
+                  `(,(cadddr res) ,(caddr res) ,(set-value (term pending-r) (term dst) (cadr res)) ,(set-value (term q-set) (term dst) (car res)) ,(car(cddddr res)))))
             `(,(term h) 'null ,(term pending-r) ,(term q-set) ,(term error))))))
    ])
-
 
 
 (define-metafunction lang
@@ -550,7 +548,7 @@
                 (let ([send-entry (remove-first send-set)])
                           `(,(set-value (term pending-s)(term dst)
                            (set-value fset (term src)
-                                      (car send-entry))) ,(cadr send-entry) ,(cddr send-entry) ,(term status)))))))])
+                                      (car send-entry))) ,(cadr send-entry) ,(caddr send-entry) ,(term status)))))))])
 
 (define-metafunction lang
   make-send : aid src dst x ploc number -> any
@@ -587,6 +585,7 @@
   [(apply-op <= number_l number_r) ,(->bool (<= (term number_l) (term number_r)))])
 
 (define (my-append l x)
-    (if (empty? l)
-        (cons x l)
-        (cons (car l) (my-append (cdr l) x))))
+  (match l
+    ['() (append x l)]
+    [`([,k ->,value]) (list x `[,k -> ,value])]
+    [`(,s [,k ->,value]) (append (my-append (list s) x) `([,k -> ,value]))]))

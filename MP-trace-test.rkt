@@ -41,7 +41,7 @@
            [t1_2 (assert (= a 5))]
            ⊥))
          ((t0_0 ⊥) (t0_1 ⊥) (t0_2 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥))
-         success (()()))))
+         success () (()()))))
 
 ;(test-term-equal (get-last-send/replace () 0 1 send1) (([0 1 send1]) ⊥))
 ;(test-term-equal (get-last-send/replace ([0 1 send0]) 0 1 send1) (([0 1 send1]) send0))
@@ -62,6 +62,7 @@
            ⊥))
          ((t0_1 ⊥) (t0_2 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥))
          success
+         ()
          (((define t0_0 :: int))
           ((HB t0_0 t0_1)(= b 5)))
          )))
@@ -81,6 +82,7 @@
            ⊥))
          ((t0_2 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥))
          success
+         ()
          (((define t0_1 :: int) (define send1 :: send) (define t0_0 :: int))
           ((HB t0_1 t0_2) (and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
          )))
@@ -99,6 +101,7 @@
            ⊥))
          ((t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥))
          success 
+         ()
          (((define t0_2 :: int)(define t0_1 :: int)(define send1 :: send)(define t0_0 :: int))
           ((HB t0_1 t0_2)(and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
          )))
@@ -116,6 +119,7 @@
            ⊥))
          ((t1_1 ((1 0) ⊥)) (t1_2 ⊥))
          success
+         ()
          (((define t1_0 :: int)(define recvA :: recv)(define t0_2 :: int)(define t0_1 :: int)(define send1 :: send)(define t0_0 :: int))
           ((HB t1_0 t1_1)(and (= (select recvA ep) 1) (= (select recvA event) t1_0) (= (select recvA var) a))(HB t0_1 t0_2)(and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
          )))
@@ -157,10 +161,10 @@
            ⊥))
          ((t1_2 ⊥))
          success 
+         ([0 1 send1])
          (((define t1_1 :: int)(define t1_0 :: int)(define recvA :: recv)(define t0_2 :: int)(define t0_1 :: int)(define send1 :: send)(define t0_0 :: int))
-          ((HB t1_1 t1_2)(MATCH recvA send1)(HB t1_0 t1_1)(and (= (select recvA ep) 1) (= (select recvA event) t1_0) (= (select recvA var) a))(HB t0_1 t0_2)(and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
+          ((HB t1_1 t1_2)(HB (select ⊥ match_po) (select send1 match_po))(MATCH recvA send1)(HB t1_0 t1_1)(and (= (select recvA ep) 1) (= (select recvA event) t1_0) (= (select recvA var) a))(HB t0_1 t0_2)(and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
          )))
-
 
 
 (define mstate7a
@@ -174,8 +178,9 @@
           (⊥))
          ()
          success
+         ([0 1 send1])
          (((define t1_2 :: int)(define t1_1 :: int)(define t1_0 :: int)(define recvA :: recv)(define t0_2 :: int)(define t0_1 :: int)(define send1 :: send)(define t0_0 :: int))
-          ((not (= a 5))(HB t1_1 t1_2)(MATCH recvA send1)(HB t1_0 t1_1)(and (= (select recvA ep) 1) (= (select recvA event) t1_0) (= (select recvA var) a))(HB t0_1 t0_2)(and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
+          ((not (= a 5))(HB t1_1 t1_2)(HB (select ⊥ match_po) (select send1 match_po))(MATCH recvA send1)(HB t1_0 t1_1)(and (= (select recvA ep) 1) (= (select recvA event) t1_0) (= (select recvA var) a))(HB t0_1 t0_2)(and (= (select send1 ep) 1) (= (select send1 event) t0_1) (= (select send1 value) b) (= (select send1 id) 1)) (HB t0_0 t0_1) (= b 5)))
          )))
 
 
@@ -189,7 +194,7 @@
          mt
          (assert (= a 4))
          success
-         ret  (()()))))
+         ret () (()()))))
 
 (define estate2c
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -200,7 +205,7 @@
          mt
          (= a 4)
          success
-         (assert * -> ret) (()((not (= a 4)))))))
+         (assert * -> ret) () (()((not (= a 4)))))))
 
 (define estate3c
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -211,7 +216,7 @@
          mt
          a
          success
-         (= * 4 -> (assert * -> ret)) (()((not (= a 4)))))))
+         (= * 4 -> (assert * -> ret)) () (()((not (= a 4)))))))
 
 (define estate4c
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -222,7 +227,7 @@
          mt
          5
          success
-         (= * 4 -> (assert * -> ret)) (()((not (= a 4)))))))
+         (= * 4 -> (assert * -> ret)) () (()((not (= a 4)))))))
 
 (define estate5c
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -233,7 +238,7 @@
          mt
          4
          success
-         (= 5 * -> (assert * -> ret)) (()((not (= a 4)))))))
+         (= 5 * -> (assert * -> ret)) () (()((not (= a 4)))))))
 
 (define estate6c
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -244,7 +249,7 @@
          mt
          false
          success
-         (assert * -> ret)(()((not (= a 4)))))))
+         (assert * -> ret) () (()((not (= a 4)))))))
 
 (define estate7c
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -255,7 +260,7 @@
          mt
          false
          failure
-         ret (()((not (= a 4)))))))
+         ret () (()((not (= a 4)))))))
 
 (define estate-lt1
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -266,7 +271,7 @@
          mt
          5
          success
-         (< 4 * -> ret)  (()()))))
+         (< 4 * -> ret) () (()()))))
 
 (define estate-lt2
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -277,7 +282,7 @@
          mt
          true
          success
-         ret  (()()))))
+         ret () (()()))))
 
 (define estate-ine1
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -288,7 +293,7 @@
          mt
          5
          success
-         (/= 4 * -> ret) (()()))))
+         (/= 4 * -> ret) () (()()))))
 
 (define estate-ine2
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -299,7 +304,7 @@
          mt
          true
          success
-         ret (()()))))
+         ret () (()()))))
 
 (define estate-bne1
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -310,7 +315,7 @@
          mt
          false
          success
-         (/= true * -> ret) (()()))))
+         (/= true * -> ret) () (()()))))
 
 (define estate-bne2
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -321,7 +326,7 @@
          mt
          true
          success
-         ret  (()()))))
+         ret () (()()))))
 
 (define estate-add1
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -332,7 +337,7 @@
          mt
          23
          success
-         (+ 19 * -> ret) (()()))))
+         (+ 19 * -> ret) () (()()))))
 
 (define estate-add2
   (term (((mt [0 -> 5]) [1 -> 5])
@@ -343,7 +348,7 @@
          mt
          42
          success
-         ret  (()()))))
+         ret () (()()))))
 
 
 
@@ -356,7 +361,7 @@
 (define myk (term ret))
 
 (define mycombo
-  (term (,myh ,myeta () mt mt mt ,mye ,mystatus ,myk (()()))))
+  (term (,myh ,myeta () mt mt mt ,mye ,mystatus ,myk () (()()))))
 
 (define estate1a
   (term (((mt [0 -> 0]) [1 -> 0])
@@ -367,7 +372,7 @@
          mt
          (a := true)
          success
-         ret  (()()))))
+         ret () (()()))))
 
 (define estate2a
   (term (((mt [0 -> 0]) [1 -> 0])
@@ -378,7 +383,7 @@
          mt
          true
          success
-         (a := * -> ret) (()((= a true))))))
+         (a := * -> ret) () (()((= a true))))))
 
 (define estate3a
   (term (((mt [0 -> 0]) [1 -> true])
@@ -389,7 +394,7 @@
          mt
          true
          success
-         ret  (()((= a true))))))
+         ret () (()((= a true))))))
 
 
 (define estate1z
@@ -401,7 +406,7 @@
          ((mt [0 -> ([send2 -> 4])]) [1 -> ([send1 -> 5])])
          (wait recvA)
          success
-         ret (()()))))
+         ret () (()()))))
 
 
 (define estate3z
@@ -413,7 +418,7 @@
          ((mt [0 -> ([send2 -> 4])]) [1 -> ()])
          true
          success
-         ret (()((MATCH recvA send1))))))
+         ret ([0 1 send1]) (()((HB (select ⊥ match_po) (select send1 match_po))(MATCH recvA send1))))))
 
 (test-predicate (redex-match lang h) (term ,myh))
 (test-predicate (redex-match lang eta) (term ,myeta))
@@ -541,7 +546,7 @@
            [t1_4 (assert (= a 5))]
            ⊥))
          ((t0_0 ⊥) (t0_1 ⊥) (t0_2 ⊥) (t0_3 ⊥) (t0_4 ⊥) (t1_0 ⊥) (t1_1 ⊥) (t1_2 ((1 0) (1 0) ⊥)) (t1_3 ⊥) (t1_4 ⊥))
-         success (()()))))
+         success () (()()))))
 
 (define mstate2B
   (term (((((mt [0 -> 0]) [1 -> 0]) [2 -> 0]) [3 -> 10])
@@ -563,6 +568,7 @@
            ⊥))
          ((t0_1 ⊥) (t0_2 ⊥) (t0_3 ⊥) (t0_4 ⊥) (t1_0 ⊥) (t1_1 ⊥) (t1_2 ((1 0) (1 0) ⊥)) (t1_3 ⊥) (t1_4 ⊥))
          success
+         ()
          (((define t0_0 :: int)(define send1 :: send))
           ((HB t0_0 t0_1)(and (= (select send1 ep) 1) (= (select send1 event) t0_0) (= (select send1 value) d) (= (select send1 id) 1)))
           ))))
@@ -586,6 +592,7 @@
            ⊥))
          ((t0_2 ⊥) (t0_3 ⊥) (t0_4 ⊥) (t1_0 ⊥) (t1_1 ⊥) (t1_2 ((1 0) (1 0) ⊥)) (t1_3 ⊥) (t1_4 ⊥))
          success
+         ()
          (((define t0_1 :: int)(define t0_0 :: int)(define send1 :: send))
           ((HB t0_1 t0_2)(= c 5)(HB t0_0 t0_1)(and (= (select send1 ep) 1) (= (select send1 event) t0_0) (= (select send1 value) d) (= (select send1 id) 1)))
           ))))
@@ -608,6 +615,7 @@
            ⊥))
          ((t0_3 ⊥) (t0_4 ⊥) (t1_0 ⊥) (t1_1 ⊥) (t1_2 ((1 0) (1 0) ⊥)) (t1_3 ⊥) (t1_4 ⊥))
          success
+         ()
          (((define t0_2 :: int)(define send2 :: send)(define t0_1 :: int)(define t0_0 :: int)(define send1 :: send))
           ((HB t0_2 t0_3)(and (= (select send2 ep) 1) (= (select send2 event) t0_2) (= (select send2 value) c) (= (select send2 id) 2))(HB t0_1 t0_2)(= c 5)(HB t0_0 t0_1)(and (= (select send1 ep) 1) (= (select send1 event) t0_0) (= (select send1 value) d) (= (select send1 id) 1)))
           ))))
@@ -628,6 +636,7 @@
            ⊥))
          ((t1_1 ⊥) (t1_2 ((1 0) (1 0) ⊥)) (t1_3 ⊥) (t1_4 ⊥))
          success
+         ()
          (((define t1_0 :: int)
            (define recvA :: recv)
            (define t0_4 :: int)
@@ -674,6 +683,7 @@
            ⊥))
          ((t1_2 ((1 0) (1 0) ⊥)) (t1_3 ⊥) (t1_4 ⊥))
          success
+         ()
          (((define t1_1 :: int)
            (define recvB :: recv)
            (define t1_0 :: int)
@@ -725,6 +735,7 @@
            ⊥))
          ((t1_3 ⊥) (t1_4 ⊥))
          success 
+         ([0 1 send1])
          (((define t1_2 :: int)
            (define t1_1 :: int)
            (define recvB :: recv)
@@ -738,6 +749,7 @@
            (define t0_0 :: int)
            (define send1 :: send))
           ((HB t1_2 t1_3) 
+           (HB (select ⊥ match_po) (select send1 match_po)) 
            (MATCH recvA send1)
            (HB t1_1 t1_2)
            (and 
@@ -777,6 +789,7 @@
           (⊥))
          ()
          failure
+         ([0 1 send2])
          (((define t1_4 :: int)
            (define t1_3 :: int)
            (define t1_2 :: int)
@@ -793,8 +806,10 @@
            (define send1 :: send))
           ((not (= a 5))
            (HB t1_3 t1_4)
+           (HB (select send1 match_po) (select send2 match_po))
            (MATCH recvB send2)
            (HB t1_2 t1_3)
+           (HB (select ⊥ match_po) (select send1 match_po))
            (MATCH recvA send1)
            (HB t1_1 t1_2)
            (and 
@@ -871,6 +886,7 @@
          (([t0_0 (a := (+ 3 4))] ⊥)) 
          ((t0_0 ⊥)) 
          success
+         ()
          (()()))))
 
 (define addX
@@ -883,6 +899,7 @@
          ((⊥)) 
          () 
          success
+         ()
          (((define t0_0 :: int))((= a (+ 3 4)))))))
 
 (define sub1
@@ -895,6 +912,7 @@
          (([t0_0 (a := (- 3 4))] ⊥)) 
          ((t0_0 ⊥)) 
          success  
+         ()
          (()()))))
 
 (define subX
@@ -907,6 +925,7 @@
          ((⊥)) 
          () 
          success
+         ()
          (((define t0_0 :: int))((= a (- 3 4)))))))
 
 (define ne1
@@ -919,6 +938,7 @@
          (([t0_0 (a := (/= 3 4))] ⊥)) 
          ((t0_0 ⊥)) 
          success 
+         ()
          (()()))))
 
 (define neX
@@ -931,6 +951,7 @@
          ((⊥)) 
          () 
          success
+         ()
          (((define t0_0 :: int))((= a (/= 3 4)))))))
 
 (define ass1
@@ -943,6 +964,7 @@
          (([t0_0 (assume (= (+ a b) 4))] ⊥))
          ((t0_0 ⊥)) 
          success
+         ()
          (()()))))
 
 (define assX
@@ -955,6 +977,7 @@
          ((⊥)) 
          () 
          infeasable 
+         ()
          (((define t0_0 :: int))((= (+ a b) 4))))))
 
 (define ass1-e
@@ -967,7 +990,9 @@
          (assume (= 2 3))
          success 
          ret
+         ()
          (()()))))
+
 (define ass2-e
   (term (((mt [0 -> 2]) [1 -> 5])
          ((mt [a -> 0]) [b -> 1]) 
@@ -976,8 +1001,9 @@
          mt 
          mt
          (= 2 3) 
-         success 
+         success
          (assume * -> ret) 
+         ()
          (()((= 2 3))))))
 (define ass3-e
   (term (((mt [0 -> 2]) [1 -> 5])
@@ -989,6 +1015,7 @@
          2 
          success 
          (= * 3 -> (assume * -> ret))
+         ()
          (()((= 2 3))))))
 (define ass4-e
   (term (((mt [0 -> 2]) [1 -> 5]) 
@@ -997,9 +1024,10 @@
          mt 
          mt 
          mt 
-         3 
-         success 
+         3
+         success
          (= 2 * -> (assume * -> ret)) 
+         ()
          (()((= 2 3))))))
 (define ass5-e
   (term (((mt [0 -> 2]) [1 -> 5]) 
@@ -1011,6 +1039,7 @@
          false 
          success 
          (assume * -> ret) 
+         ()
          (()((= 2 3))))))
 (define ass6-e
   (term (((mt [0 -> 2]) [1 -> 5]) 
@@ -1021,6 +1050,7 @@
          false 
          infeasable 
          ret 
+         ()
          (()((= 2 3))))))
 
 (test-predicate (redex-match lang machine-state) (term ,add1))
@@ -1091,7 +1121,7 @@
            [t1_3 (assert (= a 5))]
            ⊥))
          ((t0_0 ⊥) (t0_1 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥) (t1_3 ⊥))
-         success  (()()))))
+         success () (()()))))
 
 (define example2
   (term (((mt [0 -> 4]) [1 -> 0])
@@ -1108,7 +1138,7 @@
            [t1_3 (assert (= a 5))]
            ⊥))
          ((t0_1 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥) (t1_3 ⊥))
-         success (((define t0_0 :: int) (define send1 :: send)) ((HB t0_0 t0_1) (and (= (select send1 ep) 1) (= (select send1 event) t0_0) (= (select send1 value) b) (= (select send1 id) 1)))))))
+         success () (((define t0_0 :: int) (define send1 :: send)) ((HB t0_0 t0_1) (and (= (select send1 ep) 1) (= (select send1 event) t0_0) (= (select send1 value) b) (= (select send1 id) 1)))))))
 
 (test-predicate (redex-match lang machine-state) (term ,example1))
 (test-predicate (redex-match lang machine-state) (term ,example2))
@@ -1138,7 +1168,7 @@
            [t2_1 (wait send2)]
            ⊥))
          ((t0_0 ⊥) (t2_0 ⊥) (t1_0 ⊥) (t1_1 ⊥) (t1_3 ((1 0) (1 2) ⊥)) (t1_4 ⊥) (t2_1 ⊥) (t0_1 ⊥) (t1_5 ⊥) (t1_6 ⊥))
-         success (()()))))
+         success () (()()))))
 
 (define justBefore
     (term (((((mt (0 -> 4)) (1 -> 8)) (2 -> 0)) (3 -> 0)) 
@@ -1154,7 +1184,7 @@
              (t1_6 (assert (= d 8))) ⊥) 
             ((t2_1 (wait send2)) ⊥)) 
            ((t1_3 ((1 0) (1 2) ⊥)) (t1_4 ⊥) (t2_1 ⊥) (t0_1 ⊥) (t1_5 ⊥) (t1_6 ⊥)) 
-           success (()()))))
+           success () (()()))))
 
 (define justBefore-es
   (term (((((mt (0 -> 4)) (1 -> 8)) (2 -> 0)) (3 -> 0)) 
@@ -1164,7 +1194,7 @@
          (mt (1 -> ((recvD -> d) (recvC -> c))))
          (mt (1 -> ((send2 -> 8) (send1 -> 4))))
          (wait recvC) 
-         success ret (()()))))
+         success ret () (()()))))
 
 (define waitRelax2
   (term (((((mt [0 -> 4]) [1 -> 8]) [2 -> 0] ) [3 -> 0])
@@ -1187,7 +1217,7 @@
            [t2_1 (wait send2)]
            ⊥))
          ((t0_0 ⊥) (t2_0 ⊥) (t1_0 ⊥) (t1_1 ⊥) (t1_3 ((1 0) (1 2) ⊥)) (t1_4 ⊥) (t2_1 ⊥) (t0_1 ⊥) (t1_5 ⊥) (t1_6 ⊥))
-         success (()()))))
+         success () (()()))))
 
 (test-predicate (redex-match lang machine-state) (term ,waitRelax))
 (test-predicate (redex-match lang machine-state) (term ,justBefore))
@@ -1266,6 +1296,7 @@ mt
 )
 ((t2_0 ⊥) (t2_1 ⊥) (t1_0 ⊥) (t1_1 ((1 2) ⊥)) (t1_2 ⊥) (t1_3 ⊥) (t2_2 ⊥) (t2_3 ⊥) (t0_0 ⊥) (t0_1 ((0 1) (0 2) ⊥)) (t0_2 ⊥) (t0_3 ⊥) (t0_4 ⊥) (t0_5 ⊥))
 success
+()
 (()()))
 ))
 
@@ -1303,6 +1334,7 @@ mt
 )
 ((t1_0 ⊥) (t1_1 ⊥) (t0_0 ⊥) (t0_1 ((0 1) ⊥)) (t0_2 ⊥)) 
 success
+()
 (()()))
 ))
 
@@ -1335,6 +1367,7 @@ mt
 )
 ((t0_0 ⊥) (t0_1 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥)) 
 success
+()
 (()()))
 ))
 

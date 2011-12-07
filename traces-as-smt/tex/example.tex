@@ -28,14 +28,14 @@
 \begin{lrbox}{\boxATZero}
 \begin{minipage}[t]{0.65\linewidth}
 \begin{alltt}
-08 00        (00 (rcvi rcvA 0 a))
-09 (01 snd3) (01 (wait rcvA))
-              
-10 02        (02 (rcvi rcvB 0 b))
-11 (03 snd1) (03 (wait rcvB))
+08 0_0        (0_0 (rcvi rcvA 0 a))
+09 (0_1 (0 1)) (0_1 (wait rcvA))
 
-12 04        (04 (assume (> b 0)))
-13 05        (05 (assert (= a 4)))
+10 0_2        (0_2 (rcvi rcvB 0 b))
+11 (0_3 (0 2)) (0_3 (wait rcvB))
+
+12 0_4        (0_4 (assume (> b 0)))
+13 0_5        (0_5 (assert (= a 4)))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -63,11 +63,11 @@
 \begin{lrbox}{\boxATOne}
 \begin{minipage}[t]{0.65\linewidth}
 \begin{alltt}
-04 01        (01 (rcvi rcvC 1 c))
-05 (02 snd2) (02 (wait rcvC))
+04 1_1        (1_1 (rcvi rcvC 1 c))
+05 (1_2 (1 2)) (1_2 (wait rcvC))
 
-06 03        (03 (sndi snd3 1 0 0x1))
-07 04        (wait snd3)
+06 1_3        (1_3 (sndi snd3 1 0 0x1))
+07 1_4        (1_4 (wait snd3))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -86,7 +86,7 @@
 
 02 06 msg_send_i(ep2,ep1,"Go",3,N,&snd2,&s);
 03 07 wait(&snd2,&size,&status,MCAPI_INF);
-   08 
+   08
    09 finalize(&s);
 \end{alltt}
 \end{minipage}
@@ -96,11 +96,11 @@
 \begin{lrbox}{\boxATTwo}
 \begin{minipage}[t]{0.65\linewidth}
 \begin{alltt}
-00 00        (00 (sndi snd1 2 0 0x4))
-01 01        (01 (wait snd1))
+00 2_0        (2_0 (sndi snd1 2 0 0x4))
+01 2_1        (2_1 (wait snd1))
 
-02 02        (02 (sndi snd2 2 1 0x476f00))
-03 03        (03 (wait snd2))
+02 2_2        (2_2 (sndi snd2 2 1 0x476f00))
+03 2_3        (2_3 (wait snd2))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -125,11 +125,17 @@
 \begin{lrbox}{\boxSMT}
 \begin{minipage}[c]{0.4\linewidth}
 \begin{alltt}
-(HB rcvA_loc rcvB_loc)
-(HB rcvB_loc assume_loc)
+(HB rcvA_loc wait_rcvA_loc)
+(HB wait_rcvA_loc rcvB_loc)
+(HB rcvB_loc wait_rcvB_loc)
+(HB wait_rcvB_loc assume_loc)
 (HB assume_loc assert_loc)
-(HB rcvC_loc snd3_loc)
-(HB snd1_loc snd2_loc)
+(HB rcvC_loc wait_rcvC_loc)
+(HB wait_rcvC_loc snd3_loc)
+(HB snd3_loc wait_snd3_loc)
+(HB snd1_loc wait_snd1_loc)
+(HB wait_snd1_loc snd2_loc)
+(HB snd2_loc wait_snd2_loc)
 
 (or (MATCH rcvA snd3)
     (MATCH rcvA snd1))
@@ -145,7 +151,7 @@
 \end{minipage}
 \end{lrbox}
 % ---------------------------------------------------------------------
-% END Save boxes 
+% END Save boxes
 % ---------------------------------------------------------------------
 
 \section{Example}
@@ -191,14 +197,16 @@ concurrent components including the requisite control flow on which
 the trace is valid \cite{wang:fse09}. The CTP for the trace indicated
 in the first column of each task in \figref{fig:mcapi} is shown in
 the bottom of the same figure. The CTP is more abstract than the
-original C code, and line numbers are now grouped in each command, but it retains sufficient details to reason about
-other possible executions. The assume statement on line \texttt{05}
+original C code, and line numbers are now grouped into a program location
+(where the number in front of ``\_'' is the thread number and the number behind is the command line)
+in each command, but it retains sufficient details to reason about
+other possible executions. The assume statement on program location \texttt{0\_5}
 of task 0 preserves the control flow of the original trace. In other
 words, any alternative trace on the CTP is only valid if the assume
 statement holds; otherwise, such an execution belongs to a different
 path through the program. An SMT solver is used to enumerate the
 possible valid executions in an effort to find one that violates the
-assertion on line \texttt{05} of the CTP for our example.
+assertion on program location \texttt{0\_5} of the CTP for our example.
 
 The novelty of the SMT encoding in this paper is its use of match
 pairs rather than the state-based or order-based encoding of prior
@@ -207,13 +215,13 @@ work. A match pair is the coupling of a receive to a particular send.
 the bottom of \figref{fig:mcapi} for our running example. The set
 admits, for example, that \texttt{rcvA} can be matched with either
 \texttt{snd1} or \texttt{snd2}. The SMT encoding in this paper asks
-the SMT solver to resolve the match pairs for the system. 
+the SMT solver to resolve the match pairs for the system.
 
 Prior SMT models of MCAPI program executions implicitly compute
 match-pairs by adding possible happens-before relations on sends and
 receives with the conditions under which those orderings are
 valid. The SMT solver is then asked to resolve the happens-before
-relation by choosing specific orders of send and receives. Match-pair
+relation by choosing specific orders of sends and receives. Match-pair
 encoding, as presented in this work, though it has the same
 computational complexity as order based encoding (you still need to
 figure out match pairs on endpoints), is simpler to reason about
@@ -226,15 +234,15 @@ misses valid traces.
 example. Not shown are the definitions for \texttt{rcvA}, \texttt{rcvB}, etc.
 that are not novel to our solution but are records that group the various
 parameters for the respective send and receive calls with an event term to
-encode order. In our simple example, the send definitions only have the event
+encode order. In our simple example, the send definitions have the match-pair and event
 term unconstrained. Receive definitions leave the event term, match-pair, and final
 value of the receive variable unconstrained. All of these unconstrained variables must
 be resolved by the SMT solver. The variables ending in ``\_loc'' represent the
-event variables for the correspoding MCAPI operations. The \texttt{HB} terms
+event variables for the corresponding MCAPI operations. The \texttt{HB} terms
 encodes constraints on the event variables to enforce program order as it
 appears in each task of the CTP. For example, by program order, \texttt{rcvA}
-happens before \texttt{rcvB} as shown in \figref{fig:smt}(b). Similarly,
-\texttt{rcvB} happens before the assume statement. Any assignment to event
+happens before the wait command \texttt{wait\_rcvA} for \texttt{rcvA} as shown in \figref{fig:smt}(b). Similarly,
+\texttt{wait\_rcvA} happens before \texttt{rcvB}. Any assignment to event
 variables must comply with program order constraints.
 
 The \texttt{MATCH} terms in \figref{fig:smt}(b) add constraints
@@ -261,11 +269,11 @@ The MCAPI natural language description states that the send operation
 the return of the send only implies a copy-out of the message buffer
 and not a delivery to the intended endpoint; thus, an additional
 program execution places the value $1$ in variable $a$ and the value
-$4$ in variable $b$. The first column of each task in the bottom
+$4$ in variable $b$. In order to place the value of some send to a variable of a specific receive call, we apply the queue movement in the sequential execution, where the pending sends in the source task are moved to the send queue in the destination task. The first column of each task in the bottom
 of the figure gives the sequential program order of each statement for the error trace, and the
-second column indicates the chosen match pair where appropriate. For example,
+second column indicates the appropriate queue movements where the match pairs are implied. For example,
 step \texttt{09} of the trace (found in task 0) indicates
-that the wait command on \texttt{rcvA} in line \texttt{01} matches with \texttt{snd3}.  Conversations with the
+that the first item of the pending sends in task 1 is moved to the send queue in task 0, and the wait command on \texttt{rcvA} in program location \texttt{0\_1} matches with \texttt{snd3} (the first item in the send queue in task 0).  Conversations with the
 MCAPI designers confirm the intended behavior of the API to include
 both program executions of the scenario. To date, there have been
 three published verification and analysis tools purpose-built for
@@ -297,7 +305,7 @@ Task 0 & Task 1 & Task 2 \\
 \hline
 \scalebox{0.5}{\usebox{\boxATZero}} &
 \scalebox{0.5}{\usebox{\boxATOne}}  &
-\scalebox{0.5}{\usebox{\boxATTwo}}  
+\scalebox{0.5}{\usebox{\boxATTwo}}
 \end{tabular}
 \end{center}
 \caption{Two versions and traces of the same concurrent system with the top using MCAPI and the bottom using the trace language abstraction derived from the execution order in the first column of the program in the top.}

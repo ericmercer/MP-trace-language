@@ -147,7 +147,7 @@
 %           (defs (e any ...)))
 %        "Assume Pull Out Expr")
 \inferrule[Assume Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assume\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e} 
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assume\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e}
   (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assume\ * \rightarrow k)\ (\defs\ (e\ \any\ \ldots)))
 }
 \and
@@ -158,7 +158,7 @@
 %           (defs ((not e) any ...)))
 %        "Assert Pull Out Expr")
 \inferrule[Assert Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assert\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e} 
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assert\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e}
   (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assert\ * \rightarrow k)\ (\defs\ ((\negate\ e)\ \any\ \ldots)))
 }
 \and
@@ -168,7 +168,7 @@
 %           (defs ((= x e) any ...)))
 %        "Assign Pull Out Expr")
 \inferrule[Assign Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (x\ :=\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e} 
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (x\ :=\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e}
   (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (x\ :=\ * \rightarrow k)\ (\defs\ ((=\ x\ e)\ \any\ \ldots)))
 }
 \and
@@ -225,9 +225,11 @@
 %        )
 %   ))
 \inferrule[Wait (rcvi) Command]{
-    true = \findrecv(\eprcv, \aid_r) \\ (\aidmap_0\ \dst) = \getep(\aidmap, \aid_r) \\
+    ([\aid_0\ \ep_0]\ \ldots\ [\aid_r\ \dst][\aid_1\ \ep_1]) = \aidmap\\
+    \aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
     (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
-    (\aidmap_p\ \src) = \getep(\aidmap_0, \aid_s)
+    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
+    \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])
 }{
     (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k\ (\defs\ (\any_a\ \ldots))) \reduce{e} \\
     (h_p\ \eta \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k\ (\defs\ ((\HB\ (\select\ \last(\aid_s)\ match_{po})\ (\select\ \aid_s\ match_{po}))\
@@ -235,7 +237,7 @@
 }
 \end{mathpar}}
 \caption{Expression Reductions to build the SMT model of a trace language program ($\reduce{\mathrm{e-smt}}$)}
-\label{fig:expression}
+\label{fig:expression_smt}
 \end{figure}
 %%% END --- SMT Machine reductions
 %%---------------------------------------------------------------------------
@@ -312,37 +314,34 @@ occurs before the receive.
   \mathit{true} & \mathrm{if}\ M = I~\wedge \\
   & E_r = E_s~\wedge \\
   & V_r = V_s~\wedge \\
-  & \mathrm{HB}(T_s,T_r) \\
+  & \mathrm{HB}(T_s,T_r)~\wedge \\
+  & MP_r = E_r \\
   \mathit{false} & \mathrm{otherwise}\
 \end{array}
 \right . \\
 \end{equation}
 
-The $\mathrm{MATCH}$ function takes two four-tuples as parameters. The first tuple
+The $\mathrm{MATCH}$ function takes a four-tuple and a five-tuple as parameters. The first tuple
 represents the a receive operation, and the second represents a send operation.
-The two tuples are evalueted to see whether or not the two operations could
+The two tuples are evaluated to see whether or not the two operations could
 conceivably be matched.  The receive tuple, $R$, is defined as $R =
 (M,E_r,V_r,T_r)$ such that $M,E_r,V_r,T_r \in \mathbb{N}$. $M$ represents a
 free variable that is used to define a match pair. The variable must be equal
 to the corresponding value in a send tuple in order for the two operations to
 be matched. $E_r$ represents the end point of the receive operation. $V_r$
-reprensents the the value received by the receive operation. $T_r$ represents
+represents the the value received by the receive operation. $T_r$ represents
 the program order of the receive operation.
 
 The second tuple $S$ represents a send operation that is defined as $S =
-(I,E_r,V_r,T_r)$ such that $I,E_r,V_r,T_r \in \mathbb{N}$. $I$ is a unique
-assigned value that identifies each send operation. $E_r$ represents that end
-point that is being sent a message. $V_r$ contains the value being sent, and
-$T_r$ represents the program order of the receive operation.
+(I,E_r,V_r,T_r,MP_r)$ such that $I,E_r,V_r,T_r,MP_r \in \mathbb{N}$. $I$ is a unique assigned value that identifies each send operation. $E_r$ represents that end point that is being sent a message. $V_r$ contains the value being sent, $T_r$ represents the program order of the receive operation, and $MP_r$ represents a free variable that is used to define a match pair.
 
 The MATCH function creates a number of constraints that represent the pairing
 of the specified send and receive operations. This function asserts that the
 destination endpoint of the send operation is the same as the endpoint used by
 the receive operation, that the value sent by the send operation is the same
 value received by the receive operation, that the send operation occurs before
-the receive operation, and that the ``match'' value in the recveive tuple is
-equal to the ``id'' value in the send tuple, which indicates that the receiver
-operation is paired with only this send operation.
+the receive operation, that the ``match'' value in the receive tuple is
+equal to the ``id'' value in the send tuple, and that the ``match\_po" value in the send tuple is equal to the ``event" value in the receive tuple, which indicates that the receive operation is paired with only this send operation.
 
 \begin{equation}
 \mathrm{ne}(a,b) \equiv \left\{ \begin{array}{rl}
@@ -358,10 +357,10 @@ tuples. An assertion is made that the values of their ``match'' fields, $M$,
 are not equal. This shows that they are paired with two different send
 operations.
 
-The first five statments in each SMT problem in \figref{fig:smts} uses the
+The first eleven statements in each SMT problem in \figref{fig:smts} uses the
 $\mathrm{HB}$ function to assert the program order of each thread as defined by
 the CTP. The last two lines of each problem contain $\mathrm{assume}$ and
-$\mathrm{assert}$ statments. The $\mathrm{assume}$ statement is created by
+$\mathrm{assert}$ statements. The $\mathrm{assume}$ statement is created by
 asserting any branch conditions that we encountered in the trace. As was stated
 earlier, this prevents the SMT solver from finding any solutions that are not
 consistent with the program's control flow. The $\mathrm{assert}$ statement is
@@ -377,7 +376,7 @@ receive operation. For each receive operation, we assert a MATCH between any
 one of the send operations in the set of all operations that the receive could
 be matched with. In order to make sure that no two receive operations are
 matched with the same send operation, we also create an $\mathrm{ne}$ function
-call for each pair of receive statments who have a non-empty intersection
+call for each pair of receive statements who have a non-empty intersection
 between their sets of possible matching send operations.
 
 The evaluation syntax for the machine reductions to build the SMT
@@ -386,10 +385,10 @@ reductions with a few changes below
 \[
 \cfgstart
 \cfgrule{mstate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\
-  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{ctp}\ \cfgnt{\trace}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
+  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{ctp}\ \cfgnt{\trace}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
 %  (expr-state (h eta aid-map pending-s pending-r e status k smt))
 \cfgrule{estate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\
-  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{e}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
+  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{e}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
 %  (smt (defs asrts))
 \cfgrule{\smt}{\lp\cfgnt{defs}~\cfgnt{constraints}\rp}
 %  (defs (any ...))
@@ -402,7 +401,7 @@ The new syntax adds an \textit{smt} member to the \textit{mstate}
 and \textit{estate} where the ``\cfgnt{any}'' term in \textit{defs}
 and \textit{constraints} matches any structure.  The lists will
 be filled with definitions, HB entries, MATCH entries, \texttt{ne}
-entries, etc. as defined by the SMT machine reductions.
+entries, etc. as defined by the SMT machine reductions. The \textit{qstate} does not contain any SMT encodings in the reductions, so that it is not changed.
 
 There are several support functions for the SMT machine reductions.  The function $\mathrm{addHB}(((\mathit{any}_d ...)\ (\mathit{any}_c ...))\ \ploc_0\ \ploc_1)$ adds program location to the definition list and adds a happens before relation
 \[
@@ -441,6 +440,34 @@ My Lemma
 \end{theorem}
 \begin{proof}
 Proof
+\end{proof}
+
+\begin{definition}
+A combinator operation for two SMT problems with an identical CTP and distinct traces, denoted by $smt$ and $smt'$ respectively, is defined as follows:\\
+\begin{enumerate}
+\item Since either of the given SMT problems simulates one(or multiple) execution(s) of the same CTP, the variable definitions, program orders, and the assume, assign and assert statements remain the same. Clone all the unchanged definitions and logical assertions into a combined SMT problem $smt_c$.
+\item For every match pair $(R, S)$ defined in $smt$ and $smt'$,
+\begin{itemize}
+\item If it is in the set of match pairs in $smt_c$, do nothing.
+\item Otherwise, add it to the match pair set in $smt_c$ by the following steps: append $(\mathrm{MATCH}\;R\;S)$ to the inclusive disjunction where $R$ is the common command in each element; for every other match pair in $smt_c$ where the $S$ occurs, add the logical assertion $(\mathrm{ne}\;R\;R')$ to $smt_c$, where $R'$ is the command that matches $S$.
+\end{itemize}
+\item After all the match pairs in $smt$ and $smt'$ are merged into $smt_c$, the combined SMT problem $smt_c$ is returned as the result of the combinator operation.
+\end{enumerate}
+\label{definition:combinator}
+\end{definition}
+
+\begin{lemma}
+For multiple well-formed machine states with an identical CTP and distinct traces, there exists a SMT problem $smt$, such that for each well-formed machine state $m$,
+\[
+\mathrm{smt}(m) = \cfgt{satisfied} \to \mathrm{smt\_status} = \cfgt{satisfied},
+\]
+where $\mathrm{smt\_status}$ is the status of $smt$.
+\end{lemma}
+\begin{proof}
+We prove it by induction.\\
+\textbf{Base case}. There is one well-formed machine state $m$. By \lemmaref{lemma:mstate_smt}, the SMT problem taken from the final SMT reduced state is what we want to construct.\\
+\textbf{Induction by $n$}. By hypothesis, there are $n$ well-formed machine states with an identical CTP and distinct traces. Also, there exists a SMT problem $smt$ such that the implication above is satisfied. To prove that there is another SMT problem $smt'$, such that it can be implied by the combination of SMT problems derived by $n+1$ machine states, we add a new well-formed machine state $m$ with the same CTP and a different trace from those of other machine states. By detecting the SMT problem $smt''$ taken from $m$, we obtain a match pair set which describes a transitivity of the CTP. Let $mp$ denote the match pair set. By applying the combinator operation defined in \defref{definition:combinator} to $smt$ and $smt''$ with match pair set $mp$, we can construct the final SMT problem $smt'$. Since $smt'$ contains the entire transitivity logic in $m$, we can conclude that $smt'$ is satisfied if the status of $m$ is $\cfgt{failure}$, which is equivalent to say that \[
+\mathrm{smt}(m) = \cfgt{satisfied} \to \mathrm{smt\_status'} = \cfgt{satisfied},\] where $\mathrm{smt\_status'}$ is the status of $smt'$.
 \end{proof}
 
 \subsection{Outline}

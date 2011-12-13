@@ -41,7 +41,7 @@
 \newcommand{\removesend}{\ensuremath{\mathrm{removesend}}}
 \newcommand{\addrecv}{\ensuremath{\mathrm{addrecv}}}
 \newcommand{\getrecv}{\ensuremath{\mathrm{getrecv}}}
-\newcommand{\removerecv}{\ensuremath{\mathrm{removerecv}}}
+\newcommand{\removerecv}{\ensuremath{\mathrm{removefrecv}}}
 \newcommand{\hextend}{\ensuremath{\mathrm{hextend}}}
 \newcommand{\hlookup}{\ensuremath{\mathrm{hlookup}}}
 \newcommand{\etalookup}{\ensuremath{\mathrm{etalookup}}}
@@ -58,7 +58,7 @@
 \newcommand{\reduceNK}[1]{\ensuremath{\dashrightarrow_{#1}^{*}}}
 \newcommand{\mt}{\ensuremath{\emptyset}}
 \newcommand{\trace}{\ensuremath{\mathit{trace}}}
-\newcommand{\movebot}{\ensuremath{\mathit{move}}}
+\newcommand{\movebot}{\ensuremath{\mathit{m}}}
 \newcommand{\ret}{\ensuremath{\mathbf{ret}}}
 
 \newsavebox{\boxLangSyntax}
@@ -293,10 +293,12 @@
 %
 %))
 \inferrule[Process Queue Movement]{
-  (\epsnd_p\ \aid_s\ v\ \status_p) = \removesend(\src, \dst, \epsnd, \status)\\
-  \qset_p = \addsend(\dst, \aid_s, v, \qset, \status)
+  ([\aid_s\ v]\ [\aid_1\ v_1]\ \ldots) = \epsnd(\dst)(\src) \\
+   \epsnd_p = [\epsnd \mid \dst \mapsto [\epsnd(\dst) \mid \src \mapsto ([\aid_1\ v_1]\ \ldots)]] \\
+   ([\aid_1\ v_1]\ \ldots) = \qset(\dst) \\
+   \qset_p = [\qset \mid \dst \mapsto ([\aid_s\ v]\ [\aid_1\ v_1]\ \ldots)]
 }{
-  (\epsnd\ \qset\ ((\dst\ \src)\ (\dst_0\ \src_0)\ \ldots\ \bot)\ \status) \reduce{q}(\epsnd_p\ \qset_p\ ((\dst_0\ \src_0)\ \ldots\ \bot)\ \status_p)
+  (\epsnd\ \qset\ ((\dst\ \src)\ (\dst_0\ \src_0)\ \ldots\ \bot)\ \status) \reduce{q}(\epsnd_p\ \qset_p\ ((\dst_0\ \src_0)\ \ldots\ \bot)\ \status)
 }
 \end{mathpar}}
 \caption{Queue Reductions ($\reduce{q}$)}
@@ -438,9 +440,7 @@
 %        (h eta aid-map pending-s pending-r q-set true status k smt)
 %        "Sendi Wait Cmd"
 %        (where false (find-recv pending-r aid) ))
-\inferrule[Wait (sndi) Command]{
-    false = \findrecv(\epsnd, \aid_s)
-}{
+\inferrule[Wait (sndi) Command]{}{
   (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_s)\ \status\ k) \reduce{e}
   (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ true\ \status\ k)
 }
@@ -460,12 +460,14 @@
 %        )
 %   ))
 \inferrule[Wait (rcvi) Command]{
-    true = \findrecv(\eprcv, \aid_r) \\ (\aidmap_0\ \dst) = \getep(\aidmap, \aid_r) \\
+    ([\aid_0\ \ep_0]\ \ldots\ [\aid_r\ \dst][\aid_1\ \ep_1]) = \aidmap\\ 
+    \aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\ 
     (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
-    (\aidmap_p\ \src) = \getep(\aidmap_0, \aid_s)
+    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
+    \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])
 }{
     (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k) \reduce{e}
-    (h_p\ \eta \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k)
+    (h_p\ \eta\ \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k)
 }
 
 \end{mathpar}}
@@ -525,12 +527,13 @@ The language defines a CTP (\textit{ctp}) as a list of threads.  A
 thread (\thread) is a list of pairs with each pair being a program
 location and a command.  For simplicity, commands (\textit{c}) are
 restricted to assume, assert, assignment, non-blocking send (\snd) and
-receive (\rcv), and wait.  The non-terminal \aid\ in the grammar is a
+receive (\rcv), and wait. The queue movement (\movebot) is either a special symbol indicating no movement or a list of move commands.
+The move list (\movelist) consists of several pairs of endpoints where the first and second endpoints are the destination and source endpoints respectively.
+Each pair in the move list refers to a queue movement such that the head item of the pending sends in the source endpoint should be moved to the send queue in the destination endpoint.
+The non-terminal \aid\ in the grammar is a
 unique string identifier associated with a send or receive command
 referred to as an action ID in the text.  The wait command takes a
-single action ID belonging to the associated send or receive action.
-The other wait command that takes two action IDs is reserved for the
-operational semantics only.  The non-terminals $\src$ and $\dst$ are
+single action ID belonging to the associated send or receive action. The non-terminals $\src$ and $\dst$ are
 source and destination endpoints respectively.  The non-terminal $\ep$
 is a number.  The terminal \textbf{x} is any string not mentioned in
 the grammar definition and represents a program variable.    Expressions (\textit{e}) are defined
@@ -540,13 +543,12 @@ using prefix notation over binary operators.  The bottom of
 thread and its commands into an appropriate list using parenthesis).
 
 A sequential trace of a CTP in the grammar is a list of trace entries
-(\traceentry).  A trace entry is either a program location (\ploc) or
-a pair consisting of a program location and an action ID.  An example
+(\traceentry).  A trace entry is a pair of consisting of a program location (\ploc) and a list of queue movement. An example
 of a trace can be seen in the bottom of \figref{fig:mcapi} in the
 second column by following the sequential order in the first column
-which starts on line \texttt{00} of task 2.  Notice that whenever the
+which starts on program location \texttt{2\_0} of task 2.  Notice that whenever the
 trace reaches a wait command on a receive action, the trace includes
-the intended send with which to match in order to resolve any
+a list of queue movement with which to move commands among the queues and to match the send action with the same index in the send queue as that of this receive action in the receive queue, in order to resolve any
 non-determinism on message orders in the program trace.  In other
 words, the trace resolves any non-determinism in scheduling or
 message buffering that is present in the CTP.
@@ -569,8 +571,8 @@ machine, members relating to the message passing model, and the trace status.  T
 $h$ (a store mapping a location $l$ to a value $v$), and $k$ (a continuation).
 Members belonging to the message passing model are
 \aidmap\ (a dictionary mapping an action ID \aid\ to an endpoint \ep),
-\epsnd\ (a store mapping any given destination endpoint \dst\ to another store which then maps any given source endpoint \src\ to a list of pairs where each pair is an action ID \aid\ and a value $v$), and
-\eprcv\ (a store mapping any given destination endpoint \dst\ to a list of pairs where each pair is an action ID \aid\ and a variable $x$).  Intuitively, \epsnd\ and \eprcv\ are endpoint queues tracking actions with associated values (sends) or variables (receives).
+\epsnd\ (a store mapping any given destination endpoint \dst\ to another store which then maps any given source endpoint \src\ to a list of pairs where each pair is an action ID \aid\ and a value $v$),
+\eprcv\ (a store mapping any given destination endpoint \dst\ to a list of pairs where each pair is an action ID \aid\ and a variable $x$) and \qset (a store mapping any given destination endpoint \dst\ to a list of pairs where each pair is an action IF \aid\ and a value $v$).  Intuitively, \epsnd\, \qset\ and \eprcv\ are endpoint queues tracking actions with associated values (sends) or variables (receives). Both \epsnd\ and \qset\ store the sends. Their difference is \epsnd\ records the source and destination endpoints, but \qset\ only records the destination endpoint. \eprcv\ and \qset\ has the similar structure so that they can be applied to store and find matched send and receive actions in machine steps.
 
 The trace status in the \textit{mstate} nine-tuple is given by
 \status\ which ranges over a lattice:
@@ -585,23 +587,22 @@ not complete.
 
 The machine reductions modify a given \textit{mstate} nine-tuple
 depending on the next command in the trace.  For example, the
-\emph{Machine Step on Wait} inference matches any \textit{mstate} with
-a thread sitting at a wait command
+\emph{Machine Step} inference matches any \textit{mstate} with
+a thread sitting at a command
 \[
-(\thread_0~\ldots~([\ploc_0~(\wait~\aid_r)]~[\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\ldots)~\thread_2~\ldots))
+(\thread_0~\ldots~([\ploc_0~\cmd_0]~[\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\ldots)~\thread_2~\ldots))
 \]
 and having the next entry in the trace match on that threads location
-$([\ploc_0~\aid_s]~\traceentry_1~\ldots)$.  A match on the inference
+$([\ploc_0~\movebot_0]~\traceentry_1~\ldots)$.  A match on the inference
 rewrites the \textit{mstate} with new entries for each member of the
-nine-tuple by applying the expression reduction relation until no
-more reductions apply (as indicated by the asterisk).  Note the use of
-the reserved version of wait that takes two action ID parameters in
-the expression to reduce.  At this point, send and receive actions are matched in the wait expression.  The inference for \textit{Machine Step} is
-defined similarly to \emph{Machine Step on Wait}.
+nine-tuple by first applying the queue reduction relation until no more reductions apply (no more queue movement are performed) and then applying the expression reduction relation until no
+more reductions apply (as indicated by the asterisk). Note the queue reductions perform the queue movement such that all send actions are moved to the destination send queue, and the matching can be processed in the expression reduction. At this point, send and receive actions are matched in the wait expression.  The inference for \textit{Machine Step} on the other commands is defined similarly.
+
+The queue reduction for each command of the queue movement list in the trace entry is given in \figref{fig:queue}. The definition of \textit{qstate}  four-tuple is presented in the evaluation syntax in \figref{fig:expr:stx}(b). The symbol $\bot$ in the queue movement \movebot\ indicates that no more queue movement follows. The pending sends \epsnd\ stores all the Sndi commands for which the expression reductions were performed. The send queue \qset\ then stores those Sndi commands indexed by the destination endpoint in the queue reductions. In the mean time, they are also removed from \epsnd\ in the reduction process. Each reduction step processes the first pair of the queue movement list and reduction steps follow until $\bot$ is shown.
 
 Expression reductions for each command in the trace language are given
 in \figref{fig:expression} and are defined over the \textit{estate}
-eight-tuple in the evaluation syntax of \figref{fig:expr:stx}(b) which
+nine-tuple in the evaluation syntax of \figref{fig:expr:stx}(b) which
 includes a continuation $k$.  The \cfgt{ret} continuation indicates
 that nothing follows, and an asterisk in a continuation is a place
 holder indication where evaluation is taking place.  For example, the
@@ -612,7 +613,7 @@ Once that expression reduces to a value, then the \emph{Assume
 
 
 The expression reductions use several helper functions.  The function \emph{op}$(v_l,v_r)$
-applies the ``op'' to the left and right operands.  The other helper functions are defined below:
+applies the ``op'' to the left and right operands. The function \emph{getMarkRemove} is described in the later paragraph. The other helper functions are defined below:
 \begin{eqnarray*}
 \checkassert(v,\status) &=& \left\{ \begin{array}{rl}
                                        \cfgt{failure} & \mathrm{if}~\status \prec \cfgt{failure}\ \wedge \\
@@ -624,11 +625,6 @@ applies the ``op'' to the left and right operands.  The other helper functions a
                                                          & v = \false \\
                                                 \status  & \mathrm{otherwise}
                                     \end{array} \right . \\
-\matchl(\aid_{r}, \aid^\prime_{r}, \aid_s, \aid^\prime_s,s) &=&  \left\{ \begin{array}{rl}
-                                                              \cfgt{\error} & \mathrm{if}~\status \prec \cfgt{\error}\ \wedge \\
-                                                                            & (\aid_r \neq \aid^\prime_r \vee \aid_s \neq \aid^\prime_s)\\
-                                       \status  & \mathrm{otherwise}
-                                    \end{array} \right .\\
 \end{eqnarray*}
 Note that the status only moves monotonically up the lattice as
 mentioned previously.  The notation $h(\eta(x))$, $\eprcv(\src)$, or
@@ -653,17 +649,10 @@ receive command being evaluated. Considering the entire rule in the figure, it a
 action ID map, \aidmap, to include the coupling between the action ID
 and its destination endpoint.
 
-The function of the \emph{Wait (Sndi) Command} rule in \figref{fig:expression} is to consume the wait command
-only.  The function of other two rules for the wait command are more involved.
-The \emph{Wait (Rcvi)--Get Receive Action} goes to $\eprcv$ to get the
-next pending receive from the list of pending receive actions on the
-specified end point $\dst$, and the rule then puts that action ID and
-variable into the continuation $k$, and creates $\eprcv_p$ to reflect
-the newly consumed receive action on the endpoint.  The \emph{Waiti
-(rcvi)} inference performs the actual update of a delivered message by
-modifying the heap $h$ and the pending send store $\epsnd$.  Both of
-these rules use and update $\aidmap$ to find destination and
-source endpoints from action IDs specified in the actual wait command.
+The function of the \emph{Wait (SNDI) Command} rule in \figref{fig:expression} is to consume the wait command
+only.  The function of the other rule for the wait command are more involved. The \emph{Waiti
+(RCVI)} inference performs the actual update by parallel searching the Rcvi command in \eprcv\ and Sndi command in \qset\ (defined in helper function \emph{getMarkRemove}).
+The only matched Sndi command is the one that has the same index number with that of the Rcvi command. The sends and receives with the same index number (less than the index number of the Sndi and Rcvi commands) in \qset\ and \eprcv\ respectively will then be considered as matched by marking the value of each send in $h$ with $\bot$. This is to avoid the ``reassignment" of variables for other matching process. After this step, \aidmap\ should be updated by removing the action IDs for both the Sndi and Rcvi commands.
 
 The syntax with the operational semantics, as presented, are
 implemented directly in PLT Redex.  PLT Redex is a language for
@@ -672,17 +661,17 @@ Racket runtime.
 
 The following definition is important to the proof of the match pair encoding in \secref{sec:smt}.
 \begin{definition}
-A machine state $(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \cfgnt{ctp}\ \trace\ \status\ k)$ is well formed if and only if it reduces to a final
+A machine state $(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ \cfgnt{ctp}\ \trace\ \status\ k)$ is well formed if and only if it reduces to a final
 state where the CTP and trace run to completion, having matched every send and receive call, and the status is either success,
 failure, or infeasible:
-\[(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \cfgnt{ctp}\ \trace\ \status\ k) \reduceK{m} (h_p\ \eta_p\ \aidmap_p\ \epsnd_p\ \eprcv_p\ \cfgnt{ctp}_p\ \trace_p\ \status_p\ k_p)\]
+\[(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ \cfgnt{ctp}\ \trace\ \status\ k) \reduceK{m} (h_p\ \eta_p\ \aidmap_p\ \epsnd_p\ \eprcv_p\ \qset_p\ \cfgnt{ctp}_p\ \trace_p\ \status_p\ k_p)\]
 such that
 \[
 \begin{array}{llll}
 \aidmap_p = ()                    & \wedge & \forall \dst, \forall \src, \epsnd_p(\dst)(\src) = () & \wedge \\
-\forall \dst, \eprcv_p(\dst) = () & \wedge & \cfgnt{ctp}_p\ = (()\ \ldots)                         & \wedge \\
-\trace_p\  = ()                   & \wedge & \status_p\ \prec \cfgt{error}                         & \wedge \\
-k_p = \cfgt{ret}                  &        &                                                       &
+\forall \dst, \eprcv_p(\dst) = () & \wedge & \forall \dst, \qset_p(\dst) = ()                               & \wedge\\
+\cfgnt{ctp}_p\ = (()\ \ldots)     & \wedge & \trace_p\  = ()                                          & \wedge \\
+\status_p\ \prec \cfgt{error}     & \wedge & k_p = \cfgt{ret}
 \end{array}
 \]
 For convenience, we define the function $\mathrm{status}(m)$ to return the final status after reduction of a well formed machine state $m$.

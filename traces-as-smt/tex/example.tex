@@ -28,14 +28,14 @@
 \begin{lrbox}{\boxATZero}
 \begin{minipage}[t]{0.65\linewidth}
 \begin{alltt}
-08 0_0        (0_0 (rcvi rcvA 0 a))
+08 0_0         (0_0 (rcvi rcvA 0 a))
 09 (0_1 (0 1)) (0_1 (wait rcvA))
 
-10 0_2        (0_2 (rcvi rcvB 0 b))
+10 0_2         (0_2 (rcvi rcvB 0 b))
 11 (0_3 (0 2)) (0_3 (wait rcvB))
 
-12 0_4        (0_4 (assume (> b 0)))
-13 0_5        (0_5 (assert (= a 4)))
+12 0_4         (0_4 (assume (> b 0)))
+13 0_5         (0_5 (assert (= a 4)))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -63,11 +63,11 @@
 \begin{lrbox}{\boxATOne}
 \begin{minipage}[t]{0.65\linewidth}
 \begin{alltt}
-04 1_1        (1_1 (rcvi rcvC 1 c))
+04 1_1         (1_1 (rcvi rcvC 1 c))
 05 (1_2 (1 2)) (1_2 (wait rcvC))
 
-06 1_3        (1_3 (sndi snd3 1 0 0x1))
-07 1_4        (1_4 (wait snd3))
+06 1_3         (1_3 (sndi snd3 1 0 0x1))
+07 1_4         (1_4 (wait snd3))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -206,11 +206,10 @@ words, any alternative trace on the CTP is only valid if the assume
 statement holds; otherwise, such an execution belongs to a different
 path through the program. An SMT solver is used to enumerate the
 possible valid executions in an effort to find one that violates the
-assertion on program location \texttt{0\_5} of the CTP for our example.
+assertion on program location \texttt{0\_5} of the CTP for our example while preserving the assumption on line \texttt{0\_4}.
 
 The novelty of the SMT encoding in this paper is its use of match
-pairs rather than the state-based or order-based encoding of prior
-work. A match pair is the coupling of a receive to a particular send.
+pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. A match pair is the coupling of a receive to a particular send.
 \figref{fig:smt}(a) is the set of possible match pairs for the CTP in
 the bottom of \figref{fig:mcapi} for our running example. The set
 admits, for example, that \texttt{rcvA} can be matched with either
@@ -239,7 +238,7 @@ term unconstrained. Receive definitions leave the event term, match-pair, and fi
 value of the receive variable unconstrained. All of these unconstrained variables must
 be resolved by the SMT solver. The variables ending in ``\_loc'' represent the
 event variables for the corresponding MCAPI operations. The \texttt{HB} terms
-encodes constraints on the event variables to enforce program order as it
+encode constraints on the event variables to enforce program order as it
 appears in each task of the CTP. For example, by program order, \texttt{rcvA}
 happens before the wait command \texttt{wait\_rcvA} for \texttt{rcvA} as shown in \figref{fig:smt}(b). Similarly,
 \texttt{wait\_rcvA} happens before \texttt{rcvB}. Any assignment to event
@@ -264,14 +263,14 @@ example, the interest is in solutions the resolve in $a \neq 4$.
 The SMT encoding in \figref{fig:smt}(b) can be given to any preferred SMT
 solver and a satisfying assignment is a feasible execution that violates an
 assertion. For the example in \figref{fig:mcapi} such an execution does exist.
-The MCAPI natural language description states that the send operation
+The MCAPI natural language description states the send operation
 \emph{``returns once the buffer can be reused by the application."}. As such,
 the return of the send only implies a copy-out of the message buffer
 and not a delivery to the intended endpoint; thus, an additional
 program execution places the value $1$ in variable $a$ and the value
 $4$ in variable $b$. In order to place the value of some send to a variable of a specific receive call, we apply the queue movement in the sequential execution, where the pending sends in the source task are moved to the send queue in the destination task. The first column of each task in the bottom
-of the figure gives the sequential program order of each statement for the error trace, and the
-second column indicates the appropriate queue movements where the match pairs are implied. For example,
+of \figref{fig:smt} gives the sequential program order of each statement for the error trace, and the
+second column indicates the appropriate queue movements where the match pairs are implied in \figref{fig:smt}. For example,
 step \texttt{09} of the trace (found in task 0) indicates
 that the first item of the pending sends in task 1 is moved to the send queue in task 0, and the wait command on \texttt{rcvA} in program location \texttt{0\_1} matches with \texttt{snd3} (the first item in the send queue in task 0).  Conversations with the
 MCAPI designers confirm the intended behavior of the API to include
@@ -288,7 +287,7 @@ is accomplished by creating a model of the MCAPI library with full
 operational semantics. The model is able to detect bad match pairs in
 a given program trace. The bad match-pairs can be omitted from the SMT
 encoding and the SMT solver re-run to see if another solution exists.
-The framework provides a CEGAR loop for MCAPI trace verification. The
+The framework provides a \textit{CEGAR} loop\footnote{The \textit{CEGAR} loop is defined as a \textbf{C}ounter \textbf{E}xample \textbf{G}uided \textbf{A}bstraction \textbf{R}efinement.} for MCAPI trace verification. The
 remainder of this paper details our MCAPI trace model, encoding, and
 an algorithm to compute a precise match pair set.
 

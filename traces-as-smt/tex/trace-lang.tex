@@ -7,6 +7,7 @@
 \newcommand{\frm}{\textit{frm}}
 \newcommand{\vbot}{\textit{v$-\bot$}}
 \newcommand{\status}{\textit{s}}
+\newcommand{\last}{\textit{l}}
 \newcommand{\error}{\ensuremath{\mathbf{error}}}
 \newcommand{\aidmap}{\textit{A}}
 \newcommand{\thread}{\ensuremath{\mathit{t}}}
@@ -48,6 +49,7 @@
 \newcommand{\checkmatch}{\ensuremath{\mathrm{checkmatch}}}
 \newcommand{\getep}{\ensuremath{\mathrm{getEP}}}
 \newcommand{\getmarkremove}{\ensuremath{\mathrm{getMarkRemove}}}
+\newcommand{\getlastsendreplace}{\ensuremath{\mathrm{getlastsend/replace}}}
 \newcommand{\statuschange}{\left\{ \begin{array}{ll}  \status &\ \mathrm{if}\ |\epsnd(\dst)(\src)|>0\\
    \mathit{error} &\  \mathrm{otherwise}\end{array}\right .}
 
@@ -654,16 +656,21 @@ The following definition is important to the proof of the match pair encoding in
 A machine state $(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ \cfgnt{ctp}\ \trace\ \status\ k)$ is well formed if and only if it reduces to a final
 state where the CTP and trace run to completion, having matched every send and receive call, and the status is either success,
 failure, or infeasible:
-\[(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ \cfgnt{ctp}\ \trace\ \status\ k) \reduceK{m} (h_p\ \eta_p\ ()\ \epsnd_p\ \eprcv_p\ \qset_p\ (()\ ...)\ ()\ \status_p\ ret)\]
+\[
+\begin{array}{l}
+(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ \cfgnt{ctp}\ \trace\ \status\ k) \reduceK{m} \\
+(h_p\ \eta_p\ ()\ \epsnd_p\ \eprcv_p\ \qset_p\ (()\ ...)\ ()\ \status_p\ ret)
+\end{array}
+\]
 such that
 \[
 \begin{array}{llll}
 \forall \dst, \forall \src, \epsnd_p(\dst)(\src) = ()  & \wedge & \forall \dst, \eprcv_p(\dst) = () & \wedge \\
-\forall \dst, \qset_p(\dst) = () & \wedge &  \status_p\ \prec \cfgt{error}   
+\forall \dst, \qset_p(\dst) = () & \wedge &  \status_p\ \prec \cfgt{error}
 \end{array}
 \]
 For convenience, we define the function $\mathrm{status}(m)$ to return the final status after reduction of a well formed machine state $m$.
 \end{definition}
 
-Intuitively, a well-formed machine state completes all the transitions of send and receive calls, meaning that there are no elements in $\aidmap$, $\epsnd$, $\eprcv$ and $\qset$, the commands in the CTP and the execution trace are correctly executed, and the status of state never enter $\cfgt{error}$.
+Intuitively, a well-formed machine state completes all the transitions of send and receive calls, meaning that there are no elements in $\aidmap$, $\epsnd$, $\eprcv$ and $\qset$, the commands in the CTP and the execution trace are correctly executed, and the status of state never enters $\cfgt{error}$.
 

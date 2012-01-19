@@ -5,7 +5,7 @@
 \newcommand{\andd}{\ensuremath{\mathrm{and}}}
 \newcommand{\select}{\ensuremath{\mathrm{select}}}
 \newcommand{\HB}{\ensuremath{\mathrm{HB}}}
-\newcommand{\last}{\ensuremath{\mathrm{last}}}
+\newcommand{\getlast}{\ensuremath{\mathrm{last}}}
 \newcommand{\MATCH}{\ensuremath{\mathrm{MATCH}}}
 \newcommand{\ml}{\ensuremath{\mathit{ML}}}
 \newcommand{\matchpair}{\ensuremath{\mathrm{MP}}}
@@ -123,17 +123,17 @@
 \inferrule[Machine Step]{
   (\epsnd~\qset~\movebot~\status)~\reduceK{q}~
   (\epsnd_\mathit{p0}~\qset_\mathit{p0}~\movebot_p~\status_\mathit{p0}) \\\\
-  (h~\eta~\aidmap~\epsnd_\mathit{p0}~\eprcv~\qset_\mathit{p0}~\cmd_0~\status_\mathit{p0}~\ret~\smt)~\reduceK{e}~
-  (h_p~\eta_p~\aidmap_p~\epsnd_\mathit{p1}~\eprcv_p~\qset_\mathit{p1}~e~\status_\mathit{p1}~\ret~\smt_\mathit{p0}) \\
+  (h~\eta~\aidmap~\epsnd_\mathit{p0}~\eprcv~\qset_\mathit{p0}~\cmd_0~\status_\mathit{p0}~\ret~\last~\smt)~\reduceK{e}~
+  (h_p~\eta_p~\aidmap_p~\epsnd_\mathit{p1}~\eprcv_p~\qset_\mathit{p1}~e~\status_\mathit{p1}~\ret~\last_p~\smt_\mathit{p0}) \\
   \smt_\mathit{p1} =  \mathrm{addHB}(\smt_\mathit{p0}~\ploc_0~\ploc_1)
 }{
   (h~\eta~\aidmap~\epsnd~\eprcv~\qset~
            (\thread_0~\ldots~
             ([\ploc_0~\cmd_0]~[\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\ldots)~\thread_2~\ldots)~
-           ([\ploc_0~\movebot]~\traceentry_1~\ldots)~\status) \reduce{m} \\\\
+           ([\ploc_0~\movebot]~\traceentry_1~\ldots)~\status~\last~\smt) \reduce{m} \\\\
   (h_p~\eta_p~\aidmap_p~\epsnd_\mathit{p1}~\eprcv_p~\qset_\mathit{p1}~
               (\thread_0~\ldots~([\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\dots)~\thread_2~\dots)~
-              (\traceentry_1~\dots)~\status_\mathit{p1})
+              (\traceentry_1~\dots)~\status_\mathit{p1}~\last_p~\smt_\mathit{p1})
 }
 \end{mathpar}}
 \caption{Machine Reductions to build the SMT model of a trace language program ($\reduce{\mathrm{m-smt}}$)}
@@ -151,8 +151,8 @@
 %           (defs (e any ...)))
 %        "Assume Pull Out Expr")
 \inferrule[Assume Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assume\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e}
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assume\ * \rightarrow k)\ (\defs\ (e\ \any\ \ldots)))
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assume\ e)\ \status\ k\ \last\ (\defs\ (\any\ \ldots))) \reduce{e}
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assume\ * \rightarrow k)\ \last\ (\defs\ (e\ \any\ \ldots)))
 }
 \and
 %   ;;Negate expression and add it to the SMT assertions.
@@ -162,8 +162,8 @@
 %           (defs ((not e) any ...)))
 %        "Assert Pull Out Expr")
 \inferrule[Assert Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assert\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e}
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assert\ * \rightarrow k)\ (\defs\ ((\negate\ e)\ \any\ \ldots)))
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assert\ e)\ \status\ k\ \last\ (\defs\ (\any\ \ldots))) \reduce{e}
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assert\ * \rightarrow k)\ \last\ (\defs\ ((\negate\ e)\ \any\ \ldots)))
 }
 \and
 %   (--> (h eta aid-map pending-s pending-r  (x := e) status k
@@ -172,8 +172,8 @@
 %           (defs ((= x e) any ...)))
 %        "Assign Pull Out Expr")
 \inferrule[Assign Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (x\ :=\ e)\ \status\ k\ (\defs\ (\any\ \ldots))) \reduce{e}
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (x\ :=\ * \rightarrow k)\ (\defs\ ((=\ x\ e)\ \any\ \ldots)))
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (x\ :=\ e)\ \status\ k\ \last\ (\defs\ (\any\ \ldots))) \reduce{e}
+  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (x\ :=\ * \rightarrow k)\ \last\ (\defs\ ((=\ x\ e)\ \any\ \ldots)))
 }
 \and
 %   ;;Adds sendi cmd to aid-map and pending-s. - VALIDATED
@@ -191,8 +191,8 @@
   \any_0 = (\define\ \aid\ ::\ send) \\ \any_1 = (\andd\ (=\ (\select\ \aid\ ep)\ \dst)\ (=\ (\select\ \aid\ value)\ x))
 }{
   (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ \qset\
-     (\sendi\ \aid_0\ \src\ \dst\ x)\ \status\ k\ ((\any_d\ \ldots)\ (\any_a\ \ldots))) \reduce{e} \\
-  (h\ \eta\ ([\aid_0\ \src]\ [\aid\ \ep]\ \ldots)\ \epsnd_p\ \eprcv\ \qset\ \true\ \status\ k\ ((\any_0\ \any_d\ \ldots)\ (\any_1\ \any_a\ \ldots)))
+     (\sendi\ \aid_0\ \src\ \dst\ x)\ \status\ k\ \last\ ((\any_d\ \ldots)\ (\any_a\ \ldots))) \reduce{e} \\
+  (h\ \eta\ ([\aid_0\ \src]\ [\aid\ \ep]\ \ldots)\ \epsnd_p\ \eprcv\ \qset\ \true\ \status\ k\ \last\ ((\any_0\ \any_d\ \ldots)\ (\any_1\ \any_a\ \ldots)))
 }
 \and
 %   ;;Adds recvi cmd to aid-map and pending-r. - VALIDATED
@@ -209,8 +209,8 @@
    \eprcv_p = [\eprcv \mid \dst \mapsto ([\aid_0\ x_0]\ [\aid_1\ x_1]\ \ldots)] \\
    \any_0 = (\define\ \aid\ ::\ recv) \\ \any_1 = (\andd\ (=\ (\select\ \aid\ ep)\ \dst)\ (=\ (\select\ \aid\ var)\ x_0))
 }{
-  (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ \qset\ (\recvi\ \aid_0\ \dst\ x_0)\ \status\ k\ ((\any_d\ \ldots)\ (\any_a\ \ldots))) \reduce{e} \\
-  (h\ \eta\ ([\aid_0\ \dst]\ [\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv_p\ \qset\ \true\ \status\ k\ ((\any_0\ \any_d\ \ldots)\ (\any_1\ \any_a\ \ldots)))
+  (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ \qset\ (\recvi\ \aid_0\ \dst\ x_0)\ \status\ k\ \last\ ((\any_d\ \ldots)\ (\any_a\ \ldots))) \reduce{e} \\
+  (h\ \eta\ ([\aid_0\ \dst]\ [\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv_p\ \qset\ \true\ \status\ k\ \last\ ((\any_0\ \any_d\ \ldots)\ (\any_1\ \any_a\ \ldots)))
 }
 \and
    %(--> (h eta aid-map pending-s pending-r q-set (wait aid_r)
@@ -233,10 +233,11 @@
     \aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
     (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
     ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
-    \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])
+    \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
+    (\last_p\ last\_\aid_s) = \getlastsendreplace(\last, \aid_s, \src, \dst)    
 }{
-    (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k\ (\defs\ (\any_a\ \ldots))) \reduce{e} \\
-    (h_p\ \eta \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k\ (\defs\ ((\HB\ (\select\ \last(\aid_s)\ \mathit{MP})\ (\select\ \aid_s\ \mathit{MP}))\
+    (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k\ \last\ (\defs\ (\any_a\ \ldots))) \reduce{e} \\
+    (h_p\ \eta \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k\ \last_p\ (\defs\ ((\HB\ (\select\ last\_\aid_s)\ \mathit{MP})\ (\select\ \aid_s\ \mathit{MP}))\
                     (\MATCH\ \aid_r\ \aid_s)\ \any_a\ \ldots)))
 }
 \end{mathpar}}
@@ -252,7 +253,7 @@ The next step, after formally defining the operational semantics of our trace
 language, is to formally define a translation from the trace language into an
 SMT problem that can correctly model the original execution trace.
 
-An SMT problem that encodes a trace through CTP needs various data structure and support functions. We have intuitively introduced most of them in the example of Section 2. Before presenting the translation framework from trace language to the SMT problem, we need to explain them in detail.
+An SMT problem that encodes a trace through CTP needs various data structure and support functions. We have intuitively introduced most of them in the example of Section 2. Before presenting the translation framework from trace language to the SMT problem, we need to explain them in detail. We give the definitions in the Yices input language.
 
 % (define HB::(-> a::int b::int (subtype (c::bool) (ite (< a b) (= c true) (= c false)))))
 \begin{equation}
@@ -272,7 +273,7 @@ An SMT problem that encodes a trace through CTP needs various data structure and
 %\end{equation}
 
 The HB function in equation (\ref{equation:hb}) represents a happens-before relationship between two events. It
-takes two events $a$ and $b$ as parameters, such that $a,b \in \mathbb{N}$. This
+takes two events $a$ and $b$ as parameters, such that $a,b \in \mathbb{N}$. In the SMT encoding, every location is assigned an event, and HB orders those locations (i.e., program order, etc.). This
 function creates a constraint such that the first event must be less than the
 second event, indicating that the first event occurs before the second event.
 This function is used to assert the program order of statements within the same
@@ -282,9 +283,9 @@ occurs before the receive.
 \begin{equation}
 \begin{array}{l}
 %(define-type recv (record match::int ep::int var::int event::int))
-(\mathit{\cfgt{define-type}}\ R\ (\mathit{\cfgt{record}}\ \cfgnt{M::int}\ \cfgnt{ep::int}\ \cfgnt{var::int}\ \cfgnt{event::int})) \\
+(\cfgt{define-type}\ R\ (\cfgt{record}\ \cfgnt{M::int}\ \cfgnt{ep::int}\ \cfgnt{var::int}\ \cfgnt{event::int})) \\
 %(define-type send (record match_po::int id::int ep::int value::int event::int))
-(\mathit{\cfgt{define-type}}\ S\ (\mathit{\cfgt{record}}\ \cfgnt{MP::int}\ \cfgnt{ID::int}\ \cfgnt{ep::int}\ \cfgnt{value::int}\ \cfgnt{event::int}))
+(\cfgt{define-type}\ S\ (\cfgt{record}\ \cfgnt{MP::int}\ \cfgnt{ID::int}\ \cfgnt{ep::int}\ \cfgnt{value::int}\ \cfgnt{event::int}))
 \end{array}
 \label{equation:record}
 \end{equation}
@@ -375,10 +376,10 @@ reductions with a few changes below
 \[
 \cfgstart
 \cfgrule{mstate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\
-  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{ctp}\ \cfgnt{\trace}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
+  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{ctp}\ \cfgnt{\trace}\ \cfgnt{\status}\ \cfgnt{k}\ \cfgnt{\last}\ \smt\rp}
 %  (expr-state (h eta aid-map pending-s pending-r e status k smt))
 \cfgrule{estate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\
-  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{e}\ \cfgnt{\status}\ \cfgnt{k}\ \smt\rp}
+  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{e}\ \cfgnt{\status}\ \cfgnt{k}\ \cfgnt{\last}\ \smt\rp}
 %  (smt (defs asrts))
 \cfgrule{\smt}{\lp\cfgnt{defs}~\cfgnt{constraints}\rp}
 %  (defs (any ...))
@@ -387,19 +388,19 @@ reductions with a few changes below
 \cfgrule{constraints}{\lp\cfgnt{any}~$\ldots$\rp}
 \cfgend
 \]
-The new syntax adds an \textit{smt} member to the \textit{mstate}
+The new syntax adds the \textit{smt} member to the \textit{mstate}
 and \textit{estate} where the ``\cfgnt{any}'' term in \textit{defs}
 and \textit{constraints} matches any structure.  The lists will
 be filled with definitions, HB entries, MATCH entries, NE
-entries, etc. as defined by the SMT machine reductions. The \textit{qstate} does not contain any SMT encodings in the reductions and it is not changed.
+entries, etc. as defined by the SMT machine reductions. \last, which records the last send operation happens before the current one in the same thread, is another member added to the \textit{mstate} and \textit{estate}. The \textit{qstate} does not contain any SMT encodings in the reductions and it is not changed.
 
 The changes for the reduction rules are presented in \figref{fig:machine_smt} and \figref{fig:expression_smt}. The support function $\mathrm{addHB}(((\mathit{any}_d ...)\ (\mathit{any}_c ...))\ \ploc_0\ \ploc_1)$ adds program location to the definition list and adds a happens before relation
 \[
  \equiv \\
-   (((\mathtt{define\ \ploc_0 :: int}) \mathit{any}_d ...)((\mathtt{HB\ \ploc_0 \ploc_1}) \mathit{any}_c ...))
+   (((\mathtt{define\ \ploc_0 :: int})\ \mathit{any}_d ...)((\mathtt{HB\ \ploc_0\ \ploc_1})\ \mathit{any}_c ...))
 \]
 
-The reduction rules in \figref{fig:machine_smt} and \figref{fig:expression_smt} add constrains to the SMT problem with respect to the semantic of trace language. The $\mathrm{Machine\ Step}$ in \figref{fig:machine_smt} adds the program order of actions in the same thread to the SMT problem. The evaluation of assume, assert and assign in \figref{fig:expression_smt} add assertions to the SMT problem. The $Sndi$ and $Rcvi$ commands define the send and receive actions in the SMT problem, and the $Wait (Rcvi)$ reduction adds the "match" constrain to the SMT problem.
+The reduction rules in \figref{fig:machine_smt} and \figref{fig:expression_smt} add constrains to the SMT problem with respect to the semantic definition of trace language. The $\mathrm{Machine\ Step}$ in \figref{fig:machine_smt} adds the program order of actions in the same thread to the SMT problem. The evaluation of assume, assert and assign in \figref{fig:expression_smt} adds assertions to the SMT problem. The $Sndi$ and $Rcvi$ commands define the send and receive actions in the SMT problem, and the $Wait (Rcvi)$ reduction adds the ''match" constrains to the SMT problem. Note that the function $\getlastsendreplace$ picks up the last send operation, $\mathit{last}\_\aid_s$, that happens before the current one in the same thread, and adds a HB relation between the $\mathit{MP}$ of $\mathit{last}\_\aid_s$ and that of the current send operation. The added relation ensures the matched receive operations of two send operations are also program ordered properly.
 
 \begin{figure}
 \begin{center}
@@ -458,7 +459,7 @@ As we have discussed in the early section, the CTP can have other traces in exec
 \begin{definition}
 A match-list \ml\ is a set of match pair lists uniquely identified by a receive action ID, and each list consists of a set of match pairs for this receive action ID and a send action ID:
 \[\ml\ =\ \emptyset\ |\ (\ml\ [\recv\ \rightarrow [(\recv\ \send)\ldots]])\]
-Note that we alpha renamed so that \recv\ and \send\ are all unique labels. For convenience, we define function $\mathit{dom(\ml)}$ that returns the set of receive action IDs in the set of match pairs of \ml.
+Note that we alpha renamed so that \recv\ and \send\ are all unique labels. For convenience, we define function $\mathit{dom(\ml)}$ and $\mathit{range{\ml}}$ that returns the set of receive action IDs in the set of match pairs of \ml and the set itself, respectively.
 \label{def:match-list}
 \end{definition}
 
@@ -492,18 +493,18 @@ We Prove it by induction.
 
 We consider the base case as a SMT problem that encodes a single trace and the answer can be trivially proved by definition.
 
-Induction. Assume we have combined n SMT problems and the combined SMT problem $\smt_{total}$ is evaluated $\mathit{\cfgt{UNSAT}}$. We combine an additional SMT problem $\smt_{n+1}$, which is different from any existent SMT problems. If $\mathrm{ANS}(\smt_{n+1})$ is equal to $\mathit{\cfgt{SAT}}$, the newly combined SMT problem, $\smt_{total}'$, is evaluated $\mathit{\cfgt{SAT}}$ because the match pairs defined in $\smt_{n+1}$ are combined into $\smt_{total}'$. If $\mathrm{ANS}(\smt_{n+1})$ is equal to $\mathit{\cfgt{UNSAT}}$, on the other hand, $\smt_{total}'$ is then evaluated $\mathit{\cfgt{UNSAT}}$ because all the traces implied in $\smt_{total}'$ are evaluated $\mathit{\cfgt{UNSAT}}$. Additionally, it can be trivially proved if $\smt_{total}$ is evaluated $\mathit{\cfgt{SAT}}$ because the newly added SMT problem $\smt_{n+1}$ do not change the answer.
+Induction. Assume we have combined n SMT problems and the combined SMT problem $\smt_{total}$ is evaluated $\mathit{\cfgt{UNSAT}}$. We combine an additional SMT problem $\smt_{n+1}$, which is different from any existent SMT problems. If $\mathrm{ANS}(\smt_{n+1})$ is equal to $\mathit{\cfgt{SAT}}$, the newly combined SMT problem, $\smt_{total}'$, is evaluated $\mathit{\cfgt{SAT}}$ because the match pairs defined in $\smt_{n+1}$ are combined into $\smt_{total}'$. If $\mathrm{ANS}(\smt_{n+1})$ is equal to $\mathit{\cfgt{UNSAT}}$, on the other hand, $\smt_{total}'$ is then evaluated $\mathit{\cfgt{UNSAT}}$ because all the traces implied in $\smt_{total}'$ are evaluated $\mathit{\cfgt{UNSAT}}$. Additionally, it can be trivially proved if $\smt_{total}$ is evaluated $\mathit{\cfgt{SAT}}$ then the newly added SMT problem $\smt_{n+1}$ do not change the answer.
 \end{proof}
 
 From \textbf{Lemma 2}, the combined SMT problem is more powerful because it can find the violation of an assertion among several trace encodings. Moreover, because the function $\mathit{COMB}$ only adds match pairs in $\ml$, we can conclude that it is all about match pairs that strength the verification process. The following theorem states this conclusion.
 
 \begin{theorem}
 For two SMT problems, $\smt_{\phi} = (\mathit{defs}\ \mathit{constrains}\ \ml_{\phi})$ and $\smt = (\mathit{defs}\ \mathit{constrains}\ \ml)$,
-if $\ml_{\phi} \subseteq \ml$,
+if $\mathit{range(\ml_{\phi})} \subseteq \mathit{range(\ml)}$,
 \[\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)\]
 \end{theorem}
 \begin{proof}
-Since $\ml_{\phi}$ is the sub set of $\ml$, we can obtain $\smt$ by combining $\smt_{\phi}$ with other SMT problems. Suppose $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{SAT}}$, by \textbf{Lemma 2}, $\mathrm{ANS}(\smt)$ is equal to $\mathit{\cfgt{SAT}}$ as well. If $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{UNSAT}}$, $\mathrm{ANS}(\smt)$ is equal to either $\mathit{\cfgt{UNSAT}}$ or $\mathit{\cfgt{SAT}}$, depending on the answers of other single SMT problems that combine $\smt$. In either case, $\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)$.
+Since the range of $\ml_{\phi}$ is the sub set of the range of $\ml$, we can obtain $\smt$ by combining $\smt_{\phi}$ with other SMT problems. Suppose $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{SAT}}$, by \textbf{Lemma 2}, $\mathrm{ANS}(\smt)$ is equal to $\mathit{\cfgt{SAT}}$ as well. If $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{UNSAT}}$, $\mathrm{ANS}(\smt)$ is equal to either $\mathit{\cfgt{UNSAT}}$ or $\mathit{\cfgt{SAT}}$, depending on the answers of other single SMT problems that combine $\smt$. In either case, $\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)$.
 \end{proof}
 
 \subsection{Outline}

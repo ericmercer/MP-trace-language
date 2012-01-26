@@ -234,7 +234,7 @@
     (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
     ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
     \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
-    (\last_p\ last\_\aid_s) = \getlastsendreplace(\last, \aid_s, \src, \dst)    
+    (\last_p\ last\_\aid_s) = \getlastsendreplace(\last, \aid_s, \src, \dst)
 }{
     (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k\ \last\ (\defs\ (\any_a\ \ldots))) \reduce{e} \\
     (h_p\ \eta \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k\ \last_p\ (\defs\ ((\HB\ (\select\ last\_\aid_s)\ \mathit{MP})\ (\select\ \aid_s\ \mathit{MP}))\
@@ -337,7 +337,7 @@ destination end-point of the send operation is the same as the end-point used by
 the receive operation, that the value sent by the send operation is the same
 value received by the receive operation, that the send operation occurs before
 the receive operation, that the ``match'' value in the receive tuple is
-equal to the ``ID'' value in the send tuple, and that the ``MP" value in the send tuple is equal to the ``event" value in the receive tuple, which indicates that the receive operation is paired with only this send operation.
+equal to the ``ID'' value in the send tuple, and that the ``MP" value in the send tuple is equal to the ``event" value in the receive tuple.
 
 %(define ne::(-> r1::recv r2::recv (subtype (res::bool) (ite
 %  (= (select r1 match) (select r2 match))

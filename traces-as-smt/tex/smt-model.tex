@@ -447,10 +447,13 @@ For a well-formed machine state $m$,
 \label{lemma:1}
 \end{lemma}
 \begin{proof}
-To prove the statement, we focus on each reduction rule that adds clauses to the SMT problem. Since the only reduction rule that causes the status of state $\cfgt{failure}$ is
-Assert Expression Evaluation in \figref{fig:expression_smt}, we need to prove that an $\cfgt{assert}$ expression causes the machine state $\cfgt{failure}$ if and only if the added clause in SMT problem is satisfiable. Suppose expression $\emph{e}$ in the assert reduction rule in \figref{fig:machine_smt} is evaluated false, which causes the status of state $\cfgt{failure}$, It is obvious that the new clause, $(not\ \emph{e})$, is evaluated true by any SMT solver. For the other direction, since $(not\ \emph{e})$ is true, the evaluation of $\emph{e}$ is false so that the status of state is evaluated $\cfgt{failure}$.
-For other reduction rules in \figref{fig:machine_smt} and \figref{fig:expression_smt}, we need to prove the contraposition, such that the SMT problem returns $\mathrm{\cfgt{UNSAT}}$ if and only if the status of state is either $\cfgt{success}$ or $\cfgt{infeasible}$ ($\cfgt{error}$ is not considered since it can only reduced by non-well-formed machine state). Suppose the status of final state is $\cfgt{success}$, such that each reduction rule is reduced without changing the status. Note that the $\mathrm{HB}$ relations are correctly defined in the machine reduction, assertions for assume and assign commands are evaluated true, the send and receive operations are correctly defined and the match pairs are valid in the SMT problem since the trace is executed successfully in the trace language semantics. The assertion for the assert command, however, is negated in the SMT problem so that makes it $\mathrm{\cfgt{UNSAT}}$. Also, suppose the status of state is $\cfgt{infeasible}$, such that the evaluation of expression $\emph{e}$ in assume command is false. Since the clause $e$ is also added to the SMT problem and it is evaluated false, the whole SMT problem is evaluated $\mathrm{\cfgt{UNSAT}}$ eventually. For the other direction, suppose the generated SMT problem is $\mathrm{\cfgt{UNSAT}}$, we need to prove the non-existence of $\cfgt{failure}$ for the state status. Since the SMT problem is found $\mathrm{\cfgt{UNSAT}}$, there should be at least one clause that is not satisfiable. If the unsatisfiable clause is generated from the assert command, such that $(not\ e)$ is evaluated false. It implies that $e$ is evaluated true. Thus, the assert command can not make the status of state $\cfgt{failure}$. If the unsatisfiable clause is generated from other reduction rules, the status of state could only be $\cfgt{success}$ or $\cfgt{infeasible}$ by definition.
-Thus, this is the end of proof.
+%To prove the statement, we focus on each reduction rule that adds clauses to the SMT problem. Since the only reduction rule that causes the status of state $\cfgt{failure}$ is
+%Assert Expression Evaluation in \figref{fig:expression_smt}, we need to prove that an $\cfgt{assert}$ expression causes the machine state $\cfgt{failure}$ if and only if the added clause in SMT problem is satisfiable. Suppose expression $\emph{e}$ in the assert reduction rule in \figref{fig:machine_smt} is evaluated false, which causes the status of state $\cfgt{failure}$, It is obvious that the new clause, $(not\ \emph{e})$, is evaluated true by any SMT solver. For the other direction, since $(not\ \emph{e})$ is true, the evaluation of $\emph{e}$ is false so that the status of state is evaluated $\cfgt{failure}$.
+%For other reduction rules in \figref{fig:machine_smt} and \figref{fig:expression_smt}, we need to prove the contraposition, such that the SMT problem returns $\mathrm{\cfgt{UNSAT}}$ if and only if the status of state is either $\cfgt{success}$ or $\cfgt{infeasible}$ ($\cfgt{error}$ is not considered since it can only reduced by non-well-formed machine state). Suppose the status of final state is $\cfgt{success}$, such that each reduction rule is reduced without changing the status. Note that the $\mathrm{HB}$ relations are correctly defined in the machine reduction, assertions for assume and assign commands are evaluated true, the send and receive operations are correctly defined and the match pairs are valid in the SMT problem since the trace is executed successfully in the trace language semantics. The assertion for the assert command, however, is negated in the SMT problem so that makes it $\mathrm{\cfgt{UNSAT}}$. Also, suppose the status of state is $\cfgt{infeasible}$, such that the evaluation of expression $\emph{e}$ in assume command is false. Since the clause $e$ is also added to the SMT problem and it is evaluated false, the whole SMT problem is evaluated $\mathrm{\cfgt{UNSAT}}$ eventually. For the other direction, suppose the generated SMT problem is $\mathrm{\cfgt{UNSAT}}$, we need to prove the non-existence of $\cfgt{failure}$ for the state status. Since the SMT problem is found $\mathrm{\cfgt{UNSAT}}$, there should be at least one clause that is not satisfiable. If the unsatisfiable clause is generated from the assert command, such that $(not\ e)$ is evaluated false. It implies that $e$ is evaluated true. Thus, the assert command can not make the status of state $\cfgt{failure}$. If the unsatisfiable clause is generated from other reduction rules, the status of state could only be $\cfgt{success}$ or $\cfgt{infeasible}$ by definition.
+%Thus, this is the end of proof.
+
+Suppose the status of the final machine state is $\cfgt{failure}$. From the reduction rules, we know that there exists at least one assert action that is evaluated false. In \figref{fig:expression_smt}, we know that expression ``$e$" is negated and added to the SMT encoding for the second reduction rule. By hypothesis, $e$ is evaluated false, so clause $(not\ e)$ is evaluated satisfiable in the generated SMT problem. Since the SMT problem generated by applying the reduction rules only remains a set of free variables for program ordering unresolved (other free variables are assigned to some value after creating the problem), the SMT problem exactly captures the execution trace described in the final state. Thus, the SMT problem is evaluated $\cfgt{SAT}$.
+On the other hand, suppose the SMT problem is evaluated $\cfgt{SAT}$, indicating that all statements of the SMT problem are satisfiable. Since the reduction rules in \figref{fig:expression_smt} add statements with respect to the transition of the trace, it implies that each transition of the trace is executed correctly except for some assert action. Because of the same reason above, we know that expression $e$ for the assert action is evaluated false. Thus, the status of the final machine state is $\cfgt{failure}$.
 \end{proof}
 
 
@@ -507,28 +510,28 @@ if $\mathit{range(\ml_{\phi})} \subseteq \mathit{range(\ml)}$,
 Since the range of $\ml_{\phi}$ is the sub set of the range of $\ml$, we can obtain $\smt$ by combining $\smt_{\phi}$ with other SMT problems. Suppose $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{SAT}}$, by \textbf{Lemma 2}, $\mathrm{ANS}(\smt)$ is equal to $\mathit{\cfgt{SAT}}$ as well. If $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{UNSAT}}$, $\mathrm{ANS}(\smt)$ is equal to either $\mathit{\cfgt{UNSAT}}$ or $\mathit{\cfgt{SAT}}$, depending on the answers of other single SMT problems that combine $\smt$. In either case, $\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)$.
 \end{proof}
 
-\subsection{Outline}
+%\subsection{Outline}
 
-SMT model is created from an extension to the operational semantics of the
-trace language.  The semantics generate an SMT for a single trace.  The key
-observation is that the SMT does not change for different traces on the same
-CTP except for the specified match pairs.  This observation leads to the main
-result that we can over-approximate the match pair sets and use the
-trance-language in a refinement loop.
+%SMT model is created from an extension to the operational semantics of the
+%trace language.  The semantics generate an SMT for a single trace.  The key
+%observation is that the SMT does not change for different traces on the same
+%CTP except for the specified match pairs.  This observation leads to the main
+%result that we can over-approximate the match pair sets and use the
+%trance-language in a refinement loop.
 
-Add a figure showing the encoding of two traces for the example system.   Put the two traces next to each other.  Use the ones from LaDefense.pptx
-\begin{itemize}
-\item Define upfront MATCH, HB, and the data structure definitions (anything boiler plate)
-\item Focusing on one trace, give the new reductions for assert and assume referencing directly the line number in the trace where these statements appear.
-\item Give the new reductions for WAITI-rcv to define a match pair.  Again reference the line number in the figure for clarity.
-\item Add the full semantics to the appendix and give the reference here.
-\item Lemma 1: we can encode a single trace.
-\item Examine the second trace.  Note the only difference is seen in the MATCH pairs.
-\item Define the combinator operation that combines two SMT encodings for a common CTP
-\item Lemma 2: we can encode multiple traces into a single SMT problem.  Proof by induction.  Base case is a single trace.  Trivially established by Lemma 1.  Induction is assume you have correctly encoded n-traces, and you are adding a new trace (i.e., a new set of match pairs) to the encoding using your combinator operation.
-\item Suppose we an answer function that given a MP set and a CTP returns either success or failure with a trace.
-\item Define the main theorem for the paper (slide 68 in LaDefense.pptx).  Generalize to arbitrary sets.  Proof by induction.  Base case is a single trace in $\mathrm{mp}_1$ so $\mathrm{mp}_1 \subseteq \mathrm{mp}_1$.  Proof is trivial since $\mathrm{answer}(\mathrm{mp}_1)$ does not change.  Inductive step is $mathrm{mp}_n \subseteq \mathrm{mp}_n+1$.   Assume $\mathrm{mp}_n$ give the correct answer.  Argue on the lattice and the operational semantics for each rule that touches the status.  You have to reference in the proof every rule that updates the status!
-\end{itemize}
+%Add a figure showing the encoding of two traces for the example system.   Put the two traces next to each other.  Use the ones from LaDefense.pptx
+%\begin{itemize}
+%\item Define upfront MATCH, HB, and the data structure definitions (anything boiler plate)
+%\item Focusing on one trace, give the new reductions for assert and assume referencing directly the line number in the trace where these statements appear.
+%\item Give the new reductions for WAITI-rcv to define a match pair.  Again reference the line number in the figure for clarity.
+%\item Add the full semantics to the appendix and give the reference here.
+%\item Lemma 1: we can encode a single trace.
+%\item Examine the second trace.  Note the only difference is seen in the MATCH pairs.
+%\item Define the combinator operation that combines two SMT encodings for a common CTP
+%\item Lemma 2: we can encode multiple traces into a single SMT problem.  Proof by induction.  Base case is a single trace.  Trivially established by Lemma 1.  Induction is assume you have correctly encoded n-traces, and you are adding a new trace (i.e., a new set of match pairs) to the encoding using your combinator operation.
+%\item Suppose we an answer function that given a MP set and a CTP returns either success or failure with a trace.
+%\item Define the main theorem for the paper (slide 68 in LaDefense.pptx).  Generalize to arbitrary sets.  Proof by induction.  Base case is a single trace in $\mathrm{mp}_1$ so $\mathrm{mp}_1 \subseteq \mathrm{mp}_1$.  Proof is trivial since $\mathrm{answer}(\mathrm{mp}_1)$ does not change.  Inductive step is $mathrm{mp}_n \subseteq \mathrm{mp}_n+1$.   Assume $\mathrm{mp}_n$ give the correct answer.  Argue on the lattice and the operational semantics for each rule that touches the status.  You have to reference in the proof every rule that updates the status!
+%\end{itemize}
 
 
 

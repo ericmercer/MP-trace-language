@@ -280,7 +280,7 @@ MCAPI that omit this less intuitive program
 execution~\cite{sharma:fmcad09,elwakil:padtad10,elwakil:atva10}.
 
 Finally, since the computation of match-pairs is expensive to do
-precisely, our solution includes the ability to overapproximate the
+precisely, our solution includes the ability to over-approximate the
 match-pair set, and then validate satisfying assignments from the SMT
 solver to see if they use only feasible match pairs. Such validation
 is accomplished by creating a model of the MCAPI library with full
@@ -289,7 +289,7 @@ a given program trace. The bad match-pairs can be omitted from the SMT
 encoding and the SMT solver re-run to see if another solution exists.
 The framework provides a \textit{CEGAR} loop\footnote{The \textit{CEGAR} loop is defined as a \textbf{C}ounter \textbf{E}xample \textbf{G}uided \textbf{A}bstraction \textbf{R}efinement.} for MCAPI trace verification. The
 remainder of this paper details our MCAPI trace model, encoding, and
-an algorithm to compute a precise match pair set.
+an algorithm to compute an over-approximated match pair set.
 
 \begin{figure*}
 \begin{center}

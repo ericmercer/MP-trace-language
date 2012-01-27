@@ -19,7 +19,7 @@ The specification places few ordering constrains on messages passed from one
 endpoint to another. This freedom introduces into the system possibilities for
 non-deterministic behavior in the way the messages arrive at their destination.
 As an example we present an abstract of a small program that uses MCAPI in
-\figref{example_code}. Each node represents a different thread. The
+\figref{fig:mcapi}. Each node represents a different thread. The
 $\mathit{Send}$ function call parameters include a unique identifier, the
 source endpoint, the destination endpoint, and the message contents,
 respectively. The $\mathit{Recv}$ function call parameters include a unique
@@ -82,42 +82,41 @@ that if a satisfiable assignment is discovered for the problem, then the
 assignment can be used to simply create an error trace that indicates how the
 program could reach an error state in the program under test.
 
-We will also describe how to determine a precise and complete set of all the
-match pairs that could occur for a given MCAPI execution trace, and how this
+We will also describe how to determine an over-approximated set of match pairs, and how this
 set of match pairs can be used to create a satisfiability problem to precisely
 model all possible behaviors of an execution trace of an MCAPI application.
 Finally we will describe how this verification technique may be used within a
 refinement loop to provide a more efficient means of verifying MCAPI
 applications.
 
-\noindent\textbf{We have 10 pages for the paper!}
+%\noindent\textbf{We have 10 pages for the paper!}
 
-Problem statement (one paragraph)
+%Problem statement (one paragraph)
 
-Create an SMT problem from a set of possible send-receive match pairs
-such that if the SMT problem can be satisfied, then the assignment is
-a violating execution.
+%Create an SMT problem from a set of possible send-receive match pairs
+%such that if the SMT problem can be satisfied, then the assignment is
+%a violating execution.
 
-Input: CTP + match pairs (probably cannot use CTP and match pair--be
-more abstract) Output: Error or noError
+%Input: CTP + match pairs (probably cannot use CTP and match pair--be
+%more abstract) Output: Error or noError
 
-Why would anyone care about answering such a question? (Fusion in one
-paragraph) Enables the creation of property specific partial order
-reduction that helps scale verification technology (like model
-checking) to larger systems--better counteracts state explosion.
-Critical assumption is that SMT technology is better managing state
-explosion than model checking.  Directly Related work (one paragraph)
+%Why would anyone care about answering such a question? (Fusion in one
+%paragraph) Enables the creation of property specific partial order
+%reduction that helps scale verification technology (like model
+%checking) to larger systems--better counteracts state explosion.
+%Critical assumption is that SMT technology is better managing state
+%explosion than model checking.  Directly Related work (one paragraph)
 
-Elwakil etc. 
-Our Solution
+%Elwakil etc.
+%Our Solution
 
-Accomplished in a refinement loop using SMT technology (refinement
-loop figure): CTP + Match Pairs --> SMT --> Error --> Validated -->
-(report or refine) Contributions:
+%Accomplished in a refinement loop using SMT technology (refinement
+%loop figure): CTP + Match Pairs --> SMT --> Error --> Validated -->
+%(report or refine) Contributions:
 
-Efficient encoding of a CTP with match pairs as an SMT problem (scales
-linearly with the match pair set rather than quadratically)--whether
-or not the encoding size matters is debatable...we believe that
-smaller is always better (fewer terms to deal with).  Refinement loop
-for iterative verification (with supporting theorem) Precise algorithm
-for computing precise match pair sets
+%Efficient encoding of a CTP with match pairs as an SMT problem (scales
+%linearly with the match pair set rather than quadratically)--whether
+%or not the encoding size matters is debatable...we believe that
+%smaller is always better (fewer terms to deal with).  Refinement loop
+%for iterative verification (with supporting theorem) Precise algorithm
+%for computing precise match pair sets

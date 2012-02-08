@@ -5,7 +5,7 @@ Embedded devices continue to become more powerful as computing hardware becomes
 smaller and more modular. It is now becoming commonplace to find multiple
 processing units inside a single device. The Multicore Association (MCA) is an
 industry group that has formed to define specifications for low-level
-communication, resource management, and something else specifications for
+communication, resource management, and task management for
 multicore devices.
 
 One specification that the MCA has released is the Multicore Association
@@ -13,76 +13,69 @@ Communications API (MCAPI). The specification defines basic data type, data
 structures, and functions that can be used to perform simple message passing
 operation between different computing entities within a device. Messages can be
 passed across persistent channels that force an ordering of the messages, or
-they can be passed to specific \emph{endpoints} within the system.
-
-The specification places few ordering constrains on messages passed from one
+they can be passed to specific \emph{endpoints} within the system. The specification places few ordering constrains on messages passed from one
 endpoint to another. This freedom introduces into the system possibilities for
 non-deterministic behavior in the way the messages arrive at their destination.
-As an example we present an abstract of a small program that uses MCAPI in
-\figref{fig:mcapi}. Each node represents a different thread. The
-$\mathit{Send}$ function call parameters include a unique identifier, the
-source endpoint, the destination endpoint, and the message contents,
-respectively. The $\mathit{Recv}$ function call parameters include a unique
-identifier, the endpoint that will receive the message, and a buffer in which
-the contents of the message will be placed. We see that the first call to
-$\mathit{Send}$ in Node 2 sends the contents of $Y$ from \emph{ep3} to
-\emph{ep1}. This message can be received into $A$ by the first call to
-$\mathit{Recv}$ in Node 0. If this were to occur we would call this a
-\emph{match pair} of $\mathit{send1}$ and $\mathit{recvA}$.
+%As an example we present an abstract of a small program that uses MCAPI in
+%\figref{fig:mcapi}. Each node represents a different thread. The
+%$\mathit{Send}$ function call parameters include a unique identifier, the
+%source endpoint, the destination endpoint, and the message contents,
+%respectively. The $\mathit{Recv}$ function call parameters include a unique
+%identifier, the endpoint that will receive the message, and a buffer in which
+%the contents of the message will be placed. We see that the first call to
+%$\mathit{Send}$ in Node 2 sends the contents of $Y$ from \emph{ep3} to
+%\emph{ep1}. This message can be received into $A$ by the first call to
+%$\mathit{Recv}$ in Node 0. If this were to occur we would call this a
+%\emph{match pair} of $\mathit{send1}$ and $\mathit{recvA}$.
 
-If this abstract program is examined carefully it will be observed that
-messages received by $\mathit{recvA}$ and $\mathit{recvB}$ will be determined
-non-deterministically. One possible execution of the program would have the
-messages sent from $\mathit{send1}$ and $\mathit{send2}$. $\mathit{recvC}$
-would receive the message from $\mathit{send2}$ and then the message from
-$\mathit{send3}$ would be sent. Then $\mathit{recvA}$ could receive the message
-from $\mathit{send1}$, and $\mathit{recvB}$ could receive the message from
-$\mathit{send3}$.
+%If this abstract program is examined carefully it will be observed that
+%messages received by $\mathit{recvA}$ and $\mathit{recvB}$ will be determined
+%non-deterministically. One possible execution of the program would have the
+%messages sent from $\mathit{send1}$ and $\mathit{send2}$. $\mathit{recvC}$
+%would receive the message from $\mathit{send2}$ and then the message from
+%$\mathit{send3}$ would be sent. Then $\mathit{recvA}$ could receive the message
+%from $\mathit{send1}$, and $\mathit{recvB}$ could receive the message from
+%$\mathit{send3}$.
 
-Another possible execution would have the message from $\mathit{send1}$ being
-sent but then delayed in the communications layer. This would allow
-$\mathit{send2}$ to send its message to $\mathit{recvC}$ which would then allow
-$\mathit{send3}$ to be paired with $\mathit{recvA}$. The message that was
-originally sent from $\mathit{send1}$ might then be unblocked and be received
-by $\mathit{recvB}$.
+%Another possible execution would have the message from $\mathit{send1}$ being
+%sent but then delayed in the communications layer. This would allow
+%$\mathit{send2}$ to send its message to $\mathit{recvC}$ which would then allow
+%$\mathit{send3}$ to be paired with $\mathit{recvA}$. The message that was
+%originally sent from $\mathit{send1}$ might then be unblocked and be received
+%by $\mathit{recvB}$.
 
-It is important to recognize that the thread schedules of these two executions
-are exactly the same, even though the resulting behavior is completely
-different. It is the match pairings of the send and receive operations that
+%It is important to recognize that the thread schedules of these two executions
+%are exactly the same, even though the resulting behavior is completely
+%different. 
+By scheduling different executions for the same current program, we know that it is the match pairs of the send and receive operations that
 introduce non-determinism into the program. We have defined a process that
 takes as input an execution of an MCAPI program and verifies it, according to
 provided correctness properties. Output is given in the form of a path of
 execution to an error state, or as a declaration of correctness for the
 provided trace.
 
-With this method of verifying individual execution traces, we have now begun
-work on defining a more complete method for verifying entire MCAPI
-applications. This method includes a concrete execution engine that controls
-the production of execution traces to be verified. The method will also include
-a property-based state-reduction technique that will provide input to the
-execution engine, allowing the whole system to remain complete in its
-exploration, while safeguarding the system from suffering the performance pains
-of the state-explosion problem.
-
-Chao Wang provided a description of a similar verification method for
-multithreaded software that uses shared memory as a means of synchronization.
-Sharma et al. created a method of using concrete execution to verify MCAPI
-programs, but it was later discovered that this method does not completely
-explore the entire execution space of certain kinds of MCAPI programs. Elwakil
-et al. defined a method of representing MCAPI program executions as
-satisfiability problems, but this method does not correctly model all kinds of
-MCAPI program executions \cite{elwakil:padtad10}
-.
-
-In this paper we describe our method of modeling executions of MCAPI programs
-as satisfiability problems such that the size of the problem scales linearly
+Given the output form of the process, we can model an MCAPI program as a satisfiability problem such that the size of the problem scales linearly
 based on the number of possible match pairs that are being modeled. Negated
 system properties are integrated in the satisfiability problem in such a manner
 that if a satisfiable assignment is discovered for the problem, then the
 assignment can be used to simply create an error trace that indicates how the
 program could reach an error state in the program under test.
 
-We will also describe how to determine an over-approximated set of match pairs, and how this
+
+Chao Wang provided a description of a similar verification method for
+multithreaded software that uses shared memory as a means of synchronization \cite{wang:fse09}.
+Sharma et al. created a method of using concrete execution to verify MCAPI
+programs, but it was later discovered that this method does not completely
+explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. Elwakil
+et al. also defined a method of representing MCAPI program executions as
+satisfiability problems, but this method does not correctly model all kinds of
+MCAPI program executions \cite{elwakil:padtad10}
+.
+
+We model our satisfiability problem based on the match pairs of the send and receive operations. This method creates light-weighted encoding for MCAPI programs. In other words, it provides efficient solutions. Most importantly, this method guarantees of finding and verifying all possible execution traces through a concurrent program. 
+
+
+In this paper, we also describe how to determine an over-approximated set of match pairs, and how this
 set of match pairs can be used to create a satisfiability problem to precisely
 model all possible behaviors of an execution trace of an MCAPI application.
 Finally we will describe how this verification technique may be used within a

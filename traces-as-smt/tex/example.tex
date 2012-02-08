@@ -141,11 +141,11 @@
     (MATCH rcvA snd1))
 (or (MATCH rcvB  snd1)
     (MATCH rcvB snd3))
-(ne rcvA rcvB)
+(NE rcvA rcvB)
 
 (MATCH rcvC snd2)
 
-(assume (> b 0))
+(assert (> b 0))
 (assert (not (= a 4)))
 \end{alltt}
 \end{minipage}
@@ -198,13 +198,13 @@ the trace is valid \cite{wang:fse09}. The CTP for the trace indicated
 in the first column of each task in \figref{fig:mcapi} is shown in
 the bottom of the same figure. The CTP is more abstract than the
 original C code, and line numbers are now grouped into a program location
-(where the number in front of ``\_'' is the thread number and the number behind is the command line)
+(where the number in front of ``\_'' is the thread number and the number behind is the command order)
 in each command, but it retains sufficient details to reason about
-other possible executions. The assume statement on program location \texttt{0\_5}
+other possible executions. The assume statement on program location \texttt{0\_4}
 of task 0 preserves the control flow of the original trace. In other
 words, any alternative trace on the CTP is only valid if the assume
 statement holds; otherwise, such an execution belongs to a different
-path through the program. An SMT solver is used to enumerate the
+path through the program. We define a trace language that takes as input a single execution trace and the CTP, to verify the correctness of executing a single trace. The trace language simulates the trace execution by rewriting the program state based on transitions described in the trace and the CTP. We apply queue movement in the language semantic to specify the communication between a send and a receive command. By applying the same framework of our trace language, an SMT problem can be defined on the simulation of a trace execution. An SMT solver for the defined problem is used to enumerate the
 possible valid executions in an effort to find one that violates the
 assertion on program location \texttt{0\_5} of the CTP for our example while preserving the assumption on line \texttt{0\_4}.
 
@@ -253,12 +253,12 @@ example, matching \texttt{rcvA} with \texttt{snd3} forces the variable
 $a$ to have the value 1. The \texttt{MATCH} function encodes this
 relationship. The \texttt{ne} term prevents the SMT solver from
 finding solutions that use conflicting match pairs. In our example,
-the \texttt{ne} term precludes \texttt{rcvA} and \texttt{rcvB} from
-matching to the same send. The assume prevents the SMT solver from
+the \texttt{NE} term precludes \texttt{rcvA} and \texttt{rcvB} from
+matching to the same send. The first assert works as the assume in \figref{fig:mcapi}, such that it prevents the SMT solver from
 finding solutions that are not consistent with control flow, so any
-solution that has $b \leq 0$ is infeasible. Finally, the assert is negated
+solution that has $b \leq 0$ is infeasible. Finally, the second assert is negated
 as the goal is to find schedules that violate the property. In our
-example, the interest is in solutions the resolve in $a \neq 4$.
+example, the interest is in solutions that resolve in $a \neq 4$.
 
 The SMT encoding in \figref{fig:smt}(b) can be given to any preferred SMT
 solver and a satisfying assignment is a feasible execution that violates an
@@ -320,6 +320,6 @@ Task 0 & Task 1 & Task 2 \\
 (a) & (b)
 \end{tabular}
 \end{center}
-\caption{A match-pair set and SMT encoding of the system in bottom half of \figref{fig:mcapi}. (a) The match pairs based on end-points. (b) The SMT encoding where \texttt{HB} creates a \emph{happens-before} constraint, \emph{MATCH} creates a match-pair constraint, and \emph{ne} creates a constraint to preclude the use of conflicting match pairs.}
+\caption{A match-pair set and SMT encoding of the system in bottom half of \figref{fig:mcapi}. (a) The match pairs based on end-points. (b) The SMT encoding where $\mathrm{HB}$ creates a \emph{happens-before} constraint, $\mathrm{MATCH}$ creates a match-pair constraint, and $\mathrm{NE}$ creates a constraint to preclude the use of conflicting match pairs.}
 \label{fig:smt}
 \end{figure}

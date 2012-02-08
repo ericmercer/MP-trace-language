@@ -1,4 +1,4 @@
-\section{Result} 
+\section{Result}
 In Section 4, we know that a well defined SMT problem can encode all possible execution traces for a CTP given a precise set of match pair. A precise set of match pair contains all possible match pairs that can exist in the real execution, and all match pairs that can not exist in the execution are not included. In other words, every hidden error can be found if it exists in some trace. To evaluate the reliability and efficiency of our system, we compare our encoding with the work presented in \cite{elwakil:padtad10}.
 
 Elwakil et al. defined a similar order-based SMT encoding for the same problem.
@@ -11,4 +11,19 @@ Their encoding can handle most regular scenarios of CTP and some errors can be f
 
 An important measurement of efficiency for solving an SMT problem is to measure the ``size" of the SMT encoding, one way of which is to count the numbers of the clauses that construct the encoding. To count the clause number of our encoding, we have the following rules: 1) there are $N-M$ HB clauses where $N$ is the total number of actions and $M$ is the number of thread; 2) there are $R+1$ MATCH clauses (some of them is a disjunction of several match pairs), where $R$ is the number of receive actions; 3) there are $A$ assignment and assertion clauses, where $A$ is the total number of assignment and assertion in the program. Compared with those in \cite{elwakil:padtad10}, our encoding has few clauses, and their encoding has more free variables and rules.
 
-For the example in the previous section, we encodes 17 clauses for modeling the problem, omitting the definition of variables at the beginning of the encoding. Based on their encoding rules, however, there are 47 clauses for the same problem, omitting the definitions as well. Reducing the clause number means a large improvement of efficiency. Thus, our encoding can be executed faster given an SMT solver.
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+		\hline
+        CTP & Example in \figref{fig:mcapi} & small1	 &	small2 & small3 \\ \hline
+        Our Encoding& 17 & 8 & 4 & 11 \\
+        Encoding in \cite{elwakil:padtad10}& 47 & 33 & 18 & 44\\ \hline	
+		\end{tabular}
+\end{center}
+\caption{Comparison of two encodings}
+\label{table:comparison}
+\end{table}
+
+For the example in the previous section, we encodes 17 clauses for modeling the problem, omitting the definition of variables at the beginning of the encoding. Based on their encoding rules, however, there are 47 clauses for the same problem, omitting the definitions as well. Other than the previous example, we present the clause number of both encodings for three more examples in \tableref{table:comparison}. Reducing the clause number means a large improvement of efficiency. From the comparison of two encodings in \tableref{table:comparison}, it is obvious that our encoding can be executed faster given an SMT solver.
+
+

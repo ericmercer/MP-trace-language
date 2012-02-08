@@ -532,7 +532,7 @@ location and a command.  For simplicity, commands (\textit{c}) are
 restricted to assume, assert, assignment, non-blocking send (\snd) and
 receive (\rcv), and wait. We model a trace as an order of executed locations identified by (\ploc) and a series of queue movements that move a message from a source queue to a destination queue. The queue movement (\movebot) is either a special symbol indicating no movement or a list of move commands.
 The move list (\movelist) consists of several pairs of end-points where the first and second end-points are the destination and source end-points respectively.
-Each pair in the move list refers to a queue movement such that the head item of the pending sends in the source end-point should be moved to the send queue in the destination end-point.
+Each pair in the move list refers to a queue movement such that the first pending send of the source end-point should be moved to the send queue of the destination end-point.
 The non-terminal \aid\ in the grammar is a
 unique string identifier associated with a send or receive command
 referred to as an action ID in the text.  The wait command takes a

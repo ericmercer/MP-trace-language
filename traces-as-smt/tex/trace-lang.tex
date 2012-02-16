@@ -546,12 +546,12 @@ using prefix notation over binary operators.  The bottom of
 thread and its commands into an appropriate list using parenthesis).
 
 A sequential trace of a CTP in the grammar is a list of trace entries
-(\traceentry).  A trace entry is a pair consisting of a program location (\ploc) and queue movement list. An example
+(\traceentry).  A trace entry is a pair consisting of a program location (\ploc) and either a queue movement list (\movebot) or a symbol ($\bot$). An example
 of a trace can be seen in the bottom of \figref{fig:mcapi} in the
 second column by following the sequential order in the first column
 which starts on program location \texttt{2\_0} of task 2.  Notice that whenever the
 trace reaches a wait command on a receive action, the trace includes
-a queue movement list that delivers messages from a source queue to a destination queue. In other words, the trace resolves any non-determinism in scheduling or
+a queue movement list where the destination is listed followed by the source. Messages are delivered from the source queue to the destination queue. In other words, the trace resolves any non-determinism in scheduling or
 message buffering that is present in the CTP.
 
 \subsection{Operational Semantics}
@@ -573,7 +573,7 @@ $h$ (a store mapping a location $l$ to a value $v$), and $k$ (a continuation).
 Among the members of the message passing model,
 \aidmap\ is a dictionary mapping an action ID \aid\ to an end-point \ep.
 \epsnd\ is a set of send queues where each queue is uniquely identified first by the source end-point and then by the destination end-point. The queue itself holds pairs consisting of an action ID and value (\aid,v).
-\eprcv\ is a set of receive queues where each queue is uniquely identified by the destination end-point. The queue itself holds pairs consisting of an action ID and a variable (\aid,$x$). \qset is the structure similar as \eprcv, except that the queue itself in the set is (a store mapping any given destination end-point \dst\ to a list of pairs where each pair is an action IF \aid\ and a value $v$).  Intuitively, \epsnd\, \qset\ and \eprcv\ are end-point queues tracking actions with associated values (sends) or variables (receives). Both \epsnd\ and \qset\ store the sends. \qset\ holds delivered messages that are ready to be received. A message moves from \epsnd\ to \qset\ through queue movement lists in the trace on the CTP.
+\eprcv\ is a set of receive queues where each queue is uniquely identified by the destination end-point. The queue itself holds pairs consisting of an action ID and a variable (\aid,$x$). \qset\ is also a set of queues where each queue is uniquely identified by the destination end-point. The queue itself holds pairs consisting of an action ID \aid\ and either a value $v$ or a symbol $\bot$. Intuitively, \epsnd\, \qset\ and \eprcv\ are end-point queues tracking actions with associated values (sends) or variables (receives). Both \epsnd\ and \qset\ store the sends. \qset\ holds delivered messages that are ready to be received. A message moves from \epsnd\ to \qset\ through queue movement lists in the trace on the CTP.
 
 The trace status in the \textit{mstate} nine-tuple is given by
 \status\ which ranges over a lattice:
@@ -590,10 +590,10 @@ We have several CESK machines that handle different aspects of the CTP and trace
 
 The \textit{Machine Step} inference in \figref{fig:machine} matches any \textit{mstate} that has a thread whose first list entry matches the program location in the head of the trace.  A match on the inference
 rewrites the \textit{mstate} with new entries for each member of the
-nine-tuple by first applying the queue reduction relation until no more reductions apply (no more queue movement are performed) and then applying the expression reduction relation until no
-more reductions apply (as indicated by the asterisk). Note the queue reductions perform the queue movement such that all send actions are moved to the destination send queues, and the matching can be processed in the expression reduction. At this point, send and receive actions are matched in the wait expression.
+nine-tuple by first applying the queue reduction relation until no more reductions apply (all queue movements are processed in the trace entry first) and then applying the expression reduction relation until no
+more reductions apply (as indicated by the asterisk). Note that queue reductions perform the queue movement such that all send actions are moved to the destination send queues. After completing all queue movements, messages can be delivered in the process of expression reduction.
 
-The queue reduction for each command of the queue movement list in the trace entry is given in \figref{fig:queue}. The definition of the \textit{qstate}  four-tuple is presented in the evaluation syntax in \figref{fig:expr:stx}(b). The symbol $\bot$ in the queue movement \movebot\ indicates that no more queue movement follows. \epsnd\ represents pending sends that have yet to be delivered from the source end-points. \qset\ represents delivered sends sitting in the destination end-point. A message moves from pending to delivered through queue movement lists. Each reduction step processes the first pair of the queue movement list and reduction steps follow until $\bot$ is shown.
+The queue reduction for each command of the queue movement list in the trace entry is given in \figref{fig:queue}. The definition of the \textit{qstate} four-tuple is presented in the evaluation syntax in \figref{fig:expr:stx}(b). The symbol $\bot$ in the queue movement \movebot\ indicates that no more queue movement follows. A message moves from pending to delivered through queue movement lists. Each reduction step processes the first pair of the queue movement list and reduction steps follow until $\bot$ is shown.
 
 Expression reductions for each command in the trace language are given
 in \figref{fig:expression} and are defined over the \textit{estate}
@@ -604,7 +604,7 @@ holder indication where evaluation is taking place.  For example, the
 \emph{Assume Expressions Evaluation} creates a continuation indicating
 that it is first evaluating the expression in the assume command.
 Once that expression reduces to a value, then the \emph{Assume
-  Command} inference matches to validate the assumptions.
+  Command} inference matches to check the assumptions.
 
 
 The expression reductions use several helper functions. The function \emph{op}$(v_l,v_r)$
@@ -635,16 +635,22 @@ Consider a portion of the \emph{Rcvi Command}:
   ([\aid_0\ x_0]\ [\aid_1\ x_1]\ \ldots)]\\
 ([\aid_1\ x_1]\ \ldots) &=& \eprcv(\dst)
 \end{eqnarray*}
-$\eprcv_p$\ is a new store, just
-like the old store $\eprcv$, only the new store maps the destination
-end-point $\dst$\ to its contents in the old store plus the added
+$\eprcv_p$\ is a new set, just
+like the old set $\eprcv$, only the new set maps the destination
+end-point $\dst$\ to its contents in the old set plus the added
 entry to the front of the list of the action ID and variable for the
 receive command being evaluated. Considering the entire rule in the figure, it also updates the
-action ID map, \aidmap, to include the coupling between the action ID
+action ID map, $\aidmap = ([\aid_0\ \dst]\ [\aid\ \ep]\ \ldots)$, to include the coupling between the action ID
 and its destination end-point.
 
-The function of the \emph{Wait (SNDI) Command} rule in \figref{fig:expression} is to consume the wait command
-only.  The function of the other rule for the wait command is more involved. The \emph{Wait(RCVI) Command} rule is complicated because a CTP can wait on receive actions out of program order. Consider the simple trace \emph{rcvA} followed by \emph{rcvB}. It is perfectly valid to now call \emph{wait(rcvB)} even though it appeared after the \emph{rcvA} action. The \emph{Wait(RCVI) Command} handles this very situation in function $\mathrm{getMarkRemove}$ by first finding in the pending receive queue the sub queue from the head of the queue to the receive being waited on. The length of the delivered queue \qset\ must be at least as long as this sub queue. The actual wait command then updates the indicated variable in every receive preceding the one indicated by the wait command to reflect the completion of those commands which must precede the one indicated in the wait command.
+The function of the \emph{Wait(SNDI) Command} rule in \figref{fig:expression} is to consume the wait command
+only. The function of the other rule for the wait command is more involved. The \emph{Wait(RCVI) Command} rule is complicated because a CTP can wait on receive actions out of program order. Consider the following trace
+ \[(\ldots\ (\mathit{rcvA}~\bot)\ (\mathit{rcvB}~\bot)\ (\mathit{wait(rcvB)}~\bot)\ (\mathit{wait(rcvA)}~\bot)\ \ldots)\]
+omitting the regular definition for the commands and the trace. It is perfectly valid to now call $wait(rcvB)$ even though it appeared after the $rcvA$ action. The \emph{Wait(RCVI) Command} handles this very situation in function $\mathrm{getMarkRemove}$. %by first finding in the pending receive queue the subqueue from the head of the queue to the receive being waited on. The function then gets the send operation in the delivered queue \qset\ with the same length of the destination receive from the head of the queue. The length of the delivered queue \qset\ must be at least as long as this sub queue. The actual wait command then updates the indicated variable in every send preceding the one that matches the receive indicated by the wait command to reflect the completion of those commands which must precede the one indicated in the wait command.
+Consider the same trace above, we have the following structures of the \emph{pending receive queue} and the \emph{delivered queue} respectively,
+\[\eprcv:~(\ldots~(\dst~\rightarrow~([rcvA~x_0]~[rcvB~x_1]~\ldots))~\ldots)\]
+\[\qset:~(\ldots~(\dst~\rightarrow~([snd1~v_0]~[snd2~v_1]~\ldots))~\ldots)\]
+Function $\mathrm{getMarkRemove}$ in the command $wait(rcvB)$ works as the following steps: first finding the pair $[rcvB~x_1]$ in the pending receive queue; then getting the pair $[snd2~v_1]$ in the delivered queue; then marking the pair $[snd1~v_0]$ as first assigning $v_0$ to variable $x_0$ in the heap then updating the pair $[snd1~v_0]$ to $[snd1~\bot]$; finally removing the pair $[rcvB~x_1]$ and $[snd2~v_1]$ in $\eprcv$ and $\qset$, respectively.
 
 The syntax with the operational semantics, as presented, are
 implemented directly in PLT Redex.  PLT Redex is a language for

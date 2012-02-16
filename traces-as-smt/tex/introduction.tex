@@ -15,7 +15,35 @@ operation between different computing entities within a device. Messages can be
 passed across persistent channels that force an ordering of the messages, or
 they can be passed to specific \emph{endpoints} within the system. The specification places few ordering constrains on messages passed from one
 endpoint to another. This freedom introduces into the system possibilities for
-non-deterministic behavior in the way the messages arrive at their destination.
+non-deterministic behavior in the way the messages arrive at their destination. 
+
+This non-deterministic behavior in MCAPI programs is difficult for current tools to test or debug. 
+Chao Wang provided a description of a verification method for
+multithreaded software that uses shared memory as a means of synchronization \cite{wang:fse09}.
+Sharma et al. created a method of using concrete execution to verify MCAPI
+programs, but it was later discovered that this method does not completely
+explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. Elwakil
+et al. also defined a method of representing MCAPI program executions as
+satisfiability problems, but this method does not correctly model all kinds of
+MCAPI program executions \cite{elwakil:padtad10}.
+
+Either the existing technique can not correctly encodes the program, or they can not provide efficient method for testing or debugging.
+Due to the difficulty and defect described above, we provide and present a method in this paper that creates a light weight encoding for an MCAPI program. In other words, the encoding itself provides efficiency. Most importantly, this method guarantees of finding all hidden errors by encoding all possible execution traces of a concurrent program into an SMT problem.
+
+We define a trace language - a framework for match pair encoding in Section 3 that
+takes as input an execution of an MCAPI program and verifies it, according to
+provided correctness properties. Output is given in the form of a path of
+execution to an error state, or as a declaration of correctness for the
+provided trace. Given the output form of the process, we can model a single execution trace of an MCAPI program as a satisfiability problem in the same framework of our trace language in Section 4. By scheduling different executions for the same concurrent program, we know that it is the match pairs of the send and receive operations that
+introduce non-determinism into the program. By combining several satisfiability problems for an identical program, we can model all possible execution traces into one satisfiability problem such that the size of the problem scales linearly based on the number of possible match pairs that are being modeled. Negated
+system properties are integrated in the satisfiability problem in such a manner
+that if a satisfiable assignment is discovered for the problem, then the
+assignment can be used to simply create an error trace that indicates how the
+program could reach an error state in the program under test. Our method provides correct and efficient encoding for modeling an MCAPI program. The experimental result is provided by comparing the encoding itself with the work in \cite{elwakil:padtad10} in Section 5. Finally, we describe how to determine an over-approximated set of match pairs and how this verification technique is used within a
+refinement loop to provide a more efficient means of verifying MCAPI
+applications in Section 6.  
+
+
 %As an example we present an abstract of a small program that uses MCAPI in
 %\figref{fig:mcapi}. Each node represents a different thread. The
 %$\mathit{Send}$ function call parameters include a unique identifier, the
@@ -46,41 +74,22 @@ non-deterministic behavior in the way the messages arrive at their destination.
 
 %It is important to recognize that the thread schedules of these two executions
 %are exactly the same, even though the resulting behavior is completely
-%different. 
-By scheduling different executions for the same current program, we know that it is the match pairs of the send and receive operations that
-introduce non-determinism into the program. We have defined a process that
-takes as input an execution of an MCAPI program and verifies it, according to
-provided correctness properties. Output is given in the form of a path of
-execution to an error state, or as a declaration of correctness for the
-provided trace.
-
-Given the output form of the process, we can model an MCAPI program as a satisfiability problem such that the size of the problem scales linearly
-based on the number of possible match pairs that are being modeled. Negated
-system properties are integrated in the satisfiability problem in such a manner
-that if a satisfiable assignment is discovered for the problem, then the
-assignment can be used to simply create an error trace that indicates how the
-program could reach an error state in the program under test.
+%different.
 
 
-Chao Wang provided a description of a similar verification method for
-multithreaded software that uses shared memory as a means of synchronization \cite{wang:fse09}.
-Sharma et al. created a method of using concrete execution to verify MCAPI
-programs, but it was later discovered that this method does not completely
-explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. Elwakil
-et al. also defined a method of representing MCAPI program executions as
-satisfiability problems, but this method does not correctly model all kinds of
-MCAPI program executions \cite{elwakil:padtad10}
-.
 
-We model our satisfiability problem based on the match pairs of the send and receive operations. This method creates light-weighted encoding for MCAPI programs. In other words, it provides efficient solutions. Most importantly, this method guarantees of finding and verifying all possible execution traces through a concurrent program. 
+%We model our satisfiability problem based on the match pairs of the send and receive operations. This method creates light-weighted encoding for MCAPI programs. In other words, it provides efficient solutions. Most importantly, this method guarantees of finding and verifying all possible execution traces through a concurrent program.
 
 
-In this paper, we also describe how to determine an over-approximated set of match pairs, and how this
-set of match pairs can be used to create a satisfiability problem to precisely
-model all possible behaviors of an execution trace of an MCAPI application.
-Finally we will describe how this verification technique may be used within a
-refinement loop to provide a more efficient means of verifying MCAPI
-applications.
+Our main contributions in this paper include:
+
+\begin{enumerate}
+\item An MCAPI program that introduces non-deterministic behavior.
+\item A trace language framework that simulates and verifies an execution trace of an MCAPI program.
+\item A modified trace language framework that generates an SMT problem for a single trace in the machine executions.
+\item A combination function that combines several SMT problems for an identical concurrent program into one SMT encoding that provides a larger answer set.
+\item An algorithm with low complexity that generates an over-approximated set of match pair.  
+\end{enumerate}
 
 %\noindent\textbf{We have 10 pages for the paper!}
 

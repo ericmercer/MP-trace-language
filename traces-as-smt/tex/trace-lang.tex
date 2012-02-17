@@ -463,10 +463,10 @@
 %        )
 %   ))
 \inferrule[Wait (rcvi) Command]{
-    ([\aid_0\ \ep_0]\ \ldots\ [\aid_r\ \dst][\aid_1\ \ep_1]) = \aidmap\\
-    \aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
+    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src]\ \ldots\ [\aid_r\ \dst]\ \ldots\ [\aid_1\ \ep_1]) = \aidmap\\
+    %\aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
     (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
-    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
+    %([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
     \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])
 }{
     (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k) \reduce{e}

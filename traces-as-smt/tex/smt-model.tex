@@ -229,7 +229,7 @@
 %        )
 %   ))
 \inferrule[Wait (rcvi) Command]{
-    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src]\ \ldots\ [\aid_r\ \dst]\ \ldots\ [\aid_1\ \ep_1]) = \aidmap\\ 
+    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src]\ \ldots\ [\aid_r\ \dst]\ \ldots\ [\aid_1\ \ep_1]) = \aidmap\\
     %\aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src]\ \ldots\ [\aid_1\ \ep_1])\\
     (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
     %([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
@@ -474,11 +474,11 @@ $\Box$
 %\end{definition}
 
 %We extend the structure \ml\ to the structure \smt\ such that
-%\[\smt=(\mathit{defs}\ \mathit{constrains}\ \ml)\]
+%\[\smt=(\mathit{defs}\ \mathit{constraints}\ \ml)\]
 %where the match constraints are separated from $\mathit{constraints}$. In addition, two SMT problems are assumed to hold the same $\mathit{defs}$ and $\mathit{constraints}$ excluding the match constraints if and only if they can be combined by applying a combination operator in \defref{def:combinator}.
 
 \begin{definition}
-A combination operator $\mathit{COMB}$ for two SMT problems, represented as three-tuples $\smt_1$ and $\smt_2$, where $\smt_1 = (\mathit{defs}\ \mathit{constrains}\ \ml_1)$ and $\smt_2 = (\mathit{defs}\ \mathit{constrains}\ \ml_2)$, returns a new SMT tuple, such that,
+A combination operator $\mathit{COMB}$ for two SMT problems, represented as three-tuples $\smt_1$ and $\smt_2$, where $\smt_1 = (\mathit{defs}\ \mathit{constraints}\ \ml_1)$ and $\smt_2 = (\mathit{defs}\ \mathit{constraints}\ \ml_2)$, returns a new SMT tuple, such that,
 \[\mathit{COMB}(smt_1,smt_2)\ =\ (\mathit{defs}\ \mathit{constraints}\ \ml_{new})\]
 where $\ml_{new}$ is a new relation such that $\forall\recv\in dom(\ml_1)\cup dom(\ml_2)$, $\ml_{new}(\recv) = \ml_1(\recv)\cdot\ml_2(\recv)$. Note that two SMT problems are assumed to hold the same $\mathit{defs}$ and $\mathit{constraints}$ excluding the match constraints.
 \label{def:combinator}
@@ -509,7 +509,7 @@ Induction. Assume we have combined n SMT problems and the combined SMT problem $
 From \textbf{Lemma 2}, the combined SMT problem is more powerful because it can find the violation of an assertion among several trace encodings. The following theorem states the relation between the ability of finding violation and the content of the match-list \ml.
 
 \begin{theorem}
-For two SMT problems, $\smt_{\phi} = (\mathit{defs}\ \mathit{constrains}\ \ml_{\phi})$ and $\smt = (\mathit{defs}\ \mathit{constrains}\ \ml)$,
+For two SMT problems, $\smt_{\phi} = (\mathit{defs}\ \mathit{constraints}\ \ml_{\phi})$ and $\smt = (\mathit{defs}\ \mathit{constraints}\ \ml)$,
 if $\mathit{range(\ml_{\phi})} \subseteq \mathit{range(\ml)}$,
 \[\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)\]
 \end{theorem}

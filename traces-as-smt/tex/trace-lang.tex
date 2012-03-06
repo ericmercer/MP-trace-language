@@ -1,68 +1,4 @@
-\newcommand{\epsnd}{\textit{Pnd\_s}}
-\newcommand{\eprcv}{\textit{Pnd\_r}}
-\newcommand{\qset}{\textit{Q\_s}}
-\newcommand{\snd}{\textit{snd}}
-\newcommand{\rcv}{\textit{rcv}}
-\newcommand{\q}{\textit{q}}
-\newcommand{\frm}{\textit{frm}}
-\newcommand{\vbot}{\textit{v$-\bot$}}
-\newcommand{\status}{\textit{s}}
-\newcommand{\last}{\textit{l}}
-\newcommand{\error}{\ensuremath{\mathbf{error}}}
-\newcommand{\aidmap}{\textit{A}}
-\newcommand{\thread}{\ensuremath{\mathit{t}}}
-\newcommand{\aid}{\ensuremath{\mathit{a}}}
-\newcommand{\ploc}{\ensuremath{\rho}}
-\newcommand{\loc}{\ensuremath{\mathit{l}}}
-\newcommand{\cmd}{\ensuremath{\mathit{c}}}
-\newcommand{\op}{\ensuremath{\mathit{op}}}
-\newcommand{\applyop}{\ensuremath{\mathrm{op}}}
-\newcommand{\wait}{\ensuremath{\mathbf{wait}}}
-\newcommand{\sendi}{\ensuremath{\mathbf{sndi}}}
-\newcommand{\recvi}{\ensuremath{\mathbf{rcvi}}}
-\newcommand{\traceentry}{\ensuremath{\sigma}}
-\newcommand{\movelist}{\ensuremath{\delta}}
-\newcommand{\assume}{\ensuremath{\mathit{assume}}}
-\newcommand{\checkassume}{\ensuremath{\mathrm{assume}}}
-\newcommand{\assert}{\ensuremath{\mathit{assert}}}
-\newcommand{\checkassert}{\ensuremath{\mathrm{assert}}}
-\newcommand{\ep}{\ensuremath{\mathbf{\gamma}}}
-\newcommand{\src}{\ensuremath{\alpha}}
-\newcommand{\dst}{\ensuremath{\beta}}
-\newcommand{\true}{\ensuremath{\mathbf{true}}}
-\newcommand{\false}{\ensuremath{\mathbf{false}}}
-\newcommand{\match}{\ensuremath{\mathrm{m}}}
-\newcommand{\matchl}{\ensuremath{\mathrm{match}}}
-\newcommand{\findrecv}{\ensuremath{\mathrm{search_r}}}
-\newcommand{\smt}{\ensuremath{\mathit{smt}}}
 
-
-\newcommand{\addsend}{\ensuremath{\mathrm{addsend}}}
-\newcommand{\getsend}{\ensuremath{\mathrm{getsend}}}
-\newcommand{\removesend}{\ensuremath{\mathrm{removesend}}}
-\newcommand{\addrecv}{\ensuremath{\mathrm{addrecv}}}
-\newcommand{\getrecv}{\ensuremath{\mathrm{getrecv}}}
-\newcommand{\removerecv}{\ensuremath{\mathrm{removefrecv}}}
-\newcommand{\hextend}{\ensuremath{\mathrm{hextend}}}
-\newcommand{\hlookup}{\ensuremath{\mathrm{hlookup}}}
-\newcommand{\etalookup}{\ensuremath{\mathrm{etalookup}}}
-\newcommand{\checkmatch}{\ensuremath{\mathrm{checkmatch}}}
-\newcommand{\getep}{\ensuremath{\mathrm{getEP}}}
-\newcommand{\getmarkremove}{\ensuremath{\mathrm{getMarkRemove}}}
-\newcommand{\getlastsendreplace}{\ensuremath{\mathrm{getlastsend/replace}}}
-\newcommand{\statuschange}{\left\{ \begin{array}{ll}  \status &\ \mathrm{if}\ |\epsnd(\dst)(\src)|>0\\
-   \mathit{error} &\  \mathrm{otherwise}\end{array}\right .}
-
-\newcommand{\reduce}[1]{\ensuremath{\rightarrow_{#1}}}
-% Multiple reductions
-\newcommand{\reduceK}[1]{\ensuremath{\rightarrow_{#1}^{*}}}
-% Non-deterministic reductions
-\newcommand{\reduceN}[1]{\ensuremath{\dashrightarrow_{#1}}}
-\newcommand{\reduceNK}[1]{\ensuremath{\dashrightarrow_{#1}^{*}}}
-\newcommand{\mt}{\ensuremath{\emptyset}}
-\newcommand{\trace}{\ensuremath{\mathit{trace}}}
-\newcommand{\movebot}{\ensuremath{\mathit{m}}}
-\newcommand{\ret}{\ensuremath{\mathbf{ret}}}
 
 \newsavebox{\boxLangSyntax}
 \newsavebox{\boxEvalSyntax}
@@ -510,7 +446,7 @@ success-temp
 \end{figure}
 \end{comment}
 
-\section{Trace Language}\label{sec:trace}
+%\section{Trace Language}\label{sec:trace}
 The trace language is the theoretical framework for the match-pair
 encoding.  The language syntax describes a CTP with a single execution
 trace on the same CTP.  The evaluation syntax with its operational
@@ -521,7 +457,7 @@ violation), a failure (causes an assertion violation), infeasible
 SMT problem and extends that encoding to capture a set of possible
 traces using match-pairs.
 
-\subsection{Syntax}
+\subsubsection{Syntax}
 \figref{fig:expr:stx}(a) is the syntax for a trace language program.
 This presentation uses ellipses ($\ldots$) to represent zero or more
 repetitions, bold-face to indicate terminals, and omits commas in tuples for cleanliness. A trace language
@@ -554,7 +490,7 @@ trace reaches a wait command on a receive action, the trace includes
 a queue movement list where the destination is listed followed by the source. Messages are delivered from the source queue to the destination queue. In other words, the trace resolves any non-determinism in scheduling or
 message buffering that is present in the CTP.
 
-\subsection{Operational Semantics}
+\subsubsection{Operational Semantics}
 The operational semantics for the trace language are given by a term
 rewriting system using a \textit{CESK} style machine
 \footnote{The \textit{CESK} machine state is represented with a \textbf{C}ontrol string,

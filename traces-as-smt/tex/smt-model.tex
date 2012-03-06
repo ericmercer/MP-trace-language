@@ -1,3 +1,69 @@
+\newcommand{\epsnd}{\textit{Pnd\_s}}
+\newcommand{\eprcv}{\textit{Pnd\_r}}
+\newcommand{\qset}{\textit{Q\_s}}
+\newcommand{\snd}{\textit{snd}}
+\newcommand{\rcv}{\textit{rcv}}
+\newcommand{\q}{\textit{q}}
+\newcommand{\frm}{\textit{frm}}
+\newcommand{\vbot}{\textit{v$-\bot$}}
+\newcommand{\status}{\textit{s}}
+\newcommand{\last}{\textit{l}}
+\newcommand{\error}{\ensuremath{\mathbf{error}}}
+\newcommand{\aidmap}{\textit{A}}
+\newcommand{\thread}{\ensuremath{\mathit{t}}}
+\newcommand{\aid}{\ensuremath{\mathit{a}}}
+\newcommand{\ploc}{\ensuremath{\rho}}
+\newcommand{\loc}{\ensuremath{\mathit{l}}}
+\newcommand{\cmd}{\ensuremath{\mathit{c}}}
+\newcommand{\op}{\ensuremath{\mathit{op}}}
+\newcommand{\applyop}{\ensuremath{\mathrm{op}}}
+\newcommand{\wait}{\ensuremath{\mathbf{wait}}}
+\newcommand{\sendi}{\ensuremath{\mathbf{sndi}}}
+\newcommand{\recvi}{\ensuremath{\mathbf{rcvi}}}
+\newcommand{\traceentry}{\ensuremath{\sigma}}
+\newcommand{\movelist}{\ensuremath{\delta}}
+\newcommand{\assume}{\ensuremath{\mathit{assume}}}
+\newcommand{\checkassume}{\ensuremath{\mathrm{assume}}}
+\newcommand{\assert}{\ensuremath{\mathit{assert}}}
+\newcommand{\checkassert}{\ensuremath{\mathrm{assert}}}
+\newcommand{\ep}{\ensuremath{\mathbf{\gamma}}}
+\newcommand{\src}{\ensuremath{\alpha}}
+\newcommand{\dst}{\ensuremath{\beta}}
+\newcommand{\true}{\ensuremath{\mathbf{true}}}
+\newcommand{\false}{\ensuremath{\mathbf{false}}}
+\newcommand{\match}{\ensuremath{\mathrm{m}}}
+\newcommand{\matchl}{\ensuremath{\mathrm{match}}}
+\newcommand{\findrecv}{\ensuremath{\mathrm{search_r}}}
+\newcommand{\smt}{\ensuremath{\mathit{smt}}}
+
+
+\newcommand{\addsend}{\ensuremath{\mathrm{addsend}}}
+\newcommand{\getsend}{\ensuremath{\mathrm{getsend}}}
+\newcommand{\removesend}{\ensuremath{\mathrm{removesend}}}
+\newcommand{\addrecv}{\ensuremath{\mathrm{addrecv}}}
+\newcommand{\getrecv}{\ensuremath{\mathrm{getrecv}}}
+\newcommand{\removerecv}{\ensuremath{\mathrm{removefrecv}}}
+\newcommand{\hextend}{\ensuremath{\mathrm{hextend}}}
+\newcommand{\hlookup}{\ensuremath{\mathrm{hlookup}}}
+\newcommand{\etalookup}{\ensuremath{\mathrm{etalookup}}}
+\newcommand{\checkmatch}{\ensuremath{\mathrm{checkmatch}}}
+\newcommand{\getep}{\ensuremath{\mathrm{getEP}}}
+\newcommand{\getmarkremove}{\ensuremath{\mathrm{getMarkRemove}}}
+\newcommand{\getlastsendreplace}{\ensuremath{\mathrm{getlastsend/replace}}}
+\newcommand{\statuschange}{\left\{ \begin{array}{ll}  \status &\ \mathrm{if}\ |\epsnd(\dst)(\src)|>0\\
+   \mathit{error} &\  \mathrm{otherwise}\end{array}\right .}
+
+\newcommand{\reduce}[1]{\ensuremath{\rightarrow_{#1}}}
+% Multiple reductions
+\newcommand{\reduceK}[1]{\ensuremath{\rightarrow_{#1}^{*}}}
+% Non-deterministic reductions
+\newcommand{\reduceN}[1]{\ensuremath{\dashrightarrow_{#1}}}
+\newcommand{\reduceNK}[1]{\ensuremath{\dashrightarrow_{#1}^{*}}}
+\newcommand{\mt}{\ensuremath{\emptyset}}
+\newcommand{\trace}{\ensuremath{\mathit{trace}}}
+\newcommand{\movebot}{\ensuremath{\mathit{m}}}
+\newcommand{\ret}{\ensuremath{\mathbf{ret}}}
+
 \newcommand{\defs}{\ensuremath{\mathrm{defs}}}
 \newcommand{\any}{\ensuremath{\mathrm{any}}}
 \newcommand{\negate}{\ensuremath{\mathrm{not}}}
@@ -18,24 +84,29 @@
 \begin{lrbox}{\boxSMTa}
 \begin{minipage}[c]{0.4\linewidth}
 \begin{alltt}
-(HB rcvA (wait rcvA))
-(HB (wait rcvA) rcvB)
-(HB rcvB (wait rcvB))
-(HB (wait rcvB) assume)
-(HB assume assert)
-(HB rcvC (wait rcvC))
-(HB (wait rcvC) snd3)
-(HB snd3 (wait snd3))
-(HB snd1 (wait snd1))
-(HB (wait snd1) snd2)
-(HB snd2 (wait snd2))
+\textit{defs} is not shown;
 
+
+\textit{constraints};
+(HB rcvA.event wait_rcvA.event)
+(HB wait_rcvA.event rcvB.event)
+(HB rcvB.event wait_rcvB.event)
+(HB wait_rcvB.event assume.event)
+(HB assume.event assert.event)
+(HB rcvC.event wait_rcvC.event)
+(HB wait_rcvC.event snd3.event)
+(HB snd3.event wait_snd3.event)
+(HB snd1.event wait_snd1.event)
+(HB wait_snd1.event snd2.event)
+(HB snd2.event wait_snd2.event)
+(assert (> b 0))
+(assert (not (= a 4)))
+
+\textit{match};
 (MATCH rcvA snd1)
 (MATCH rcvB snd3)
 (MATCH rcvC snd2)
 
-(assert (> b 0))
-(assert (not (= a 4)))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -44,24 +115,28 @@
 \begin{lrbox}{\boxSMTb}
 \begin{minipage}[c]{0.4\linewidth}
 \begin{alltt}
-(HB rcvA (wait rcvA))
-(HB (wait rcvA) rcvB)
-(HB rcvB (wait rcvB))
-(HB (wait rcvB) assume)
-(HB assume assert)
-(HB rcvC (wait rcvC))
-(HB (wait rcvC) snd3)
-(HB snd3 (wait snd3))
-(HB snd1 (wait snd1))
-(HB (wait snd1) snd2)
-(HB snd2 (wait snd2))
+\textit{defs} is not shown;
 
+\textit{constraints};
+(HB rcvA.event wait_rcvA.event)
+(HB wait_rcvA.event rcvB.event)
+(HB rcvB.event wait_rcvB.event)
+(HB wait_rcvB.event assume.event)
+(HB assume.event assert.event)
+(HB rcvC.event wait_rcvC.event)
+(HB wait_rcvC.event snd3.event)
+(HB snd3.event wait_snd3.event)
+(HB snd1.event wait_snd1.event)
+(HB wait_snd1.event snd2.event)
+(HB snd2.event wait_snd2.event)
+(assert (> b 0))
+(assert (not (= a 4)))
+
+\textit{match};
 (MATCH rcvA snd3)
 (MATCH rcvB snd1)
 (MATCH rcvC snd2)
 
-(assert (> b 0))
-(assert (not (= a 4)))
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -70,195 +145,53 @@
 \begin{lrbox}{\boxSMTc}
 \begin{minipage}[c]{0.4\linewidth}
 \begin{alltt}
-(HB rcvA (wait rcvA))
-(HB (wait rcvA) rcvB)
-(HB rcvB (wait rcvB))
-(HB (wait rcvB) assume)
-(HB assume assert)
-(HB rcvC (wait rcvC))
-(HB (wait rcvC) snd3)
-(HB snd3 (wait snd3))
-(HB snd1 (wait snd1))
-(HB (wait snd1) snd2)
-(HB snd2 (wait snd2))
+\textit{defs} is not shown;
 
+\textit{constraints};
+(HB rcvA.event wait_rcvA.event)
+(HB wait_rcvA.event rcvB.event)
+(HB rcvB.event wait_rcvB.event)
+(HB wait_rcvB.event assume.event)
+(HB assume.event assert.event)
+(HB rcvC.event wait_rcvC.event)
+(HB wait_rcvC.event snd3.event)
+(HB snd3.event wait_snd3.event)
+(HB snd1.event wait_snd1.event)
+(HB wait_snd1.event snd2.event)
+(HB snd2.event wait_snd2.event)
+(assert (> b 0))
+(assert (not (= a 4)))
+
+\textit{match};
 (or (MATCH rcvA snd1)
     (MATCH rcvA snd3))
 (or (MATCH rcvB snd1)
     (MATCH rcvB snd3))
 (MATCH rcvC snd2)
-
 (NE rcvA rcvB)
-
-(assert (> b 0))
-(assert (not (= a 4)))
-
 
 \end{alltt}
 \end{minipage}
 \end{lrbox}
 
 
-%%---------------------------------------------------------------------------
-%%% Start --- SMT Machine reductions
-\begin{figure}
-\mprset{flushleft}
-\scalebox{0.75}{
-\begin{mathpar}
-\and
-%  (--> (h eta aid-map ep-send-calls pending-r
-%           (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] [ploc_2 cmd_2] ...) thread_2 ...)
-%           (ploc_0 trace-entry_1 ...) status smt)
-%        (h_pr eta_pr aid-map_pr ep-send-calls_pr pending-r_pr
-%              (thread_0 ... ([ploc_1 cmd_1] [ploc_2 cmd_2] ...) thread_2 ...)
-%              (trace-entry_1 ...) status_pr smt_prpr)
-%        "Machine Step"
-%        (where (h_pr eta_pr aid-map_pr ep-send-calls_pr pending-r_pr
-%                     e status_pr ret smt_pr)
-%               ,(apply-reduction-relation** expr-reductions
-%                                            (term (h eta aid-map ep-send-calls
-%                                                     pending-r
-%                                                     cmd_0 status ret smt))))
-%        (where smt_prpr (add-po smt_pr ploc_0 ploc_1)))
-\inferrule[Machine Step]{
-  (\epsnd~\qset~\movebot~\status)~\reduceK{q}~
-  (\epsnd_\mathit{p0}~\qset_\mathit{p0}~\movebot_p~\status_\mathit{p0}) \\\\
-  (h~\eta~\aidmap~\epsnd_\mathit{p0}~\eprcv~\qset_\mathit{p0}~\cmd_0~\status_\mathit{p0}~\ret~\last~\smt)~\reduceK{e}~
-  (h_p~\eta_p~\aidmap_p~\epsnd_\mathit{p1}~\eprcv_p~\qset_\mathit{p1}~e~\status_\mathit{p1}~\ret~\last_p~\smt_\mathit{p0}) \\
-  \smt_\mathit{p1} =  \mathrm{addHB}(\smt_\mathit{p0}~\ploc_0~\ploc_1)
-}{
-  (h~\eta~\aidmap~\epsnd~\eprcv~\qset~
-           (\thread_0~\ldots~
-            ([\ploc_0~\cmd_0]~[\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\ldots)~\thread_2~\ldots)~
-           ([\ploc_0~\movebot]~\traceentry_1~\ldots)~\status~\last~\smt) \reduce{m} \\\\
-  (h_p~\eta_p~\aidmap_p~\epsnd_\mathit{p1}~\eprcv_p~\qset_\mathit{p1}~
-              (\thread_0~\ldots~([\ploc_1~\cmd_1]~[\ploc_2~\cmd_2]~\dots)~\thread_2~\dots)~
-              (\traceentry_1~\dots)~\status_\mathit{p1}~\last_p~\smt_\mathit{p1})
-}
-\end{mathpar}}
-\caption{Machine Reductions to build the SMT model of a trace language program ($\reduce{\mathrm{m-smt}}$)}
-\label{fig:machine_smt}
-\end{figure}
 
-
-\begin{figure}
-\scalebox{0.75}{%
-\mprset{flushleft}
-\begin{mathpar}
-%   (--> (h eta aid-map pending-s pending-r  (assume e) status k
-%           (defs (any ...)))
-%        (h eta aid-map pending-s pending-r  e status (assume * -> k )
-%           (defs (e any ...)))
-%        "Assume Pull Out Expr")
-\inferrule[Assume Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assume\ e)\ \status\ k\ \last\ (\defs\ (\any\ \ldots))) \reduce{e}
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assume\ * \rightarrow k)\ \last\ (\defs\ (e\ \any\ \ldots)))
-}
-\and
-%   ;;Negate expression and add it to the SMT assertions.
-%   (--> (h eta aid-map pending-s pending-r  (assert e) status k
-%           (defs (any ...)))
-%        (h eta aid-map pending-s pending-r  e status (assert * -> k)
-%           (defs ((not e) any ...)))
-%        "Assert Pull Out Expr")
-\inferrule[Assert Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (\assert\ e)\ \status\ k\ \last\ (\defs\ (\any\ \ldots))) \reduce{e}
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (\assert\ * \rightarrow k)\ \last\ (\defs\ ((\negate\ e)\ \any\ \ldots)))
-}
-\and
-%   (--> (h eta aid-map pending-s pending-r  (x := e) status k
-%           (defs (any ...)))
-%        (h eta aid-map pending-s pending-r  e status (x := * -> k)
-%           (defs ((= x e) any ...)))
-%        "Assign Pull Out Expr")
-\inferrule[Assign Expressions Evaluation]{}{
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ (x\ :=\ e)\ \status\ k\ \last\ (\defs\ (\any\ \ldots))) \reduce{e}
-  (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ e\ \status\ (x\ :=\ * \rightarrow k)\ \last\ (\defs\ ((=\ x\ e)\ \any\ \ldots)))
-}
-\and
-%   ;;Adds sendi cmd to aid-map and pending-s. - VALIDATED
-%   (--> (h eta ([aid_x ep_x] ...) pending-s pending-r q-set
-%           (sendi aid src dst x ploc number) status k ((any_d ...) (any_a ...)))
-%        (h eta ([aid src] [aid_x ep_x] ...) pending-s_pr pending-r q-set
-%           true status k ((any_0 any_d ...) (any_1 any_a ...)))
-%        "Sendi Cmd x -> v"
-%        (where v (h-lookup h (eta-lookup eta x)))
-%        (where any_0 (define aid :: send))
-%        (where any_1 (make-send aid src dst x ploc number))
-%        (where pending-s_pr (add-send pending-s [aid -> src dst v])))
-\inferrule[Sndi Command]{
-  ([\aid_1\ v_1]\ \ldots) = \epsnd(\dst)(\src) \\ \epsnd_p = [\epsnd \mid \dst \mapsto [\epsnd(\dst) \mid \src \mapsto ([\aid_0\ h(\eta(x))]\ [\aid_1\ v_1]\ \ldots)]] \\
-  \any_0 = (\define\ \aid\ ::\ send) \\ \any_1 = (\andd\ (=\ (\select\ \aid\ ep)\ \dst)\ (=\ (\select\ \aid\ value)\ x))
-}{
-  (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ \qset\
-     (\sendi\ \aid_0\ \src\ \dst\ x)\ \status\ k\ \last\ ((\any_d\ \ldots)\ (\any_a\ \ldots))) \reduce{e} \\
-  (h\ \eta\ ([\aid_0\ \src]\ [\aid\ \ep]\ \ldots)\ \epsnd_p\ \eprcv\ \qset\ \true\ \status\ k\ \last\ ((\any_0\ \any_d\ \ldots)\ (\any_1\ \any_a\ \ldots)))
-}
-\and
-%   ;;Adds recvi cmd to aid-map and pending-r. - VALIDATED
-%   (--> (h eta ([aid_x ep_x] ...) pending-s pending-r q-set
-%           (recvi aid dst x ploc) status k ((any_d ...) (any_a ...)))
-%        (h eta ([aid dst] [aid_x ep_x] ...) pending-s pending-r_pr q-set
-%           true status k ((any_0 any_d ...) (any_1 any_a ...)))
-%        "Recvi Cmd0"
-%        (where pending-r_pr (add-recv pending-r [aid -> dst x]))
-%        (where any_0 (define aid :: recv))
-%        (where any_1 (make-recv aid dst x ploc)))
-\inferrule[Rcvi Command]{
-  ([\aid_1\ x_1]\ \ldots) = \eprcv(\dst) \\
-   \eprcv_p = [\eprcv \mid \dst \mapsto ([\aid_0\ x_0]\ [\aid_1\ x_1]\ \ldots)] \\
-   \any_0 = (\define\ \aid\ ::\ recv) \\ \any_1 = (\andd\ (=\ (\select\ \aid\ ep)\ \dst)\ (=\ (\select\ \aid\ var)\ x_0))
-}{
-  (h\ \eta\ ([\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv\ \qset\ (\recvi\ \aid_0\ \dst\ x_0)\ \status\ k\ \last\ ((\any_d\ \ldots)\ (\any_a\ \ldots))) \reduce{e} \\
-  (h\ \eta\ ([\aid_0\ \dst]\ [\aid\ \ep]\ \ldots)\ \epsnd\ \eprcv_p\ \qset\ \true\ \status\ k\ \last\ ((\any_0\ \any_d\ \ldots)\ (\any_1\ \any_a\ \ldots)))
-}
-\and
-   %(--> (h eta aid-map pending-s pending-r q-set (wait aid_r)
-%           status k (defs (any_a ...)))
-%        (h_pr eta aid-map_pr pending-s pending-r_pr q-set_pr true
-%              status_pr k
-%              (defs ((HB (select aid-กอ_s-last match_po) (select aid_s match_po))
-%                    (MATCH aid_r0 aid_s0) any_a ...)))
-%        "Recvi Wait Cmd"
-%            ;; get recv and corresponding send command, mark each send in front of the destination send (by set variable "mark" to 1)
-%        (where true (find-recv pending-r aid_r) )
-%        (where (aid-map_0 dst_r) (get-ep aid-map aid_r))
-%        (where (h_pr aid_s pending-r_pr q-set_pr status_pr)
-%               (get-mark-remove h eta pending-r q-set dst_r aid_r status))
-%        (where (aid-map_pr src_s) (get-ep aid-map_0 aid_s))
-%        )
-%   ))
-\inferrule[Wait (rcvi) Command]{
-    ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src]\ \ldots\ [\aid_r\ \dst]\ \ldots\ [\aid_1\ \ep_1]) = \aidmap\\
-    %\aidmap_0 = ([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src]\ \ldots\ [\aid_1\ \ep_1])\\
-    (h_p\ \aid_s\ \eprcv_p\ \qset_p\ \status_p) = \getmarkremove(h, \eta, \eprcv, \qset, \dst, \aid_r, \status) \\
-    %([\aid_0\ \ep_0]\ \ldots\ [\aid_s\ \src][\aid_1\ \ep_1]) = \aidmap_0\\
-    \aidmap_p = ([\aid_0\ \ep_0]\ \ldots\ [\aid_1\ \ep_1])\\
-    (\last_p\ last\_\aid_s) = \getlastsendreplace(\last, \aid_s, \src, \dst)
-}{
-    (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \qset\ (\wait\ \aid_r)\ \status\ k\ \last\ (\defs\ (\any_a\ \ldots))) \reduce{e} \\
-    (h_p\ \eta\ \aidmap_p\ \epsnd\ \eprcv_p\ \qset_p\ true\ \status_p\ k\ \last_p\ (\defs\ ((\HB\ (\select\ last\_\aid_s)\ \mathit{MP})\ (\select\ \aid_s\ \mathit{MP}))\
-                    (\MATCH\ \aid_r\ \aid_s)\ \any_a\ \ldots)))
-}
-\end{mathpar}}
-\caption{Expression Reductions to build the SMT model of a trace language program ($\reduce{\mathrm{e-smt}}$)}
-\label{fig:expression_smt}
-\end{figure}
-%%% END --- SMT Machine reductions
-%%---------------------------------------------------------------------------
 
 \section{SMT Model}\label{sec:smt}
 
-The next step, after formally defining the operational semantics of our trace
-language, is to formally define a translation from the trace language into an
-SMT problem that can correctly models the original execution trace.
+%The next step, after formally defining the operational semantics of our trace
+%language, is to formally define a translation from the trace language into an
+%SMT problem that can correctly models the original execution trace.
 
-An SMT problem that encodes a trace through a CTP needs various data structures and support functions. We have intuitively introduced most of them in the example of Section 2. Before presenting the translation framework from the trace language to the SMT problem, we need to explain the data structures and support functions in detail. We give the definitions in the Yices input language.
+The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt} (a) is the set of possible match pairs for the program in \figref{fig:mcapi}. Note that the definitions of \texttt{rcvA}, \texttt{rcvB}, etc. are not shown because they are are not novel to our solution, but they are consistent with the commands in \figref{fig:mcapi}, which is shown in \figref{fig:trace}. The set admits, for example, that \texttt{rcvA} can be matched with either \texttt{snd1} or \texttt{snd2}. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system.
+
+Other than the match pairs as input, our SMT encoding needs various data structures and support functions. %We have intuitively introduced most of them in the example of Section 2.
+Before presenting the SMT encoding for a specific example, we need to explain the data structures and support functions in detail. We give the definitions in the Yices input language.
 
 % (define HB::(-> a::int b::int (subtype (c::bool) (ite (< a b) (= c true) (= c false)))))
 \begin{equation}
 \begin{array}{l}
-(\cfgt{define}\ \mathrm{HB}::(->\ \cfgnt{a::int}\ \cfgnt{b::int}\\
+(\cfgt{define}\ \mathrm{HB}::(\rightarrow\ \cfgnt{a::int}\ \cfgnt{b::int}\\
 \ \ \ (\cfgt{subtype}\ \cfgnt{(c::bool)}\ (\mathrm{ite}\ (<\ \mathit{a}\ \mathit{b})\ (=\ \mathit{c}\ \mathrm{true})\ (=\ \mathit{c}\ \mathrm{false})))))
 \end{array}
 \label{equation:hb}
@@ -272,27 +205,22 @@ An SMT problem that encodes a trace through a CTP needs various data structures 
 %\right .
 %\end{equation}
 
-The HB function in equation (\ref{equation:hb}) represents a happens-before relationship between two events. It
-takes two events $a$ and $b$ as parameters, such that $a,b \in \mathbb{N}$. In the SMT encoding, every location is assigned an event, and HB orders those locations (i.e., program order, etc.). This
-function creates a constraint such that the first event must be less than the
-second event, indicating that the first event occurs before the second event.
-This function is not only used to assert the program order of statements within the same
-thread, but also to assert, for any matched pair, that the send operation
+The HB function in equation (\ref{equation:hb}) represents a happens-before relationship between two events. It takes two events $a$ and $b$ as parameters, such that $a,b \in \mathbb{N}$. In the SMT encoding, every location is assigned an event, and HB orders those locations (i.e., program order, etc.). This function creates a constraint such that the first event must be less than the second event, indicating that the first event occurs before the second event. For example, action $a$ happens before $b$ if and only if $\mathit{event}_a$ for $a$ is greater than $\mathit{event}_b$ for $b$. This function is not only used to assert the program order of statements within the same thread, but also to assert, for any matched pair, that the send operation
 occurs before the receive.
 
 \begin{equation}
 \begin{array}{l}
-%(define-type recv (record match::int ep::int var::int event::int))
-(\cfgt{define-type}\ R\ (\cfgt{record}\ \cfgnt{M::int}\ \cfgnt{ep::int}\ \cfgnt{var::int}\ \cfgnt{event::int})) \\
-%(define-type send (record match_po::int id::int ep::int value::int event::int))
-(\cfgt{define-type}\ S\ (\cfgt{record}\ \cfgnt{MP::int}\ \cfgnt{ID::int}\ \cfgnt{ep::int}\ \cfgnt{value::int}\ \cfgnt{event::int}))
+%(define-type recv (record match::int e::int var::int event::int))
+(\cfgt{define-type}\ R\ (\cfgt{record}\ \cfgnt{M::int}\ \cfgnt{e::int}\ \cfgnt{var::int}\ \cfgnt{event::int})) \\
+%(define-type send (record match_po::int id::int e::int value::int event::int))
+(\cfgt{define-type}\ S\ (\cfgt{record}\ \cfgnt{MP::int}\ \cfgnt{ID::int}\ \cfgnt{e::int}\ \cfgnt{value::int}\ \cfgnt{event::int}))
 \end{array}
 \label{equation:record}
 \end{equation}
 %\[R = (M\ \ep_r\ x\ \ploc_r)\]
 %\[S = (\mathit{MP}\ \mathit{ID}\ \ep_s\ e\ \ploc_s)\]
 
-We define two records in equation (\ref{equation:record}) that are essential to encoding the SMT problem. The first record $\cfgnt{R}$ defined above represents a receive action such that $\mathit{M}$, $\mathit{ep}$, $\mathit{var}$, $\mathit{event} \in \mathbb{N}$. $\mathit{M}$ represents a free variable that is assigned the $\mathit{event}$ field of the matched record $S$. The endpoint $\mathit{ep}$ is the end point of the receive operation, $\mathit{var}$ represents a variable which is assigned a value received by the receive operation, and $\mathit{event}$ is the event term which indicates the program order for the receive action associated with the record. The second record $S$ defined above is a send action such that $\mathit{MP}$, $\mathit{ID}$, $\mathit{ep}$, $\mathit{value}$, $\mathit{event} \in \mathbb{N}$. The fields $\mathit{ep}$ and $\mathit{event}$, as those in $\cfgnt{R}$, are the end point of the send operation and event term, respectively. The field $\mathit{value}$ is the value being sent. $\mathit{MP}$ is another free variable used to assign match pairs, and it is assigned an end point of a receive operation if the receive operation is to be matched to the send operation. $\mathit{ID}$ is a unique number that identifies each send operation. Note that the integer value assigned to $\mathit{event}$ indicates the program order. For example, action $a$ happens before $b$ if and only if $\mathit{event}_a$ for $a$ is greater than $\mathit{event}_b$ for $b$. Also, we keep record of two match variables, $M$ and $\mathit{MP}$, for different purposes. $M$ is used for preventing two receive operations from being matched with the same send operation, which is defined in function $\mathrm{NE}$. $\mathit{MP}$ is used for ordering two receive operations with respect to the program order of two matched send operations.
+We define two records in equation (\ref{equation:record}) that are essential to encoding the SMT problem. The first record $\cfgnt{R}$ defined above represents a receive action such that $\mathit{M}$, $\mathit{e}$, $\mathit{var}$, $\mathit{event} \in \mathbb{N}$. $\mathit{M}$ represents a free variable that is assigned the $\mathit{event}$ field of the matched record $S$. The endpoint $\mathit{e}$ is the end point of the receive operation, $\mathit{var}$ represents a variable which is assigned a value received by the receive operation, and $\mathit{event}$ is the event term which indicates the program order for the receive action associated with the record. The second record $S$ defined above is a send action such that $\mathit{MP}$, $\mathit{ID}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event} \in \mathbb{N}$. The fields $\mathit{e}$ and $\mathit{event}$, as those in $\cfgnt{R}$, are the end point of the send operation and event term, respectively. The field $\mathit{value}$ is the value being sent. $\mathit{MP}$ is another free variable used to assign match pairs, and it is assigned an event term of a receive operation if the receive operation is to be matched to the send operation. $\mathit{ID}$ is a unique number that identifies each send operation. Note that the integer value assigned to $\mathit{event}$ indicates the program order. Also, we keep record of two match variables, $M$ and $\mathit{MP}$, for different purposes. $M$ is used for preventing two receive operations from being matched with the same send operation, which is defined in function $\mathrm{NE}$. $\mathit{MP}$ is used for ordering two receive operations with respect to the program order of two matched send operations. For resolving the SMT encoding by an SMT solver, the send definition has the match pair and event term unconstrained, and the receive definition leaves the event term, match pair and the receive variable unconstrained.
 
 %(define MATCH::(-> r::recv s::send (subtype (c::bool) (ite
  % (and (= (select r ep) (select s ep))
@@ -305,8 +233,8 @@ We define two records in equation (\ref{equation:record}) that are essential to 
 
 \begin{equation}
 \begin{array}{l}
-(\cfgt{define}\ \mathrm{MATCH}::(->\ \cfgnt{r::R}\ \cfgnt{s::S}\ (\cfgt{subtype}\ \cfgnt{(c::bool)}\ (\cfgnt{ite} \\
-\ \ \ (\mathrm{and}\ (=\ (\mathrm{select}\ \mathit{r}\ \mathit{ep})\ (\mathrm{select}\ \mathit{s}\ \mathit{ep})) \\
+(\cfgt{define}\ \mathrm{MATCH}::(\rightarrow\ \cfgnt{r::R}\ \cfgnt{s::S}\ (\cfgt{subtype}\ \cfgnt{(c::bool)}\ (\cfgnt{ite} \\
+\ \ \ (\mathrm{and}\ (=\ (\mathrm{select}\ \mathit{r}\ \mathit{e})\ (\mathrm{select}\ \mathit{s}\ \mathit{e})) \\
 \ \ \ \ \     (=\ (\mathrm{select}\ \mathit{r}\ \mathit{var})\ (\mathrm{select}\ \mathit{s}\ \mathit{value})) \\
 \ \ \ \ \    (\mathrm{HB}\ (\mathrm{select}\ \mathit{s}\ \mathit{event})\ (\mathrm{select}\ \mathit{r}\ \mathit{event})) \\
 \ \ \ \ \    (=\ (\mathrm{select}\ \mathit{r}\ \mathit{M})\ (\mathrm{select}\ \mathit{s}\ \mathit{ID})) \\
@@ -333,7 +261,7 @@ We define two records in equation (\ref{equation:record}) that are essential to 
 
 The $\mathrm{MATCH}$ function in equation (\ref{equation:match}) takes tuple $R$ and $S$ as parameters. It creates a number of constraints that represent the pairing
 of the specified send and receive operations. This function asserts that the
-destination end-point of the send operation is the same as the end-point used by
+destination end point of the send operation is the same as the end point used by
 the receive operation, that the value sent by the send operation is the same
 value received by the receive operation, that the send operation occurs before
 the receive operation, that the ``match'' value in the receive tuple is
@@ -346,10 +274,10 @@ equal to the ``ID'' value in the send tuple, and that the ``MP" value in the sen
 
 \begin{equation}
 \begin{array}{l}
-(\cfgt{define}\ \mathrm{NE}::(->\ \cfgnt{r1::R}\ \cfgnt{r2::R}\ (\cfgt{subtype}\ \cfgnt{(res::bool)}\ (\cfgnt{ite} \\
+(\cfgt{define}\ \mathrm{NE}::(\rightarrow\ \cfgnt{r1::R}\ \cfgnt{r2::R}\ (\cfgt{subtype}\ \cfgnt{(c::bool)}\ (\cfgnt{ite} \\
 \ \ (=\ (\mathrm{select}\ \mathit{r1}\ \mathit{M})\ (\mathrm{select}\ \mathit{r2}\ \mathit{M})) \\
-\ \ (=\ \mathit{res}\ \mathrm{false}) \\
-\ \ (=\ \mathit{res}\ \mathrm{true})))))
+\ \ (=\ \mathit{c}\ \mathrm{false}) \\
+\ \ (=\ \mathit{c}\ \mathrm{true})))))
 \end{array}
 \label{equation:ne}
 \end{equation}
@@ -368,177 +296,89 @@ tuples. An assertion is made that the values of their ``match'' fields, $M$,
 are not equal. This shows that they are paired with two different send
 operations.
 
-Given the definition of the data structures and the support functions, we give the following modified framework that produces a correlating SMT problem for a given execution trace. The evaluation syntax for the machine reductions to build the SMT
-model of a trace language program are largely those of the regular machine
-reductions with a few changes below
-\[
-\cfgstart
-\cfgrule{mstate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\
-  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{ctp}\ \cfgnt{\trace}\ \cfgnt{\status}\ \cfgnt{k}\ \cfgnt{\last}\ \smt\rp}
-%  (expr-state (h eta aid-map pending-s pending-r e status k smt))
-\cfgrule{estate}{\lp\cfgnt{h}\ \cfgnt{\ensuremath{\eta}}\ \cfgnt{\aidmap}\
-  \cfgnt{\epsnd}\ \cfgnt{\eprcv}\ \cfgnt{\qset}\ \cfgnt{e}\ \cfgnt{\status}\ \cfgnt{k}\ \cfgnt{\last}\ \smt\rp}
-%  (smt (defs constraints ML))
-\cfgrule{\smt}{\lp\cfgnt{defs}~\cfgnt{constraints}~\ml\rp}
-%  (defs (any ...))
-\cfgrule{defs}{\lp\cfgnt{any}~$\ldots$\rp}
-%  (constraints (any ...))
-\cfgrule{constraints}{\lp\cfgnt{any}~$\ldots$\rp}
-% ()
-\cfgrule{\ml}{\lp\ml~=~$\emptyset$~$|$~(\ml~[\recv~$\rightarrow$[(\recv~\send)$\ldots$]])\rp}
-\cfgend
-\]
-The new syntax adds the \textit{smt} member to the \textit{mstate}
-and \textit{estate} where the ``\cfgnt{any}'' term in \textit{defs}
-and \textit{constraints} matches any structure. The lists will
-be filled with definitions, HB entries, MATCH entries, NE
-entries, etc. as defined by the SMT machine reductions. A match-list \ml\ is a set of match pair lists uniquely identified by a receive action ID, and each list consists of a set of match pairs for this receive action ID and a send action ID. Note that we alpha renamed so that \recv\ and \send\ are all unique labels. For convenience, we define function $\mathit{dom(\ml)}$ and $\mathit{range(\ml)}$ that return the set of receive action IDs in the set of match pairs of \ml\ and the set itself, respectively. The symbol \last\ is another member added to the \textit{mstate} and \textit{estate}. It records the last send operation that happens before the current one in the same thread. The \textit{qstate} does not contain any SMT encodings in the reductions and it is not changed.
+Prior SMT models of MCAPI program executions implicitly compute
+match pairs by adding possible happens-before relations on sends and
+receives with the conditions under which those orderings are
+valid. The SMT solver is then asked to resolve the happens-before
+relation by choosing specific orders of sends and receives. Match pair
+encoding, as presented in this work, though it has the same
+computational complexity as order based encoding (you still need to
+figure out match pairs on endpoints), is simpler to reason about
+directly rather than implicitly through orders, results in
+significantly fewer terms in the SMT problem, and does not restrict
+out possible matches in non-blocking actions--the order based encoding
+misses valid traces.
 
-The changes for the reduction rules are presented in \figref{fig:machine_smt} and \figref{fig:expression_smt}. The support function $\mathrm{addHB}(((\mathit{any}_d ...)\ (\mathit{any}_c ...))\ \ploc_0\ \ploc_1)$ adds program location to the definition list and adds a happens before relation
-\[
- \equiv \\
-   (((\mathtt{define\ \ploc_0 :: int})\ \mathit{any}_d ...)((\mathtt{HB\ \ploc_0\ \ploc_1})\ \mathit{any}_c ...))
-\]
+The SMT encoding as defined in the following equation,
+\[\mathit{smt}\ =\ (\mathit{defs}\ \mathit{constraints}\ \mathit{match})\]
+such that the field $\mathit{defs}$ represents all definitions of the send, receive operations and the free variables; The field $\mathit{constraints}$ represents all constraint clauses, including the assert clauses and the clauses built by the \texttt{HB} functions; and the field $\mathit{match}$ represents the clauses built by the \texttt{MATCH} function on a set of match pairs and the \texttt{NE} function. %We use $\mathit{match}.\mathit{input}$ to represent the input set of match pairs.
 
-The reduction rules in \figref{fig:machine_smt} and \figref{fig:expression_smt} add constraints to the SMT problem with respect to the semantic definition of the trace language. The $\mathrm{Machine\ Step}$ in \figref{fig:machine_smt} adds the program order of actions in the same thread to the SMT problem. The evaluation of assume, assert and assign in \figref{fig:expression_smt} adds assertions to the SMT problem. The $Sndi$ and $Rcvi$ commands define the send and receive actions in the SMT problem, and the $Wait (Rcvi)$ reduction adds the ''match" constraints to the SMT problem. Note that the function $\getlastsendreplace$ picks up the last send operation, $\mathit{last}\_\aid_s$, that happens before the current one in the same thread, and adds a HB relation between the $\mathit{MP}$ of $\mathit{last}\_\aid_s$ and that of the current send operation. The added relation ensures the messages from a common endpoint are non-overtaking (i.e., FIFO ordered).
-
-The following definition supports the rest of the section.
-
-\begin{definition}
-A machine state $(h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \cfgnt{ctp}\ \trace\ \status\ k)$ is smt-enabled if it is well formed.  The SMT problem is taken from the final SMT reduced state:
-\[\begin{array}{l}
-        (h\ \eta\ \aidmap\ \epsnd\ \eprcv\ \cfgnt{ctp}\ \trace\ \status\ k\ (()()))  \reduceK{\mathrm{m-smt}} \\
- (h_p\ \eta_p\ \aidmap_p\ \epsnd_p\ \eprcv_p\ \cfgnt{ctp}_p\ \trace_p\ \status_p\ k_p\ \mathrm{smt})
- \end{array}\]
-For convenience, we define the function
-$\mathrm{getSMT}(m) \mapsto\ \mathrm{smt}$ to return the SMT problem in the final state, and $\mathrm{ANS}(\mathrm{getSMT}(m)) \mapsto \{\mathrm{\cfgt{SAT}},\mathrm{\cfgt{UNSAT}}\}$ to return the status of the SMT problem in the final state of $m$. Also, we define the relation of the range of function $\mathrm{ANS}$ such that $\mathrm{\cfgt{UNSAT}} > \mathrm{\cfgt{SAT}}$.
-\end{definition}
+Given an MCAPI program as input with a set of match pairs, we can now generate our encoding in the following steps. First, for each send or receive, add an $S$ or $R$ definition. Second, use an variable for such definition following by a string ``.event'' to represent the field $\mathrm{event}$ of the variable. Third, for each location represented by the field $\mathrm{event}$ in each thread, add an \texttt{HB} relation on the associated event for program order. Finally, for each match pair, add the \texttt{MATCH} relation and the associated \texttt{NE} relation.
 
 \begin{figure}
 \begin{center}
-\setlength{\tabcolsep}{7pt}
-\begin{tabular}[c]{ccc}
-\scalebox{0.68}{\usebox{\boxSMTa}} &
-\scalebox{0.68}{\usebox{\boxSMTb}} &
-\scalebox{0.68}{\usebox{\boxSMTc}} \\
-(a) & (b) & (c)
+\setlength{\tabcolsep}{30pt}
+\begin{tabular}[c]{cc}
+\scalebox{0.7}{\usebox{\boxMP}} &
+%\scalebox{0.6}{\usebox{\boxSMTa}} &
+%\scalebox{0.6}{\usebox{\boxSMTb}} &
+\scalebox{0.7}{\usebox{\boxSMTc}} \\
+(a) & (b)
 \end{tabular}
 \end{center}
-
-\caption{SMT problems. (a) SMT problem based on the first trace. (b) SMT
-problem based on a second trace. (c) SMT problem built from the preceding two
-problems.}
-
-\label{fig:smts}
+\caption{A match pair set and SMT encoding of the system in \figref{fig:mcapi}.
+(a) The match pairs based on end points. (b) The SMT encoding where \texttt{HB} creates a
+happens-before constraint, \texttt{MATCH} creates a match pair constraint, and \texttt{NE} creates a constraint to preclude the use of conflicting match pairs.}
+\label{fig:smt}
 \end{figure}
 
-\figref{fig:smts} shows the SMT problem (minus the event definitions) generated from our new \textit{CESK SMT} encoding machines for the program in \figref{fig:mcapi} on two different traces (parts (a) and (b)). Note that the encodings in \figref{fig:smts} (a) and (b) are identical except for the $\mathrm{MATCH}$ clauses, which are generated from the trace parts of the program. Furthermore, the encoding in \figref{fig:smts}(a) violates the properties of interest encoded in the assert clauses, and the answer for the encoding in \figref{fig:smts} (a) is $\mathrm{SAT}$. From this observation, we present the following lemma that indicates the equivalence between the status of our \textit{CESK} machines and the satisfiability of the generated SMT encoding.%\figref{fig:smts}(a) uses several functions defined above to encode a single trace through the CTP. Especially, the $\mathrm{assume}$ statement is created by
-%asserting any branch conditions that we encountered in the trace. As was stated
-%earlier, this prevents the SMT solver from finding any solutions that are not
-%consistent with the program's control flow. The $\mathrm{assert}$ statement is
-%created by negating any assertions that were made in the original program. This
-%creates an SMT problem that will only be satisfiable if an assertion violation
-%can be found.
+\figref{fig:smt} (b) is a concrete example of the stylized SMT encoding for our running program in \figref{fig:mcapi}. The fields $\mathit{constraints}$ and $\mathit{match}$ work as we defined above. In particular, by encoding function $\mathrm{HB}$, \texttt{rcvA} happens before the wait command \texttt{wait\_rcvA} given the ``event'' for each command as parameters in \figref{fig:smt} (b). Any assignment to event variables by the SMT solver must comply with program order constraints. Also, the \texttt{MATCH} function encodes the relation such that \texttt{rcvA} is matched with \texttt{snd3} in \figref{fig:smt} (b). Note that the \texttt{MATCH} clauses sets the set of match pairs in \figref{fig:smt} (a) as input. The \texttt{NE} term precludes \texttt{rcvA} and \texttt{rcvB} from matching to the same send. Other than the support functions, the first assert works as the assume (line \texttt{08} at task 0) in \figref{fig:mcapi}, such that it prevents the SMT solver from finding solutions that are not consistent with control flow, so any solution that has $b \leq 0$ is infeasible. Finally, the second assert is negated as the goal is to find schedules that violate the property. In our example, the interest is in solutions that resolve in $a \neq 4$.
 
-%So far, we have achieved two different methods that can both verify the execution of a single trace. Furthermore, the following lemma indicates the equivalence between the trace language and the SMT encoding. Before presenting the lemma, we have the following definition.
+Other then the basic structure of the SMT encoding, we use the function
+\[\mathrm{ANS}(\mathit{smt}) \mapsto \{\mathrm{\cfgt{SAT}},\mathrm{\cfgt{UNSAT}}\} \]
+to return the solution of an SMT problem, such that $\mathrm{\cfgt{SAT}}$ represents an satisfiable solution that finds an invalid execution of the MCAPI program, and $\mathrm{\cfgt{UNSAT}}$ represents an unsatisfiable solution that guarantees all program executions implied by the encoding are valid. Note that $\mathrm{\cfgt{UNSAT}}$ and $\mathrm{\cfgt{SAT}}$ are ordered such that $\mathrm{\cfgt{UNSAT}} < \mathrm{\cfgt{SAT}}$.
 
-
-\begin{lemma}
-For a well-formed machine state $m$,
-\[
-\mathrm{status}(m) = \cfgt{failure} \iff \mathrm{ANS}(\mathrm{getSMT}(m)) = \mathrm{\cfgt{SAT}}
-\]
-\label{lemma:1}
-\end{lemma}
-\begin{proof}
-%To prove the statement, we focus on each reduction rule that adds clauses to the SMT problem. Since the only reduction rule that causes the status of state $\cfgt{failure}$ is
-%Assert Expression Evaluation in \figref{fig:expression_smt}, we need to prove that an $\cfgt{assert}$ expression causes the machine state $\cfgt{failure}$ if and only if the added clause in SMT problem is satisfiable. Suppose expression $\emph{e}$ in the assert reduction rule in \figref{fig:machine_smt} is evaluated false, which causes the status of state $\cfgt{failure}$, It is obvious that the new clause, $(not\ \emph{e})$, is evaluated true by any SMT solver. For the other direction, since $(not\ \emph{e})$ is true, the evaluation of $\emph{e}$ is false so that the status of state is evaluated $\cfgt{failure}$.
-%For other reduction rules in \figref{fig:machine_smt} and \figref{fig:expression_smt}, we need to prove the contraposition, such that the SMT problem returns $\mathrm{\cfgt{UNSAT}}$ if and only if the status of state is either $\cfgt{success}$ or $\cfgt{infeasible}$ ($\cfgt{error}$ is not considered since it can only reduced by non-well-formed machine state). Suppose the status of final state is $\cfgt{success}$, such that each reduction rule is reduced without changing the status. Note that the $\mathrm{HB}$ relations are correctly defined in the machine reduction, assertions for assume and assign commands are evaluated true, the send and receive operations are correctly defined and the match pairs are valid in the SMT problem since the trace is executed successfully in the trace language semantics. The assertion for the assert command, however, is negated in the SMT problem so that makes it $\mathrm{\cfgt{UNSAT}}$. Also, suppose the status of state is $\cfgt{infeasible}$, such that the evaluation of expression $\emph{e}$ in assume command is false. Since the clause $e$ is also added to the SMT problem and it is evaluated false, the whole SMT problem is evaluated $\mathrm{\cfgt{UNSAT}}$ eventually. For the other direction, suppose the generated SMT problem is $\mathrm{\cfgt{UNSAT}}$, we need to prove the non-existence of $\cfgt{failure}$ for the state status. Since the SMT problem is found $\mathrm{\cfgt{UNSAT}}$, there should be at least one clause that is not satisfiable. If the unsatisfiable clause is generated from the assert command, such that $(not\ e)$ is evaluated false. It implies that $e$ is evaluated true. Thus, the assert command can not make the status of state $\cfgt{failure}$. If the unsatisfiable clause is generated from other reduction rules, the status of state could only be $\cfgt{success}$ or $\cfgt{infeasible}$ by definition.
-%Thus, this is the end of proof.
-
-The generated SMT problem in \figref{fig:machine_smt} and \figref{fig:expression_smt} captures the execution trace from the initial state up to the final state by looking at the following facts. First, the machine step in \figref{fig:machine_smt} adds an $\mathrm{HB}$ relation for two consecutive program locations $\ploc_0$ and $\ploc_1$ in an identical thread, with respect to the program order constraint. Second, the $\mathrm{assume}$, $\mathrm{assert}$ and $\mathrm{assign}$ expression evaluations in \figref{fig:expression_smt} add assert constraints for variable $x$ or expression $e$ with respect to the trace constraint. Note that the negated system is used in the assert evaluation when generating the SMT statement. Third, the $\mathrm{sndi}$ and $\mathrm{rcvi}$ commands in \figref{fig:expression_smt} add $\any_0$ as the definition of a receive or send operation, followed by $\any_1$ as the initialization of operation fields. Finally, the $\mathrm{wait(rcvi)}$ command in \figref{fig:expression_smt} adds a match pair for the receive operation $\aid_r$ and the send operation $\aid_s$ where $\aid_s$ is obtained by applying the process we described in Section 3.2. Furthermore, an $\mathrm{HB}$ relation is added with respect to the program order, such that the messages from a common endpoint are non-overtaking. The observations described above either adds program order constraints for the execution trace modeled in the machine states, or adds constraints for variables or expressions that are also modeled in the machine state. In a word, the generated SMT problem captures the execution trace in the machine.
-
-Notice the fact above, we suppose the status of the final machine state is $\cfgt{failure}$. From the reduction rules, we know that there exists at least one assert action that is evaluated false. In \figref{fig:expression_smt}, we know that expression ``$e$" is negated and added to the SMT encoding for the second reduction rule. Since $e$ is evaluated false, $(not\ e)$ is evaluated true trivially in the generated SMT problem. Other statements are all evaluated true due to the trace capture fact that the program order is assigned correctly based on the execution trace modeled in the machine states, and the variables and expressions are also evaluated true in assume and assign commands. Thus, the SMT problem is evaluated $\cfgt{SAT}$.
-On the other hand, suppose the SMT problem is evaluated $\cfgt{SAT}$, indicating that all statements of the SMT problem are satisfiable. Since the reduction rules in \figref{fig:expression_smt} add statements with respect to the transition flow of the trace, it implies that each transition of the trace is executed correctly except for some assert action. Because of the same reason above, we know that expression $e$ for the assert action is evaluated false. Thus, the status of the final machine state is $\cfgt{failure}$.
-$\Box$
-\end{proof}
-
-
- As we discussed early, \figref{fig:smts} (a) and (b) are generated from the same program with two different traces. The encoding in \figref{fig:smts} (c) combines part (a) and (b) into one, the answer of which implies the non-deterministic behavior of the program. By solving the problem in \figref{fig:smts} (c), we implicitly solve two problems in \figref{fig:smts} (a) and (b) respectively. The following definition defines the ``combination" behavior of two SMT problems.
-
-%\begin{definition}
-%A match-list \ml\ is a set of match pair lists uniquely identified by a receive action ID, and each list consists of a set of match pairs for this receive action ID and a send action ID:
-%\[\ml\ =\ \emptyset\ |\ (\ml\ [\recv\ \rightarrow [(\recv\ \send)\ldots]])\]
-%Note that we alpha renamed so that \recv\ and \send\ are all unique labels. For convenience, we define function $\mathit{dom(\ml)}$ and $\mathit{range(\ml)}$ that return the set of receive %action IDs in the set of match pairs of \ml\ and the set itself, respectively.
-%\label{def:match-list}
-%\end{definition}
-
-%We extend the structure \ml\ to the structure \smt\ such that
-%\[\smt=(\mathit{defs}\ \mathit{constraints}\ \ml)\]
-%where the match constraints are separated from $\mathit{constraints}$. In addition, two SMT problems are assumed to hold the same $\mathit{defs}$ and $\mathit{constraints}$ excluding the match constraints if and only if they can be combined by applying a combination operator in \defref{def:combinator}.
-
-\begin{definition}
-A combination operator $\mathit{COMB}$ for two SMT problems, represented as three-tuples $\smt_1$ and $\smt_2$, where $\smt_1 = (\mathit{defs}\ \mathit{constraints}\ \ml_1)$ and $\smt_2 = (\mathit{defs}\ \mathit{constraints}\ \ml_2)$, returns a new SMT tuple, such that,
-\[\mathit{COMB}(smt_1,smt_2)\ =\ (\mathit{defs}\ \mathit{constraints}\ \ml_{new})\]
-where $\ml_{new}$ is a new relation such that $\forall\recv\in dom(\ml_1)\cup dom(\ml_2)$, $\ml_{new}(\recv) = \ml_1(\recv)\cdot\ml_2(\recv)$. Note that two SMT problems are assumed to hold the same $\mathit{defs}$ and $\mathit{constraints}$ excluding the match constraints.
-\label{def:combinator}
-\end{definition}
-
-To further finding the correlation between the combined SMT problem and the single SMT problems, we get the following lemma and proof.
-
-\begin{lemma}
-For a set of traces $\mathrm{T_n}$ for the same CTP, and a set of SMT problems $\mathrm{SMT_n} = \{\smt_0,\smt_{1},\ldots,\smt_{n}\}$, where each member in $\mathrm{SMT_n}$ encodes a trace in $\mathrm{T_n}$ according to our trace machine, there exists a new SMT problem $\smt_{total}$, where
-\[\smt_{total} = \mathit{COMB}(\smt_n, \mathit{COMB}(\smt_{n-1}, \mathit{COMB}(\smt_{n-2}, \mathit{COMB}(\ldots ))))\]
-and
-\[
-\mathrm{ANS}(\smt_{total}) = \left\{ \begin{array}{rl}
-  \mathit{\cfgt{SAT}} &\ \mathrm{iff}\ \exists \smt_i \in \mathrm{SMT_n},\ s.t.\ \mathrm{ANS}(\smt_i) = \mathit{\cfgt{SAT}}  \\
-  \mathit{\cfgt{UNSAT}} &\ \mathrm{otherwise}\
-\end{array}
-\right .
-\]
-\end{lemma}
-\begin{proof}
-We Prove it by induction.
-
-We consider the base case as a SMT problem that encodes a single trace and the answer can be trivially proved by definition.
-
-Induction. Assume we have combined n SMT problems and the combined SMT problem $\smt_{total}$ is evaluated $\mathit{\cfgt{UNSAT}}$. We combine an additional SMT problem $\smt_{n+1}$, which is different from any existent SMT problems. If $\mathrm{ANS}(\smt_{n+1})$ is equal to $\mathit{\cfgt{SAT}}$, the newly combined SMT problem, $\smt_{total}'$, is evaluated $\mathit{\cfgt{SAT}}$ because the match pairs defined in $\smt_{n+1}$ are combined into $\smt_{total}'$. If $\mathrm{ANS}(\smt_{n+1})$ is equal to $\mathit{\cfgt{UNSAT}}$, on the other hand, $\smt_{total}'$ is then evaluated $\mathit{\cfgt{UNSAT}}$ because all the traces implied in $\smt_{total}'$ are evaluated $\mathit{\cfgt{UNSAT}}$. Additionally, it can be trivially proved if $\smt_{total}$ is evaluated $\mathit{\cfgt{SAT}}$ then the newly added SMT problem $\smt_{n+1}$ do not change the answer. $\Box$
-\end{proof}
-
-From \textbf{Lemma 2}, the combined SMT problem is more powerful because it can find the violation of an assertion among several trace encodings. The following theorem states the relation between the ability of finding violation and the content of the match-list \ml.
+The SMT encoding defined above is used to capture the non-deterministic behavior of an MCAPI program by giving a complete set of match pairs. As we discussed in the previous section, the MCAPI program in \figref{fig:mcapi} contains two outcomes of execution. The SMT encoding we present in \figref{fig:smt} (b) captures both executions, since the set of match pairs in \figref{fig:smt} (a) is a complete set where all matches that can occur in the real execution for our running example in \figref{fig:mcapi} are included, and all matches that can not occur in the real execution are not included. Given a different set of match pairs, however, the MCAPI program behavior will be captured differently through a new encoding. Furthermore, the following theorem states that a larger set of match pairs over-approximates the true behavior of the system. If there is no error with the over-approximated set, then there is no error arising from non-determinism in the runtime on that program execution. If there is an error from the over-approximated set, then that error may or may not be a real error.
 
 \begin{theorem}
-For two SMT problems, $\smt_{\phi} = (\mathit{defs}\ \mathit{constraints}\ \ml_{\phi})$ and $\smt = (\mathit{defs}\ \mathit{constraints}\ \ml)$,
-if $\mathit{range(\ml_{\phi})} \subseteq \mathit{range(\ml)}$,
-\[\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)\]
+For two SMT problems, $\smt_{\alpha} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match}_{\alpha})$ and $\smt_{\beta} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match_{\beta}})$,
+if $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$,
+\[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
+where $\mathit{set(match)}$ represents the input set of match pairs for the $\mathtt{MATCH}$ clauses in the field $\mathit{match}$.
+\label{thm:1}
 \end{theorem}
-\begin{proof}
-Since the range of $\ml_{\phi}$ is the subset of the range of $\ml$, we can obtain $\smt$ by combining $\smt_{\phi}$ with other SMT problems. Suppose $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{SAT}}$, by \textbf{Lemma 2}, $\mathrm{ANS}(\smt)$ is equal to $\mathit{\cfgt{SAT}}$ as well. If $\mathrm{ANS}(\smt_{\phi})$ is equal to $\mathit{\cfgt{UNSAT}}$, $\mathrm{ANS}(\smt)$ is equal to either $\mathit{\cfgt{UNSAT}}$ or $\mathit{\cfgt{SAT}}$, depending on the answers of other single SMT problems that combine $\smt$. In either case, $\mathrm{ANS}(\smt_{\phi}) \geq \mathrm{ANS}(\smt)$.
-\end{proof}
 
-%\subsection{Outline}
+\begin{figure}
+\begin{center}
+\setlength{\tabcolsep}{30pt}
+\begin{tabular}[c]{cc}
+%\scalebox{0.7}{\usebox{\boxMP}} &
+\scalebox{0.7}{\usebox{\boxSMTa}} &
+\scalebox{0.7}{\usebox{\boxSMTb}} \\
+%\scalebox{0.7}{\usebox{\boxSMTc}} \\
+(a) & (b)
+\end{tabular}
+\end{center}
+\caption{Two SMT encodings of the system in \figref{fig:mcapi}.
+(a) The SMT encoding for Trace 1 in \figref{fig:trace}. (b) The SMT encoding for Trace 2 in \figref{fig:trace}.}
+\label{fig:smt_trace}
+\end{figure}
 
-%SMT model is created from an extension to the operational semantics of the
-%trace language.  The semantics generate an SMT for a single trace.  The key
-%observation is that the SMT does not change for different traces on the same
-%CTP except for the specified match pairs.  This observation leads to the main
-%result that we can over-approximate the match pair sets and use the
-%trance-language in a refinement loop.
+\subsubsection{Proof Sketch}
+Consider the MCAPI program in \figref{fig:mcapi} as an example.
+\figref{fig:smt_trace} (a) and (b) are the stylized SMT encodings for our running
+example in \figref{fig:mcapi}, such that \figref{fig:smt_trace} (a) encodes trace 1 in \figref{fig:trace} and \figref{fig:smt_trace} (b) encodes trace 2 in \figref{fig:trace}. By solving the encodings in \figref{fig:smt_trace} (a) and (b) for trace 1 and 2 in \figref{fig:trace} respectively, we get an unsatisfiable solution for \figref{fig:smt_trace} (a), and a satisfiable solution for \figref{fig:smt_trace} (b). As we discussed in Section 2, trace 1 is a valid execution without failure of the assertion, and trace 2 is the one that fails the assertion. %We can see that the encodings in \figref{fig:smt_trace} (a) and (b) correctly encodes trace 1 and 2 in \figref{fig:trace}, respectively.
+Compare both encodings with that in \figref{fig:smt} (b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the \texttt{MATCH} clauses. In particular, the input set of match pairs of either \figref{fig:smt_trace} (a) or (b) is the subset of that in \figref{fig:smt} (b). As discussed above, the encoding in \figref{fig:smt} (b) captures the non-deterministic behavior of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt} (b). Thus, the answer of the encoding in \figref{fig:smt} (b) is great or equal to that in either \figref{fig:smt_trace} (a) or (b). The formal proof can be given similarly, which is shown in our long version of paperwork at (url??????????).
 
-%Add a figure showing the encoding of two traces for the example system.   Put the two traces next to each other.  Use the ones from LaDefense.pptx
-%\begin{itemize}
-%\item Define upfront MATCH, HB, and the data structure definitions (anything boiler plate)
-%\item Focusing on one trace, give the new reductions for assert and assume referencing directly the line number in the trace where these statements appear.
-%\item Give the new reductions for WAITI-rcv to define a match pair.  Again reference the line number in the figure for clarity.
-%\item Add the full semantics to the appendix and give the reference here.
-%\item Lemma 1: we can encode a single trace.
-%\item Examine the second trace.  Note the only difference is seen in the MATCH pairs.
-%\item Define the combinator operation that combines two SMT encodings for a common CTP
-%\item Lemma 2: we can encode multiple traces into a single SMT problem.  Proof by induction.  Base case is a single trace.  Trivially established by Lemma 1.  Induction is assume you have correctly encoded n-traces, and you are adding a new trace (i.e., a new set of match pairs) to the encoding using your combinator operation.
-%\item Suppose we an answer function that given a MP set and a CTP returns either success or failure with a trace.
-%\item Define the main theorem for the paper (slide 68 in LaDefense.pptx).  Generalize to arbitrary sets.  Proof by induction.  Base case is a single trace in $\mathrm{mp}_1$ so $\mathrm{mp}_1 \subseteq \mathrm{mp}_1$.  Proof is trivial since $\mathrm{answer}(\mathrm{mp}_1)$ does not change.  Inductive step is $mathrm{mp}_n \subseteq \mathrm{mp}_n+1$.   Assume $\mathrm{mp}_n$ give the correct answer.  Argue on the lattice and the operational semantics for each rule that touches the status.  You have to reference in the proof every rule that updates the status!
-%\end{itemize}
+
+
+
+
+
+
+
+
+
 
 
 

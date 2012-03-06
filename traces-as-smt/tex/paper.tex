@@ -33,6 +33,7 @@
 \newcommand{\tableref}[1]{Table~\ref{#1}}
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
+\newcommand{\thmref}[1]{Theorem~\ref{#1}}
 
 %
 \begin{document}
@@ -43,7 +44,8 @@
 \subtitle{Applying SMT Technology to Message Passing}
 %\titlerunning{SMT for MCAPI Executions}
 
-\author{Yu Huang \and Eric Mercer \and Jay McCarthy \thanks{Special thanks to Christopher Fischer, formally at BYU and now at Amazon}}
+\author{Yu Huang \and Er
+ic Mercer \and Jay McCarthy \thanks{Special thanks to Christopher Fischer, formally at BYU and now at Amazon}}
 %\authorrunning{Y.~Huang \and E.~Mercer \and J.~McCarthy}
 \institute{Brigham Young University \\
             \email{\{yuHuang,egm,jay\}@byu.edu}}
@@ -57,15 +59,16 @@
 %
 \begin{abstract}
 \input{abstract}
+
 \keywords{Abstraction, refinement, SMT, message passing}
 \end{abstract}
 %
 \input{introduction}
 \input{example}
-\input{trace-lang}
 \input{smt-model}
-\input{result}
 \input{mp-generation}
+\input{result}
+%\input{proof}
 \input{related-work}
 \input{conclusion}
 \input{future-work}

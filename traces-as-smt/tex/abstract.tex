@@ -10,7 +10,8 @@ difficult as reference solutions implement an unknown set of allowed
 behaviors, and programmers have no way to directly control API
 internals to expose or reproduce errors.  This paper encodes an MCAPI
 execution as an SMT problem, which if satisfiable, yields a feasible
-execution schedule on the same trace, such that it resolves non-determinism in the MCAPI runtime in such a way that it now fails user provided assertions.
+execution schedule on the same trace, 
+such that it resolves non-determinism in the MCAPI runtime in such a way that it now fails user provided assertions.
 Such an encoding is useful for test, debug, and
 verification of MCAPI program execution.  The novelty in the encoding
 is the use of match-pairs (potential send and receive couplings) to

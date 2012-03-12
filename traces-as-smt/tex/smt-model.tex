@@ -186,7 +186,7 @@
 The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt} (a) is the set of possible match pairs for the program in \figref{fig:mcapi}. Note that the definitions of \texttt{rcvA}, \texttt{rcvB}, etc. are not shown because they are are not novel to our solution, but they are consistent with the commands in \figref{fig:mcapi}, which is shown in \figref{fig:trace}. The set admits, for example, that \texttt{rcvA} can be matched with either \texttt{snd1} or \texttt{snd2}. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system.
 
 Other than the match pairs as input, our SMT encoding needs various data structures and support functions. %We have intuitively introduced most of them in the example of Section 2.
-Before presenting the SMT encoding for a specific example, we need to explain the data structures and support functions in detail. We give the definitions in the Yices input language.
+Before presenting the SMT encoding for a specific example, we need to explain the data structures and support functions in detail. We give the definitions in the Yices \cite{dutertre:CAV06} input language.
 
 % (define HB::(-> a::int b::int (subtype (c::bool) (ite (< a b) (= c true) (= c false)))))
 \begin{equation}
@@ -362,7 +362,7 @@ The SMT encoding defined above is used to capture the non-deterministic behavior
 \begin{theorem}
 For two SMT problems, $\smt_{\alpha} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match}_{\alpha})$ and $\smt_{\beta} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match_{\beta}})$,
 if $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$,
-\[\mathrm{ANS}(\smt_{\beta}) \leq \mathrm{ANS}(\smt_{\alpha})\]
+\[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
 where $\mathit{set(match)}$ represents the input set of match pairs for the $\mathtt{MATCH}$ clauses in the field $\mathit{match}$.
 \label{thm:1}
 \end{theorem}

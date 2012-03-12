@@ -3,33 +3,28 @@ Embedded devices fill all sorts of crucial roles in our lives. They exist as
 medical devices, as network infrastructure, and they control our automobiles.
 Embedded devices continue to become more powerful as computing hardware becomes
 smaller and more modular. It is now becoming commonplace to find multiple
-processing units inside a single device. The Multicore Association (MCA) is an
+processing units inside a single device. The Multicore Association (MCA) \cite{mca} is an
 industry group that has formed to define specifications for low-level
 communication, resource management, and task management for
 multicore devices.
 
 One specification that the MCA has released is the Multicore Association
-Communications API (MCAPI). The specification defines basic data type, data
+Communications API (MCAPI) \cite{mcapi}. The specification defines basic data type, data
 structures, and functions that can be used to perform simple message passing
 operation between different computing entities within a device. Messages can be
 passed across persistent channels that force an ordering of the messages, or
 they can be passed to specific \emph{endpoints} within the system. The specification places few ordering constraints on messages passed from one
 endpoint to another. This freedom introduces into the system possibilities for
-non-deterministic behavior in the way the messages arrive at their destination.
+non-deterministic behavior in the way the messages are racing for their arrival at their destination \cite{netzer:spdt96}.
 
-This non-deterministic behavior in MCAPI programs is difficult for current tools to test or debug.
-Chao Wang provided a description of a verification method for
-multithreaded software that uses shared memory as a means of synchronization that provides a marked improvement over a comparable tool that uses concrete execution \cite{wang:fse09}. Unfortunately, Wang's method for shared memory system does not work on the message passing system.
-Sharma et al. created a method of using concrete execution to verify MCAPI
+This non-deterministic behavior in MCAPI programs is difficult for current tools to test or debug. Sharma et al. created a method of using concrete execution to verify MCAPI
 programs, but it was later discovered that this method does not completely
-explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. Elwakil
-et al. also defined a method of representing MCAPI program executions as
-satisfiability problems building on the method of \cite{wang:fse09} adapting it to message passing, but this method does not correctly model all kinds of
+explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. Instead of exploring all relevant interleavings of an MCAPI program in the concrete execution in \cite{sharma:fmcad09}, Wang et al. provided a symbolic algorithm that verifies each partitioned concurrent trace program (CTP) using a satisfiability solver \cite{wang:fse09}. The method is applied in shared memory system. Elwakil et al. also defined a method of representing MCAPI program executions as satisfiability problems building on the method of \cite{wang:fse09} adapting it to message passing, but this method does not correctly model all kinds of
 MCAPI program executions \cite{elwakil:padtad10}.
 
 Either the existing technique can not correctly encodes the program, or they can not provide efficient method for testing or debugging.
 Due to the difficulty and defect described above, %we provide and present a method in this paper that creates a light weight encoding for an MCAPI program.
-we present an encoding for MCAPI program executions that uses match-pairs from [3] in a new SMT encoding that requires fewer terms than [2] but includes all possible program executions unlike [2]. In other words, the encoding itself provides efficiency. Most importantly, this method guarantees of finding all hidden errors by encoding all possible execution traces of a concurrent program into an SMT problem.
+we present an encoding for MCAPI program executions that uses match pairs from \cite{sharma:fmcad09} in a new Satisfiability Modulo Theory (SMT) encoding that requires fewer terms than \cite{elwakil:padtad10} but includes all possible program executions unlike \cite{elwakil:padtad10}. In other words, the encoding itself provides efficiency. Most importantly, this method guarantees of finding all hidden errors by encoding all possible execution traces of a concurrent program into an SMT problem.
 
 
 %As an example we present an abstract of a small program that uses MCAPI in

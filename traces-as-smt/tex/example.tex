@@ -13,7 +13,7 @@
 04 a = atoi(A);
 
 05 msg_recv_i(e0,B,sizeof(B),&rcvB,&s);
-06 wait(&rcvB,&size,&status,MCAPI_INF);
+06 wait(&rcvB,&size,&s,MCAPI_INF);
 07 b = atoi(B);
 
 08 if(b > 0);
@@ -82,10 +82,10 @@
 03 t1 = get_endpoint(NODE_1,PORT_1,&s);
 
 04 msg_send_i(e2,e0,"4",2,N,&snd1,&s);
-05 wait(&snd1,&size,&status,MCAPI_INF);
+05 wait(&snd1,&size,&s,MCAPI_INF);
 
 06 msg_send_i(e2,e1,"Go",3,N,&snd2,&s);
-07 wait(&snd2,&size,&status,MCAPI_INF);
+07 wait(&snd2,&size,&s,MCAPI_INF);
 
 08 finalize(&s);
 \end{alltt}
@@ -173,7 +173,7 @@ message on endpoint \textit{e1} in variable \textit{C} on line
 \textit{e0}; and finally, task 2 sends messages \textit{``4''} and \textit{``Go''} on
 lines \texttt{04} and \texttt{06} to endpoints \textit{e0} and
 \textit{e1} respectively. Task 0 has additional code (lines \texttt{08} -
-\texttt{10}) to assert properties of the values in $a$ and
+\texttt{09}) to assert properties of the values in $a$ and
 $b$. The \texttt{mcapi\_wait} calls block until the associated
 send or receive buffer is able to be used. Given the scenario, we
 might ask the question: \emph{``What are the possible values of
@@ -201,36 +201,38 @@ Task 0 & Task 1 & Task 2 \\
 \end{figure*}
 
 
-The intuitive trace is presented in the first three columns of \figref{fig:trace}. Note that the fist column contains the task number in \figref{fig:mcapi}. The second column presents the commands with line number shown in \figref{fig:mcapi}. Also, we use the shorthand for each command of send, receive or wait in the third column. The variable \textit{a} should contain $4$ and variable
+The intuitive trace is presented in the first three columns of \figref{fig:trace}. Note that the fist column contains the task number in \figref{fig:mcapi}. The second column presents the commands identified by the line numbers shown in \figref{fig:mcapi}. Also, we define a shorthand for each command of send, receive, or wait in the third column for convenience in the presentation. Note that the sends in parenthesis following each receive entry is the send matched to each receive, and the integer in parenthesis following each send entry is the destination endpoint for each send. From the trace, variable \textit{a} should contain $4$ and variable
 \textit{b} should contain $1$ since task 2 must first send message \textit{``4''}
 to \textit{e0} before it can send message \textit{``Go''} to \textit{e1};
 consequently, task 1 is then able to send message \textit{``1''} to
-\textit{e0}. The assume notation refers to the if statement on line \texttt{08} of task 0 in \figref{fig:mcapi}, such that it is the ``check" that the program follows the same control flow.  At the end of execution the assertion on line \texttt{09}
+\textit{e0}. The assume notation asserts the control flow taken by the program execution which in this example, asserts the true branch of the condition on line \texttt{08} of task 0.  At the end of execution the assertion on line \texttt{09}
 of task 0 holds and no error is found. Such intuition is a valid
-program execution. Consider another scenario in the fourth and fifth column of \figref{fig:trace}. Note that we use the shorthand for each command of send, receive and wait in the fifth column because of space limit. The variable \textit{a} contains $1$ instead of $4$, since the message \textit{``1''} is sent to \textit{e0} after sending the message \textit{``Go''} to \textit{e1}. The send on line \texttt{04} of task 2 may be delayed in transit. The specification indicates that the wait on line \texttt{05} of task 2 returns once the buffer is available. That only means the message is somewhere in the MCAPI runtime; it does not mean the message is delivered. As such, it is possible for the message to be delayed in transit allowing the send from task 1 on line \texttt{05} to arrive at \textit{e0} first and be received in variable \textit{``a''}. Such a scenario is a program execution that results in an assertion failure at line \texttt{09} in \figref{fig:mcapi}. From the discussion above, a single valid sequential execution is not sufficient to prove correctness because of concurrency as other valid traces may exist. The next section presents our method of SMT encoding that follow the same control flow path through an MCAPI program. The encoding can be solved by an SMT solver such that the non-deterministic behavior of the program can be resolved.
+program execution. 
+
+Consider another scenario in the fourth and fifth column of \figref{fig:trace} written in the shorthand notation. The variable \textit{a} contains $1$ instead of $4$, since the message \textit{``1''} is sent to \textit{e0} after sending the message \textit{``Go''} to \textit{e1} as it is possible for the send on line \texttt{04} of task 2 to be delayed in transit. The specification indicates that the wait on line \texttt{05} of task 2 returns once the buffer is available. That only means the message is somewhere in the MCAPI runtime; it does not mean the message is delivered. As such, it is possible for the message to be delayed in transit allowing the send from task 1 on line \texttt{05} to arrive at \textit{e0} first and be received in variable \textit{``a''}. Such a scenario is a program execution that results in an assertion failure at line \texttt{09} in \figref{fig:mcapi}. From the discussion above, it is important to consider non-determinism in the MCAPI runtime when testing or debugging an MCAPI program execution. The next section presents our method of SMT encoding that follow the same control flow path through an MCAPI program. The encoding can be solved by an SMT solver such as Yices \cite{dutertre:CAV06} and Z3 \cite{demoura:tacas08}, and the non-deterministic behavior of the program can be resolved.
 
 \begin{figure*}
 \begin{center}
 \setlength{\tabcolsep}{1pt}
-\footnotesize \begin{tabular}[t]{|c|l|l||c|l|}
+\scriptsize \begin{tabular}[t]{|c|l|l||c|l|}
 \hline
 \multicolumn{3}{|c||}{Trace 1} & \multicolumn{2}{|c|}{Trace 2}\\
 \hline
 Task\  & Command\ & Shorthand\ & Task\ & Command\  \\
 \hline
-2 & 04 $\mathtt{msg\_send\_i(e2,e0,"4",2,N,\&snd1,\&s);}$ & $\mathtt{snd1}$ & 2 & 04 $\mathtt{snd1}$ \\
-2 & 05 $\mathtt{wait(\&snd1,\&size,\&status,MCAPI\_INF);}$ & $\mathtt{wait\_snd1}$ & 2 & 05 $\mathtt{wait\_snd1}$ \\
-2 & 06 $\mathtt{msg\_send\_i(e2,e1,"Go",3,N,\&snd2,\&s);}$ & $\mathtt{snd2}$ & 2 & 06 $\mathtt{snd2}$ \\
-2 & 07 $\mathtt{wait(\&snd2,\&size,\&status,MCAPI\_INF);}$ & $\mathtt{wait\_snd2}$ & 2 & 07 $\mathtt{wait\_snd2}$ \\
-0 & 02 $\mathtt{msg\_recv\_i(e0,A,sizeof(A),\&rcvA,\&s);}$ & $\mathtt{rcvA}$ & 1 & 03 $\mathtt{rcvC}$ \\
+2 & 04 $\mathtt{msg\_send\_i(e2,e0,"4",2,N,\&snd1,\&s);}$ & $\mathtt{snd1(0)}$ & 2 & 04 $\mathtt{snd1(0)}$ \\
+2 & 05 $\mathtt{wait(\&snd1,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_snd1}$ & 2 & 05 $\mathtt{wait\_snd1}$ \\
+2 & 06 $\mathtt{msg\_send\_i(e2,e1,"Go",3,N,\&snd2,\&s);}$ & $\mathtt{snd2(1)}$ & 2 & 06 $\mathtt{snd2(1)}$ \\
+2 & 07 $\mathtt{wait(\&snd2,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_snd2}$ & 2 & 07 $\mathtt{wait\_snd2}$ \\
+0 & 02 $\mathtt{msg\_recv\_i(e0,A,sizeof(A),\&rcvA,\&s);}$ & $\mathtt{rcvA}$ ($\mathtt{snd1}$) & 1 & 03 $\mathtt{rcvC}$ ($\mathtt{snd2}$) \\
 0 & 03 $\mathtt{wait(\&rcvA,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_rcvA}$ & 1 & 04 $\mathtt{wait\_rcvC}$ \\
-0 & 04 $\mathtt{a = atoi(A);}$ & & 1 & 05 $\mathtt{snd3}$ \\
-1 & 03 $\mathtt{msg\_recv\_i(e1,C,sizeof(C),\&rcvC,\&s);}$ & $\mathtt{rcvC}$ & 1 & 06 $\mathtt{wait\_snd3}$ \\
-1 & 04 $\mathtt{wait(\&rcvC,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_rcvC}$ & 0 & 02 $\mathtt{rcvA}$ \\
-1 & 05 $\mathtt{msg\_send\_i(e1,e0,"1",2,N,\&snd3,\&s);}$ & $\mathtt{snd3}$ & 0 & 03 $\mathtt{wait\_rcvA}$ \\
-1 & 06 $\mathtt{wait(\&snd3,\&size,\&status,MCAPI\_INF);}$ & $\mathtt{wait\_snd3}$ & 0 & 04 $\mathtt{a = atoi(A);}$ \\
-0 & 05 $\mathtt{msg\_recv\_i(e0,B,sizeof(B),\&rcvB,\&s);}$ & $\mathtt{rcvB}$ & 0 & 05 $\mathtt{rcvB}$ \\
-0 & 06 $\mathtt{wait(\&rcvB,\&size,\&status,MCAPI\_INF);}$ & $\mathtt{wait\_rcvB}$ & 0 & 06 $\mathtt{wait\_rcvB}$ \\
+0 & 04 $\mathtt{a = atoi(A);}$ & & 1 & 05 $\mathtt{snd3(0)}$ \\
+1 & 03 $\mathtt{msg\_recv\_i(e1,C,sizeof(C),\&rcvC,\&s);}$ & $\mathtt{rcvC}$ ($\mathtt{snd2}$)& 1 & 06 $\mathtt{wait\_snd3}$ \\
+1 & 04 $\mathtt{wait(\&rcvC,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_rcvC}$ & 0 & 02 $\mathtt{rcvA}$ ($\mathtt{snd3}$) \\
+1 & 05 $\mathtt{msg\_send\_i(e1,e0,"1",2,N,\&snd3,\&s);}$ & $\mathtt{snd3(0)}$ & 0 & 03 $\mathtt{wait\_rcvA}$ \\
+1 & 06 $\mathtt{wait(\&snd3,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_snd3}$ & 0 & 04 $\mathtt{a = atoi(A);}$ \\
+0 & 05 $\mathtt{msg\_recv\_i(e0,B,sizeof(B),\&rcvB,\&s);}$ & $\mathtt{rcvB}$ ($\mathtt{snd3}$)& 0 & 05 $\mathtt{rcvB}$ ($\mathtt{snd1}$)\\
+0 & 06 $\mathtt{wait(\&rcvB,\&size,\&s,MCAPI\_INF);}$ & $\mathtt{wait\_rcvB}$ & 0 & 06 $\mathtt{wait\_rcvB}$ \\
 0 & 07 $\mathtt{b = atoi(B);}$ & & 0 & 07 $\mathtt{b = atoi(B);}$ \\
 0 & 08 $\mathtt{assume (b > 0);}$ & & 0 & 08 $\mathtt{assume (b > 0);}$ \\
 0 & 09 $\mathtt{assert(a == 4);}$ & & 0 & 09 $\mathtt{assert(a == 4);}$ \\

@@ -1,5 +1,5 @@
 %% Should be 70-150 words
-Asynchronous message passing for C is an important paradigm in writing
+Asynchronous message passing for C language is an important paradigm in writing
 applications for embedded heterogeneous multicore systems.  The
 Multicore Association (MCA), an industry consortium promoting
 multicore technology, is working to standardize message passing into a
@@ -10,11 +10,11 @@ difficult as reference solutions implement an unknown set of allowed
 behaviors, and programmers have no way to directly control API
 internals to expose or reproduce errors.  This paper encodes an MCAPI
 execution as an SMT problem, which if satisfiable, yields a feasible
-execution schedule on the same trace, 
-such that it resolves non-determinism in the MCAPI runtime in such a way that it now fails user provided assertions.
+execution schedule on the same trace,
+such that it resolves non-determinism in the MCAPI runtime in the way that it now fails user provided assertions.
 Such an encoding is useful for test, debug, and
 verification of MCAPI program execution.  The novelty in the encoding
-is the use of match-pairs (potential send and receive couplings) to
+is the use of match pairs (potential send and receive couplings) to
 model the MCAPI execution in the SMT problem.  Match-pair encoding for
 MCAPI executions, when compared to other encoding strategies, is
 simpler to reason about, results in significantly fewer terms in the

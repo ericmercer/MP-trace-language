@@ -88,24 +88,24 @@
 
 
 \textit{constraints};
-00 (HB rcvA.event wait_rcvA.event)
-01 (HB wait_rcvA.event rcvB.event)
-02 (HB rcvB.event wait_rcvB.event)
-03 (HB wait_rcvB.event assume.event)
+00 (HB R02.event W(&h1).event)
+01 (HB W(&h1).event R05.event)
+02 (HB R05.event W(&h2).event)
+03 (HB W(&h2).event assume.event)
 04 (HB assume.event assert.event)
-05 (HB rcvC.event wait_rcvC.event)
-06 (HB wait_rcvC.event snd3.event)
-07 (HB snd3.event wait_snd3.event)
-08 (HB snd1.event wait_snd1.event)
-09 (HB wait_snd1.event snd2.event)
-10 (HB snd2.event wait_snd2.event)
+05 (HB R13.event W(&h3).event)
+06 (HB W(&h3).event S15.event)
+07 (HB S15.event W(&h4).event)
+08 (HB S24.event W(&h5).event)
+09 (HB W(&h5).event S27.event)
+10 (HB S27.event W(&h6).event)
 11 (assert (> b 0))
 12 (assert (not (= a 4)))
 
 \textit{match};
-13 (MATCH rcvA snd1)
-14 (MATCH rcvB snd3)
-15 (MATCH rcvC snd2)
+13 (MATCH R02 S24)
+14 (MATCH R05 S15)
+15 (MATCH R13 S27)
 
 \end{alltt}
 \end{minipage}
@@ -118,24 +118,24 @@
 \textit{defs} is not shown;
 
 \textit{constraints};
-00 (HB rcvA.event wait_rcvA.event)
-01 (HB wait_rcvA.event rcvB.event)
-02 (HB rcvB.event wait_rcvB.event)
-03 (HB wait_rcvB.event assume.event)
+00 (HB R02.event W(&h1).event)
+01 (HB W(&h1).event R05.event)
+02 (HB R05.event W(&h2).event)
+03 (HB W(&h2).event assume.event)
 04 (HB assume.event assert.event)
-05 (HB rcvC.event wait_rcvC.event)
-06 (HB wait_rcvC.event snd3.event)
-07 (HB snd3.event wait_snd3.event)
-08 (HB snd1.event wait_snd1.event)
-09 (HB wait_snd1.event snd2.event)
-10 (HB snd2.event wait_snd2.event)
+05 (HB R13.event W(&h3).event)
+06 (HB W(&h3).event S15.event)
+07 (HB S15.event W(&h4).event)
+08 (HB S24.event W(&h5).event)
+09 (HB W(&h5).event S27.event)
+10 (HB S27.event W(&h6).event)
 11 (assert (> b 0))
 12 (assert (not (= a 4)))
 
 \textit{match};
-13 (MATCH rcvA snd3)
-14 (MATCH rcvB snd1)
-15 (MATCH rcvC snd2)
+13 (MATCH R02 S15)
+14 (MATCH R05 S24)
+15 (MATCH R13 S27)
 
 \end{alltt}
 \end{minipage}
@@ -148,27 +148,27 @@
 \textit{defs} is not shown;
 
 \textit{constraints};
-00 (HB rcvA.event wait_rcvA.event)
-01 (HB wait_rcvA.event rcvB.event)
-02 (HB rcvB.event wait_rcvB.event)
-03 (HB wait_rcvB.event assume.event)
+00 (HB R02.event W(&h1).event)
+01 (HB W(&h1).event R05.event)
+02 (HB R05.event W(&h2).event)
+03 (HB W(&h2).event assume.event)
 04 (HB assume.event assert.event)
-05 (HB rcvC.event wait_rcvC.event)
-06 (HB wait_rcvC.event snd3.event)
-07 (HB snd3.event wait_snd3.event)
-08 (HB snd1.event wait_snd1.event)
-09 (HB wait_snd1.event snd2.event)
-10 (HB snd2.event wait_snd2.event)
+05 (HB R13.event W(&h3).event)
+06 (HB W(&h3).event S15.event)
+07 (HB S15.event W(&h4).event)
+08 (HB S24.event W(&h5).event)
+09 (HB W(&h5).event S27.event)
+10 (HB S27.event W(&h6).event)
 11 (assert (> b 0))
 12 (assert (not (= a 4)))
 
 \textit{match};
-13 (or (MATCH rcvA snd1)
-14     (MATCH rcvA snd3))
-15 (or (MATCH rcvB snd1)
-16     (MATCH rcvB snd3))
-17 (MATCH rcvC snd2)
-18 (NE rcvA rcvB)
+13 (or (MATCH R02 S24)
+14     (MATCH R02 S15))
+15 (or (MATCH R05 S24)
+16     (MATCH R05 S15))
+17 (MATCH R13 S27)
+18 (NE R02 R05)
 
 \end{alltt}
 \end{minipage}
@@ -183,7 +183,7 @@
 %language, is to formally define a translation from the trace language into an
 %SMT problem that can correctly models the original execution trace.
 
-The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. The algorithm to create the encoding takes as input a set of possible match pairs and a trace through an MCAPI program with the appropriate assumes and asserts as shown in \figref{fig:trace}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt}(a) is the set of possible match pairs for the program in \figref{fig:mcapi} using our shorthand notation defined in \figref{fig:trace}. The set admits, for example, that \texttt{rcvA} can be matched with either \texttt{snd1} or \texttt{snd2}. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system in such a way that the final values of program variables meet the assumption on control flow but violate some assertion.
+The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. The algorithm to create the encoding takes as input a set of possible match pairs and a trace through an MCAPI program with the appropriate assumes and asserts as shown in \figref{fig:trace}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt}(a) is the set of possible match pairs for the program in \figref{fig:mcapi} using our shorthand notation defined in \figref{fig:trace}. The set admits, for example, that $\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$ or $\mathtt{S_{2,4}}$. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system in such a way that the final values of program variables meet the assumption on control flow but violate some assertion.
 
 Before presenting the SMT encoding for a specific example, we need to explain auxiliary data structures and support functions in detail. We give the definitions in the Yices input language.
 
@@ -264,17 +264,19 @@ destination endpoint of the send operation is the same as the endpoint used by
 the receive operation, that the value sent by the send operation is the same
 value received by the receive operation, that the send operation occurs before
 the receive operation, that the ``match'' value in the receive tuple is
-equal to the ``ID'' value in the send tuple, and that the ``O" value in the send tuple is equal to the ``event" value in the receive tuple. Note that the encoding is going to use the ``O"  value in conjunction with the HB function to enforce message non-overtaking when messages are sent from the same endpoint. Consider a simple example below in shorthand notation that sends two messages from a Task 0 to Task 1,
+equal to the ``ID'' value in the send tuple, and that the ``O" value in the send tuple is equal to the ``event" value in the receive tuple. Note that the encoding is going to use the ``O"  value in conjunction with the HB function to enforce message non-overtaking when messages are sent from the same endpoint. Consider a simple example below that sends two messages from a Task 0 to Task 1,
 \[
-\begin{array}{c|c}
+\begin{array}{l|l}
 \;\;\;\;\;\;\;\;\mathtt{Task\ 0}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{Task\ 1}\;\;\;\;\;\;\;\; \\
 \hline
-\;\;\;\;\;\;\;\;\mathtt{snd1(1)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{rcvA}\;\;\;\;\;\;\;\; \\
-\;\;\;\;\;\;\;\;\mathtt{snd2(1)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{rcvB}\;\;\;\;\;\;\;\;
+\;\;\;\;\;\;\;\;\mathtt{S_{0,1}(1,\&h1)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{R_{1,1}(*,\&h3)}\;\;\;\;\;\;\;\; \\
+\;\;\;\;\;\;\;\;\mathtt{S_{0,2}(1,\&h2)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{R_{1,2}(*,\&h4)}\;\;\;\;\;\;\;\; \\
+\;\;\;\;\;\;\;\;\mathtt{W(\&h1)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{W(\&h3)}\;\;\;\;\;\;\;\; \\
+\;\;\;\;\;\;\;\;\mathtt{W(\&h2)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{W(\&h4)}\;\;\;\;\;\;\;\; \\
 \end{array}
 \]
-The ``O" values in the send records will be assigned to the order tracking events for rcvA and rcvB in the final encoding. Message non-overtaking from transactions on common endpoints is encoded by forcing the send events to be received in program order using the HB function as below in our simple example:
-\[(\mathrm{HB}\ (\mathrm{select}\ \mathtt{snd1}\ \mathrm{O})\ (\mathrm{select}\ \mathtt{snd2}\ \mathrm{O}))\]
+The ``O" values in the send records will be assigned to the order tracking events for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ in the final encoding. Message non-overtaking from transactions on common endpoints is encoded by forcing the send events to be received in program order using the HB function as below in our simple example:
+\[(\mathrm{HB}\ (\mathrm{select}\ \mathtt{S_{0,1}}\ \mathrm{O})\ (\mathrm{select}\ \mathtt{S_{0,2}}\ \mathrm{O}))\]
 
 
 \begin{equation}
@@ -316,6 +318,10 @@ The presentation of the SMT encoding is structured as
 \[\mathit{smt}\ =\ (\mathit{defs}\ \mathit{constraints}\ \mathit{match})\]
 where the field $\mathit{defs}$ represents all definitions of the send, receive operations and the free variables; The field $\mathit{constraints}$ represents all constraint clauses, including the assert clauses and the clauses built by the \texttt{HB} functions; and the field $\mathit{match}$ represents the clauses built by the \texttt{MATCH} function on a set of match pairs and the \texttt{NE} function. %We use $\mathit{match}.\mathit{input}$ to represent the input set of match pairs.
 
+The \textit{Intra-Happens-Before-Order}(\textit{Intra-HB}) in \cite{sarvani:fm09} constrains the Happens-Before relations between commands in any control flow path. Those relations are essential to the POE algorithm for their Message-passing verifier. Our SMT structure encodes all the relations in \textit{Intra-HB}, such that it can follow any control flow path executed by the POE algorithm in \cite{sarvani:fm09}. The \textit{Intra-HB} consists of 8 \textit{Happens-Before} relations:
+\[\prec_{mhb}\ =\ \prec_S \cup \prec_R \cup \prec_W \cup \prec_{SW} \cup \prec_{RW} \cup \prec_{mb} \cup \prec_{fo} \cup \prec_{io} \]
+The relations for \textit{Barrier} commands are omitted because they are not supported in the MCAPI programs. The relations $\prec_S$, $\prec_R$ and $\prec_W$ are used to constrain the state transition of commands. For example, issuing a send command happens before matching it with some receive in transit. Instead of explicitly giving the state information, the SMT structure in this paper implicitly encodes the state transitions in the field \textit{constraints}. The relations $\prec_{SW}$, $\prec_{RW}$, $\prec_{fo}$ and $\prec_{io}$ constrain the program order of commands. We encode those relations in the field \textit{constraints} of our SMT encoding. The relation $\prec_{mb}$ builds the match before for sends and receives. Also, we have the relation in the field \textit{match} in our SMT encoding.
+
 The input for generating the SMT encoding is a MCAPI program together with a set of match pairs. The program in \figref{fig:mcapi} with the set of match pairs in \figref{fig:smt}(a) is such an example. Given an input, the algorithm for generating our encoding is enumerated as follows.
 \begin{enumerate}
 \item Define a variable for the program order of each assume or assert command in the field $\mathit{defs}$;
@@ -323,7 +329,7 @@ The input for generating the SMT encoding is a MCAPI program together with a set
 \item for each send or receive in the trace, create an $S$ or $R$ definition and create an associated ``.event" variable for program order and add these to $\mathit{defs}$;
 \item for each program order represented by the field $\mathrm{event}$ in each thread, add an \texttt{HB} relation on the associated event for program order to $\mathit{constraints}$;
 \item for each match pair for a send and receive as input, add an $\mathrm{MATCH}$ relation to $\mathit{match}$;
-\item for two sends $\mathtt{snd1}$ and $\mathtt{snd2}$ in the same task sent to an identical endpoint, if the relation $(\mathrm{HB}\ \mathtt{snd1.event}\ \mathtt{snd2.event})$ is defined in $\mathit{constraints}$, add the clause $(\mathrm{HB}\ (\mathrm{select}\ \mathtt{snd1}\ \mathrm{O})\ (\mathrm{select}\ \mathtt{snd2}\ \mathrm{O}))$ to $\mathit{constraints}$.
+\item for two sends $\mathtt{S_{i,j}}$ and $\mathtt{S_{i,k}}$ in the same task \texttt{i} sent to an identical endpoint such that $\mathtt{i} < \mathtt{k}$, if the relation $(\mathrm{HB}\ \mathtt{S_{i,j}.event}\ \mathtt{S_{i,k}.event})$ is defined in $\mathit{constraints}$, add the clause $(\mathrm{HB}\ (\mathrm{select}\ \mathtt{S_{i,j}}\ \mathrm{O})\ (\mathrm{select}\ \mathtt{S_{i,k}}\ \mathrm{O}))$ to $\mathit{constraints}$.
 \item collect into a disjunction for all possible send matches for any given receive in the field $\mathit{match}$;
 \item and collect into a $\mathrm{NE}$ relation for all receives that are matched with any identical send and add it to $\mathit{match}$.
 \end{enumerate}
@@ -345,9 +351,9 @@ happens-before constraint, \texttt{MATCH} creates a match pair constraint, and \
 \label{fig:smt}
 \end{figure}
 
-\figref{fig:smt}(b) is a concrete example of the SMT encoding for our running program in \figref{fig:mcapi} given the set of match pairs in \figref{fig:smt}(a) as input. The field $\mathit{defs}$ is not shown because the definitions are not novel to our solution. Line \texttt{00} - \texttt{12} are the $\mathit{constraints}$, and line \texttt{13} - \texttt{18} are the $\mathit{match}$ of the SMT encoding. In particular, by encoding function $\mathrm{HB}$, \texttt{rcvA} happens before the wait command \texttt{wait\_rcvA} given the ``event'' for each command as parameters on line \texttt{00} in \figref{fig:smt}(b). Any assignment to event variables by the SMT solver must comply with program order constraints. Each event in the $\mathrm{HB}$ orderings on line \texttt{00} - \texttt{10} are ordered in a thread of \figref{fig:mcapi}. Also, the \texttt{MATCH} function encodes the relation such that \texttt{rcvA} is matched with \texttt{snd3} on line \texttt{14} in \figref{fig:smt}(b). The \texttt{NE} term precludes \texttt{rcvA} and \texttt{rcvB} from matching to the same send on line \texttt{18}. Other than the support functions, the first assert on line \texttt{11} works as the assume (line \texttt{08} at task 0) in \figref{fig:mcapi}, such that it prevents the SMT solver from finding solutions that are not consistent with control flow which requires ``$b \ge 0$". Finally, the second assert on line \texttt{12} is negated as the goal is to find schedules that violate the property. In our example, the interest is in solutions that resolve in $a \neq 4$ and follow the same control flow with $b > 0$.
+\figref{fig:smt}(b) is a concrete example of the SMT encoding for our running program in \figref{fig:mcapi} given the set of match pairs in \figref{fig:smt}(a) as input. The field $\mathit{defs}$ is not shown because the definitions are not novel to our solution. Line \texttt{00} - \texttt{12} are the $\mathit{constraints}$, and line \texttt{13} - \texttt{18} are the $\mathit{match}$ of the SMT encoding. In particular, by encoding function $\mathrm{HB}$, $\mathtt{R_{0,2}}$ happens before the wait command $\mathtt{W(\&h1)}$ given the ``event'' for each command as parameters on line \texttt{00} in \figref{fig:smt}(b). We use the wait command with handler in \figref{fig:trace} to denote the wait command for a send or receive command. Any assignment to event variables by the SMT solver must comply with program order constraints. Each event in the $\mathrm{HB}$ orderings on line \texttt{00} - \texttt{10} are ordered in a thread of \figref{fig:mcapi}. Also, the \texttt{MATCH} function encodes the relation such that $\mathtt{R_{0,2}}$ is matched with $\mathtt{S_{1,5}}$ on line \texttt{14} in \figref{fig:smt}(b). The \texttt{NE} term precludes $\mathtt{R_{0,2}}$ and $\mathtt{R_{0,5}}$ from matching to the same send on line \texttt{18}. Other than the support functions, the first assert on line \texttt{11} works as the assume (line \texttt{08} at task 0) in \figref{fig:mcapi}, such that it prevents the SMT solver from finding solutions that are not consistent with control flow which requires ``$b \ge 0$". Finally, the second assert on line \texttt{12} is negated as the goal is to find schedules that violate the property. In our example, the interest is in solutions that resolve in $a \neq 4$ and follow the same control flow with $b > 0$.
 
-Other then the basic structure of the SMT encoding, we use the function
+Other than the basic structure of the SMT encoding, we use the function
 \[\mathrm{ANS}(\mathit{smt}) \mapsto \{\mathrm{\cfgt{SAT}},\mathrm{\cfgt{UNSAT}}\} \]
 to return the solution of an SMT problem, such that $\mathrm{\cfgt{SAT}}$ represents a satisfiable solution that finds an execution of the MCAPI program that violates the user defined correctness property, and $\mathrm{\cfgt{UNSAT}}$ represents an unsatisfiable solution that all possible execution traces either meet correctness property in the same control flow, or follow a different control flow. Note that $\mathrm{\cfgt{UNSAT}}$ and $\mathrm{\cfgt{SAT}}$ are ordered such that $\mathrm{\cfgt{UNSAT}} < \mathrm{\cfgt{SAT}}$.
 
@@ -382,6 +388,8 @@ Consider the MCAPI program in \figref{fig:mcapi} as an example.
 \figref{fig:smt_trace}(a) and (b) are two different SMT encodings for our running
 example in \figref{fig:mcapi} generated from different sets of possible match pairs, such that \figref{fig:smt_trace}(a) encodes trace 1 in \figref{fig:trace} and \figref{fig:smt_trace}(b) encodes trace 2 in \figref{fig:trace}. By solving the encodings in \figref{fig:smt_trace}(a) and (b) for trace 1 and 2 in \figref{fig:trace} respectively, we get an unsatisfiable solution for \figref{fig:smt_trace}(a), and a satisfiable solution for \figref{fig:smt_trace}(b). As we discussed in Section 2, trace 1 is an execution without failure of the assertion, and trace 2 is the one that fails the assertion. %We can see that the encodings in \figref{fig:smt_trace} (a) and (b) correctly encodes trace 1 and 2 in \figref{fig:trace}, respectively.
 Compare both encodings with that in \figref{fig:smt}(b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the \texttt{MATCH} clauses. In particular, the input set of match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset of that in \figref{fig:smt}(b). As discussed above, the encoding in \figref{fig:smt}(b) captures the non-deterministic behavior of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in \figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on the encoding in either \figref{fig:smt_trace}(a) or (b). The formal proof is given in a long version of paper at (\url{``http://students.cs.byu.edu/~yhuang2/downloads/paper.pdf''}).
+
+The non-determinism of an MCAPI program discussed above relies on the \textit{infinite-buffer} setting. If the \textit{zero-buffer} setting is used instead, the SMT encoding needs to be reorganized as follows. For each match pair that can not exist in the program runtime caused by the \textit{zero-buffer} problem discussed in Section 2, add extra \texttt{HB} clauses in the SMT encoding to prevent incorrect behavior. For example in \figref{fig:mcapi}, to prevent $\mathtt{R_{1,3}}$ to be matched with $\mathtt{S_{2,6}}$ before $\mathtt{R_{0,2}}$ is matched with $\mathtt{S_{2,4}}$ prohibited by the \textit{zero-buffer}, an \texttt{HB} relation is added such that the wait command $\mathtt{W(\&h1)}$ for $\mathtt{R_{0,2}}$ happens before $\mathtt{S_{0,6}}$.
 
 
 

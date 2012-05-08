@@ -1,0 +1,43 @@
+* Run experiments for which the clause count mattered in the final running time
+** Pull traces from Jurassic Park Message Passing (using printf)
+** Pull traces out of Dijkstra's Self Stabalization
+
+* More experiments that show the method scales.
+
+* Pass paper through BYU editors
+
+* Complete specific suggestions by reviewer 1 (ignore input on citations)
+
+* Check all of your references to be sure they are 100% complete
+
+* Clarify type of programs, for example, we do allow decoding unlike
+  Ganesh, but we cannot deal with arbitrary non-linear transformations
+  unless we have a theory in the SMT solver to deal with those
+  transformations
+
+* Implement algorithm to compute match pairs and describe in some
+  language with known semantics (not Java or pseudo-code)
+
+* Read every paper in Review 3 and add to your related work
+
+* Compare against CheckFence where possible
+
+* Rewrite 4th sentence in abstract to be shorter sentences that are more clear (and other long sentences)
+
+* Fix differences between the long and short versions of the paper
+
+* Address specifically items 5 and 6 directly (remove "obvious" everywhere and add more intuition on equations)
+
+* Intuition needs to be "why did I do this" rather than "here is what it does"
+
+* Add false positives to the experiments (we should have none)
+
+* Address number 8 as future work (refining the SMT model to predict
+  other branches). Justify why it is future work and why it is OK to
+  ignore the issue currently. Acknowledge that we could plug into the same place as other work that relaxes the trace and uses the relaxation to guide the model checker in constructing a partial order reduction.
+
+* Reviewer 4, item 9: how conservative is this approach if you look just at match pair construction? For example, compare your overapproximation to the exact set for several examples to show how "overapproximate" you solution is. I believe the overapproximation level does not matter since our SMT model ignores overapproximated match-pairs. The data will show that it does not matter even if we cannot yet prove it.
+
+* Add complexity figure to paper (see repository).
+    
+* Find publication venue

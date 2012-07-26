@@ -3,7 +3,7 @@
 % for Lecture Notes in Computer Science,
 % version 2.4 for LaTeX2e as of 16. April 2010
 %
-\documentclass{llncs}
+\documentclass[preprint]{sigplanconf}
 %
 \usepackage{comment}
 \usepackage{mathpartir}
@@ -44,10 +44,10 @@
 \subtitle{Applying SMT Technology to Message Passing}
 %\titlerunning{SMT for MCAPI Executions}
 
-\author{Yu Huang \and Eric Mercer \and Jay McCarthy \thanks{Special thanks to Christopher Fischer, formally at BYU and now at Amazon}}
-%\authorrunning{Y.~Huang \and E.~Mercer \and J.~McCarthy}
-\institute{Brigham Young University \\
-            \email{\{yuHuang,egm,jay\}@byu.edu}}
+\authorinfo{}%Yu Huang \and Eric Mercer \and Jay McCarthy \thanks{Special thanks to Christopher Fischer, formally at BYU and now at Amazon}}
+    %{Brigham Young University \\
+    %{\{yuHuang,egm,jay\}@byu.edu}}
+{}
 
 \maketitle
 
@@ -66,6 +66,7 @@
 \input{example}
 \input{smt-model}
 \input{mp-generation}
+\input{experiments}
 \input{result}
 %\input{proof}
 \input{related-work}

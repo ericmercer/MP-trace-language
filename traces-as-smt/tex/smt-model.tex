@@ -82,8 +82,8 @@
 
 \newsavebox{\boxSMTa}
 \begin{lrbox}{\boxSMTa}
-\begin{minipage}[c]{0.4\linewidth}
-\begin{tabular}[t]{l}
+\normalsize
+\begin{tabular}[c]{l}
 \texttt{\textit{defs} is not shown;}\\
 \\
 \texttt{\textit{constraints};}\\
@@ -107,13 +107,12 @@
 \texttt{15 (MATCH $\mathtt{R_{1,3}}$ $\mathtt{S_{2,7}}$)}\\
 
 \end{tabular}
-\end{minipage}
 \end{lrbox}
 
 \newsavebox{\boxSMTb}
 \begin{lrbox}{\boxSMTb}
-\begin{minipage}[c]{0.4\linewidth}
-\begin{tabular}[t]{l}
+\normalsize
+\begin{tabular}[c]{l}
 \texttt{\textit{defs} is not shown;}\\
 \\
 \texttt{\textit{constraints};}\\
@@ -137,12 +136,11 @@
 \texttt{15 (MATCH $\mathtt{R_{1,3}}$ $\mathtt{S_{2,7}}$)}\\
 
 \end{tabular}
-\end{minipage}
 \end{lrbox}
 
 \newsavebox{\boxSMTc}
 \begin{lrbox}{\boxSMTc}
-\begin{minipage}[c]{0.4\linewidth}
+\normalsize
 \begin{tabular}[t]{l}
 \texttt{\textit{defs} is not shown;}\\
 \\
@@ -170,7 +168,21 @@
 \texttt{18} (\texttt{NE} $\mathtt{R_{0,2}}$ $\mathtt{R_{0,5}}$)\\
 
 \end{tabular}
-\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxMP}
+\begin{lrbox}{\boxMP}
+\normalsize
+\begin{tabular}[t]{l}
+\\\\\\\\\\\\\\\\\\
+($\mathtt{R_{0,2}}$ $\mathtt{S_{2,4}}$)\\
+($\mathtt{R_{0,2}}$ $\mathtt{S_{1,5}}$)\\
+\\
+($\mathtt{R_{0,5}}$ $\mathtt{S_{2,4}}$)\\
+($\mathtt{R_{0,5}}$ $\mathtt{S_{1,5}}$)\\
+\\
+($\mathtt{R_{1,3}}$ $\mathtt{S_{2,7}}$)\\
+\end{tabular}
 \end{lrbox}
 
 
@@ -242,8 +254,6 @@ We define two records in equation (\ref{equation:record}) that are essential to 
 \end{array}
 \label{equation:match}
 \end{equation}
-
-
 %\begin{equation}
 %\mathrm{MATCH}(R,S) \equiv \left\{
 %\begin{array}{ll}
@@ -328,19 +338,19 @@ The input for generating the SMT encoding is an MCAPI program together with a se
 \item for each send or receive in the trace, create an $S$ or $R$ definition and create an associated ``.event" variable for program order and add these to $\mathit{defs}$;
 \item for each program order represented by the field $\mathrm{event}$ in each thread, add an \texttt{HB} relation on the associated event for program order to $\mathit{constraints}$;
 \item for each match pair for a send and receive as input, add an $\mathrm{MATCH}$ relation to $\mathit{match}$;
-\item for two sends $\mathtt{S_{i,j}}$ and $\mathtt{S_{i,k}}$ in the same task \texttt{i} sent to an identical endpoint such that $\mathtt{i} < \mathtt{k}$, if the relation $(\mathrm{HB}\ \mathtt{S_{i,j}.event}\ \mathtt{S_{i,k}.event})$ is defined in $\mathit{constraints}$, add the clause $(\mathrm{HB}\ (\mathrm{select}\ \mathtt{S_{i,j}}\ \mathrm{O})\ (\mathrm{select}\ \mathtt{S_{i,k}}\ \mathrm{O}))$ to $\mathit{constraints}$.
+\item for two sends $\mathtt{S_{i,j}}$ and $\mathtt{S_{i,k}}$ in the same task \texttt{i} sent to an identical endpoint such that $\mathtt{i} < \mathtt{k}$, if the relation $(\mathrm{HB}$ $\mathtt{S_{i,j}.event}$ $\mathtt{S_{i,k}.event})$ is defined in $\mathit{constraints}$, add the clause $(\mathrm{HB}$ $(\mathrm{select}$ $\mathtt{S_{i,j}}\ \mathrm{O})$ $(\mathrm{select}$ $\mathtt{S_{i,k}}$ $\mathrm{O}))$ to $\mathit{constraints}$.
 \item collect into a disjunction for all possible send matches for any given receive in the field $\mathit{match}$;
 \item and collect into a $\mathrm{NE}$ relation for all receives that are matched with any identical send and add it to $\mathit{match}$.
 \end{enumerate}
 
 \begin{figure}
 \begin{center}
-\setlength{\tabcolsep}{30pt}
-\begin{tabular}[c]{cc}
-\scalebox{0.6}{\usebox{\boxMP}} &
+\setlength{\tabcolsep}{20pt}
+\begin{tabular}[t]{cc}
+\scalebox{0.7}{\usebox{\boxMP}} &
 %\scalebox{0.6}{\usebox{\boxSMTa}} &
 %\scalebox{0.6}{\usebox{\boxSMTb}} &
-\scalebox{0.6}{\usebox{\boxSMTc}} \\
+\scalebox{0.7}{\usebox{\boxSMTc}} \\\\
 (a) & (b)
 \end{tabular}
 \end{center}
@@ -358,21 +368,21 @@ to return the solution of an SMT problem, such that $\mathrm{\cfgt{SAT}}$ repres
 
 The SMT encoding defined above is used to capture the non-deterministic behavior of an MCAPI program by giving a complete set of match pairs. As we discussed in the previous section, the MCAPI program in \figref{fig:mcapi} contains two outcomes of execution. The SMT encoding we present in \figref{fig:smt}(b) captures both executions, since the set of match pairs in \figref{fig:smt}(a) is a complete set where all matches that can occur in the real execution for our running example in \figref{fig:mcapi} are included, and all matches that can not occur in the real execution are not included. Furthermore, the following theorem states that we can over-approximate the true set of match pairs and still prove correctness. If there is no error with the over-approximated set, then there is no error arising from non-determinism in the runtime on that program execution. If there is an error from the over-approximated set, then that error may or may not be a real error. Note that two SMT problems $\smt_{\alpha}$ and $\smt_{\beta}$ in the following theorem have an identical $\mathit{defs}$ and $\mathit{constraints}$ sets, and the match set of $\smt_{\alpha}$ is the subset of that of $\smt_{\beta}$ so that $smt_{\beta}$ represents an over-approximation of $smt_{\alpha}$.
 
-\begin{theorem}
+\subsection{Theorem}
 For two SMT problems, $\smt_{\alpha} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match}_{\alpha})$ and $\smt_{\beta} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match_{\beta}})$,
 if $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$,
 \[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
 where $\mathit{set(match)}$ represents the input set of match pairs for the $\mathtt{MATCH}$ clauses in the field $\mathit{match}$.
 \label{thm:1}
-\end{theorem}
+
 
 \begin{figure}
 \begin{center}
-\setlength{\tabcolsep}{30pt}
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}[c]{cc}
 %\scalebox{0.7}{\usebox{\boxMP}} &
-\scalebox{0.6}{\usebox{\boxSMTa}} &
-\scalebox{0.6}{\usebox{\boxSMTb}} \\
+\scalebox{0.7}{\usebox{\boxSMTa}} &
+\scalebox{0.7}{\usebox{\boxSMTb}} \\\\
 %\scalebox{0.7}{\usebox{\boxSMTc}} \\
 (a) & (b)
 \end{tabular}
@@ -382,11 +392,11 @@ where $\mathit{set(match)}$ represents the input set of match pairs for the $\ma
 \label{fig:smt_trace}
 \end{figure}
 
-\subsubsection{Proof Sketch}
+\subsection{Proof Sketch}
 Consider the MCAPI program in \figref{fig:mcapi} as an example.
 \figref{fig:smt_trace}(a) and (b) are two different SMT encodings for our running
 example in \figref{fig:mcapi} generated from different sets of possible match pairs, such that \figref{fig:smt_trace}(a) encodes trace 1 in \figref{fig:trace} and \figref{fig:smt_trace}(b) encodes trace 2 in \figref{fig:trace}. By solving the encodings in \figref{fig:smt_trace}(a) and (b) for trace 1 and 2 in \figref{fig:trace} respectively, we get an unsatisfiable solution for \figref{fig:smt_trace}(a), and a satisfiable solution for \figref{fig:smt_trace}(b). As we discussed in Section 2, trace 1 is an execution without failure of the assertion, and trace 2 is the one that fails the assertion. %We can see that the encodings in \figref{fig:smt_trace} (a) and (b) correctly encodes trace 1 and 2 in \figref{fig:trace}, respectively.
-Compare both encodings with that in \figref{fig:smt}(b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the \texttt{MATCH} clauses. In particular, the input set of match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset of that in \figref{fig:smt}(b). As discussed above, the encoding in \figref{fig:smt}(b) captures the non-deterministic behavior of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in \figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on the encoding in either \figref{fig:smt_trace}(a) or (b). The formal proof is given in a long version of paper at (\url{``http://students.cs.byu.edu/~yhuang2/downloads/paper.pdf''}).
+Compare both encodings with that in \figref{fig:smt}(b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the \texttt{MATCH} clauses. In particular, the input set of match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset of that in \figref{fig:smt}(b). As discussed above, the encoding in \figref{fig:smt}(b) captures the non-deterministic behavior of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in \figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on the encoding in either \figref{fig:smt_trace}(a) or (b). The formal proof is given in a long version of paper at (``http://students.cs.byu.edu/~yhuang2/downloads/paper.pdf'').
 
 The non-determinism of an MCAPI program discussed above relies on the \textit{infinite-buffer} setting. If the \textit{zero-buffer} setting is used instead, the SMT encoding needs to be reorganized as follows. For each match pair that can not exist in the program runtime under the \textit{zero-buffer} setting, add extra \texttt{HB} clauses in the SMT encoding to prevent incorrect behavior. For example in \figref{fig:mcapi}, to prevent $\mathtt{R_{1,3}}$ to be matched with $\mathtt{S_{2,6}}$ before $\mathtt{R_{0,2}}$ is matched with $\mathtt{S_{2,4}}$ prohibited by the \textit{zero-buffer}, an \texttt{HB} relation is added such that the wait command $\mathtt{W(\&h1)}$ for $\mathtt{R_{0,2}}$ happens before $\mathtt{S_{0,6}}$.
 

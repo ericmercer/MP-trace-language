@@ -196,7 +196,7 @@
 
 The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. The algorithm to create the encoding takes as input a set of possible match pairs and a trace through an MCAPI program with the appropriate assumes and asserts as shown in \figref{fig:trace}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt}(a) is the set of possible match pairs for the program in \figref{fig:mcapi} using our shorthand notation defined in \figref{fig:trace}. The set admits, for example, that $\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$ or $\mathtt{S_{2,4}}$. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system in such a way that the final values of program variables meet the assumption on control flow but violate some assertion.
 
-Before presenting the SMT encoding for a specific example, we need to explain auxiliary data structures and support functions in detail. We give the definitions in the Yices input language.
+Before presenting the SMT encoding for a specific example, we need to explain auxiliary data structures and support functions in detail. We give the definitions in the Yices \cite{dutertre:CAV06} input language.
 
 % (define HB::(-> a::int b::int (subtype (c::bool) (ite (< a b) (= c true) (= c false)))))
 \begin{equation}
@@ -368,14 +368,12 @@ to return the solution of an SMT problem, such that $\mathrm{\cfgt{SAT}}$ repres
 
 The SMT encoding defined above is used to capture the non-deterministic behavior of an MCAPI program by giving a complete set of match pairs. As we discussed in the previous section, the MCAPI program in \figref{fig:mcapi} contains two outcomes of execution. The SMT encoding we present in \figref{fig:smt}(b) captures both executions, since the set of match pairs in \figref{fig:smt}(a) is a complete set where all matches that can occur in the real execution for our running example in \figref{fig:mcapi} are included, and all matches that can not occur in the real execution are not included. Furthermore, the following theorem states that we can over-approximate the true set of match pairs and still prove correctness. If there is no error with the over-approximated set, then there is no error arising from non-determinism in the runtime on that program execution. If there is an error from the over-approximated set, then that error may or may not be a real error. Note that two SMT problems $\smt_{\alpha}$ and $\smt_{\beta}$ in the following theorem have an identical $\mathit{defs}$ and $\mathit{constraints}$ sets, and the match set of $\smt_{\alpha}$ is the subset of that of $\smt_{\beta}$ so that $smt_{\beta}$ represents an over-approximation of $smt_{\alpha}$.
 
-\subsection{Theorem}
+\subsection{Theorem 1}
 For two SMT problems, $\smt_{\alpha} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match}_{\alpha})$ and $\smt_{\beta} = (\mathit{defs}\ \mathit{constraints}\ \mathit{match_{\beta}})$,
 if $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$,
 \[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
 where $\mathit{set(match)}$ represents the input set of match pairs for the $\mathtt{MATCH}$ clauses in the field $\mathit{match}$.
 \label{thm:1}
-
-
 \begin{figure}
 \begin{center}
 \setlength{\tabcolsep}{3pt}
@@ -391,12 +389,22 @@ where $\mathit{set(match)}$ represents the input set of match pairs for the $\ma
 (a) The SMT encoding for Trace 1 in \figref{fig:trace}. (b) The SMT encoding for Trace 2 in \figref{fig:trace}.}
 \label{fig:smt_trace}
 \end{figure}
-
-\subsection{Proof Sketch}
+\\
+\textbf{Proof Sketch.}
 Consider the MCAPI program in \figref{fig:mcapi} as an example.
 \figref{fig:smt_trace}(a) and (b) are two different SMT encodings for our running
 example in \figref{fig:mcapi} generated from different sets of possible match pairs, such that \figref{fig:smt_trace}(a) encodes trace 1 in \figref{fig:trace} and \figref{fig:smt_trace}(b) encodes trace 2 in \figref{fig:trace}. By solving the encodings in \figref{fig:smt_trace}(a) and (b) for trace 1 and 2 in \figref{fig:trace} respectively, we get an unsatisfiable solution for \figref{fig:smt_trace}(a), and a satisfiable solution for \figref{fig:smt_trace}(b). As we discussed in Section 2, trace 1 is an execution without failure of the assertion, and trace 2 is the one that fails the assertion. %We can see that the encodings in \figref{fig:smt_trace} (a) and (b) correctly encodes trace 1 and 2 in \figref{fig:trace}, respectively.
 Compare both encodings with that in \figref{fig:smt}(b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the \texttt{MATCH} clauses. In particular, the input set of match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset of that in \figref{fig:smt}(b). As discussed above, the encoding in \figref{fig:smt}(b) captures the non-deterministic behavior of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in \figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on the encoding in either \figref{fig:smt_trace}(a) or (b). The formal proof is given in a long version of paper at (``http://students.cs.byu.edu/~yhuang2/downloads/paper.pdf'').
+
+Given $\mathit{set(match_{\alpha})}$ and $\mathit{set(match_{\beta})}$ in the theorem above a complete set of match pairs and an over-approximated set for an MCAPI program, respectively, we can further prove that $\mathrm{ANS}(\smt_{\alpha})$ $ = $ $\mathrm{ANS}(\smt_{\beta})$ by giving the following theorem. Note that a match pair $(R, S) \in \mathit{set(match_{\beta})}/\mathit{set(match_{\alpha})}$ is called ``bogus", since it can not exist in a real execution of the program.
+
+\subsection{Theorem 2}
+Any match pair $(R, S)$ used in a satisfying assignment of an SMT encoding $\smt$ is a valid match pair and reflects an actual possible MCAPI program execution.
+\\
+\textbf{Proof.}
+Proof by contradiction. Suppose $(R, S)$ is a ``bogus" match pair that causes $\mathrm{ANS}(\smt) = \cfgt{SAT}$. Since $(R, S)$ is not a valid match pair, it can not reflect an actual program execution. In other words, the $\mathrm{HB}$ constraints encoded in $\smt$ are not satisfied. Based on the fact above, the answer of $\smt$ is $\cfgt{UNSAT}$ and it contradicts the previous hypothesis. Thus, $(R, S)$ is a valid match pair in $\smt$ and reflects an actual possible MCAPI program execution. $\Box$ 
+
+By proving Theorem 2, we infer that a ``bogus" match pair can only cause an unsatisfying assignment of an SMT problem. Further, given that $\mathit{set(match_{\alpha})}$ and $\mathit{set(match_{\beta})}$ reflect a complete set and a over-approximated set respectively, the answers of two encodings $\smt_{\alpha}$ and $\smt_{\beta}$ discussed above are equal since any ``bogus" match pair involved in $\smt_{\beta}$ is only used in unsatisfying assignments.
 
 The non-determinism of an MCAPI program discussed above relies on the \textit{infinite-buffer} setting. If the \textit{zero-buffer} setting is used instead, the SMT encoding needs to be reorganized as follows. For each match pair that can not exist in the program runtime under the \textit{zero-buffer} setting, add extra \texttt{HB} clauses in the SMT encoding to prevent incorrect behavior. For example in \figref{fig:mcapi}, to prevent $\mathtt{R_{1,3}}$ to be matched with $\mathtt{S_{2,6}}$ before $\mathtt{R_{0,2}}$ is matched with $\mathtt{S_{2,4}}$ prohibited by the \textit{zero-buffer}, an \texttt{HB} relation is added such that the wait command $\mathtt{W(\&h1)}$ for $\mathtt{R_{0,2}}$ happens before $\mathtt{S_{0,6}}$.
 

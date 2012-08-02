@@ -1,6 +1,9 @@
-\section{Results}
+\section{Experiments and Results}
 %In Section 4, we know that a well defined SMT problem can encode all possible execution traces for a CTP given a precise set of match pair. A precise set of match pair contains all possible match pairs that can exist in the real execution, and all match pairs that can not exist in the execution are not included. In other words, every hidden error can be found if it exists in some trace.
-To evaluate the reliability and efficiency of our system, we compare to \cite{elwakil:padtad10} even though it misses valid MCAPI runtime behavior because it is the only other encoding for MCAPI programs and it suffices to illustrate the efficiency of our encoding.
+We have implemented the tracking and analysis algorithms in the setting of MCAPI reference implementation. Our tool is capable of handling C programs for MCAPI semantics using the Linux \textit{PThreads} library. In particular, the tool generates a real execution trace under the environment of MCAPI reference implementation at the beginning. The match set generation algorithm presented in Section 4 then builds an over-approximated match set. The tool then builds an SMT encoding based on the generated execution trace and match set. We use the \textit{Yices} SMT solver \cite{dutertre:CAV06} to check the satisfiability of the generated SMT encoding. 
+
+To evaluate the reliability and efficiency of our system, we compare to \cite{elwakil:padtad10} even though it misses valid MCAPI runtime behavior because it is the only other encoding for MCAPI programs and it suffices to illustrate the efficiency of our encoding. Two sets of benchmarks are used in the comparison. The first set consists of four ``toy" examples, including the example in \figref{fig:mcapi}. Those examples contain small amount of operations and simple message communications. Because the runtime differences for both encodings are very small, we use the number of clause from each encoding for the same example to compare the efficiency. The other set of benchmarks consists of five large programs. One of them, we call ``leader election", basically elects a leader from several candidates by message communications. The other four programs, are all extensions to the original program in \figref{fig:mcapi}. In particular, extra iterations are added to the original program so that more message passing will occupy and more properties will be checked. In all examples, the correctness
+properties are numerical assertions over variables. The experiments were conducted on a PC with 1.6 GHz Intel Quad Core processor and 8GB memory running Ubuntu 14.   
 
 \begin{table}
 \begin{center}
@@ -17,8 +20,7 @@ To evaluate the reliability and efficiency of our system, we compare to \cite{el
 \caption{Comparison of two encodings for the MCAPI program in \figref{fig:mcapi}.}
 \label{table:program}
 \end{table}
-
-For the program in \figref{fig:mcapi}, we encodes 17 clauses for modeling the problem, omitting the definition of variables at the beginning of the encoding. Based on the encoding rules in \cite{elwakil:padtad10}, however, there are 47 clauses for the same program, omitting the definitions as well. \tableref{table:program} shows the number of clauses that constrain program order, match pairs, assume/asserts, and any other extra uncategorized clauses. Program order comprises the bulk of the encoding. The extra clauses in \cite{elwakil:padtad10} come from auxiliary variables in the encoding.
+As for the first set of benchmarks, we encodes 17 clauses for modeling the program in \figref{fig:mcapi}, omitting the definition of variables at the beginning of the encoding. Based on the encoding rules in \cite{elwakil:padtad10}, however, there are 47 clauses for the same program, omitting the definitions as well. \tableref{table:program} shows the number of clauses that constrain program order, match pairs, assume/asserts, and any other extra uncategorized clauses. Program order comprises the bulk of the encoding. The extra clauses in \cite{elwakil:padtad10} come from auxiliary variables in the encoding.
 
 \begin{table}
 \begin{center}
@@ -30,14 +32,30 @@ For the program in \figref{fig:mcapi}, we encodes 17 clauses for modeling the pr
         Encoding in \cite{elwakil:padtad10}& 46 & 33 & 18 & 44\\ \hline	
 		\end{tabular}
 \end{center}
-\caption{Comparison of two encodings for four different MCAPI programs with clause number.}
+\caption{Comparison of two encodings for four ``toy" MCAPI programs with clause number.}
 \label{table:comparison}
 \end{table}
 
 Other than the program in \figref{fig:mcapi}, we manually generate three programs and provide the experimental result in \tableref{table:comparison}. Small1 is a program with two tasks, where two sends are in the first task, and two receives are in the second task. Small2 is a program with only one task, where one send and one receive are in this task. Small3 is a program with three tasks, where three sends are in the first task, two receives are in the second task, and one receive is in the third task. The number of clauses follows the performance of the SMT solver with fewer clauses leading to better runtime. \tableref{table:comparison} shows that our encoding generates  1/5 -- 1/3  the clauses of that of the encoding in \cite{elwakil:padtad10}. We believe these reductions will generalize to any given program trace and match pair set.
 
+\begin{table}
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|c||c|c|c|c|}
+		\hline
+         \multicolumn{2}{|c||}{Test Programs} & \multicolumn{2}{|c|}{Our Encoding} & \multicolumn{2}{|c|}{Encoding in \cite{elwakil:padtad10}}\\ \hline
+         Name & \# Messages & Time(ms) & Memory & Time(ms) & Memory \\ \hline
+         LeaderElection & 30 &  & & & \\
+         5iterations & 15 &  & & & \\
+         6iterations & 18 &  & & & \\
+         7iterations & 21 &  & & & \\
+         8iterations & 24 &  & & & \\
+         \hline
+		\end{tabular}
+\end{center}
+\caption{Comparison of two encodings for five ``large" MCAPI programs with runtime and used memory.}
+\label{table:comparison}
+\end{table}
 
-
-
-
+As for the other set of benchmarks, we compare the runtime and consumed memory for each example. 
 

@@ -19,5 +19,5 @@ model the MCAPI execution in the SMT problem.  Match-pair encoding for
 MCAPI executions, when compared to other encoding strategies, is
 simpler to reason about, results in significantly fewer terms in the
 SMT problem, and captures feasible behaviors that are ignored in
-previously published techniques.
+previously published techniques. To our knowledge, this is the first SMT encoding of MCAPI application that is able to run in \textit{infinite-buffer} semantics, meaning that more messages can be received by a particular endpoint at a time. In other words, our encoding with infinite-buffer controls more non-deterministic behaviors at runtime. Our results demonstrate that our SMT encoding reduces $66\%$ to $80\%$ the size of that of the existing technology. In addition, our encoding runs average eight times faster and uses two times less memory than the existing technology on the benchmarks in our experiment.
 

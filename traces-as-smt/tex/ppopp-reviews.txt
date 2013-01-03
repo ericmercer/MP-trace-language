@@ -1,0 +1,297 @@
+============================================================================
+PPoPP 2013 Reviews for Submission #261
+============================================================================
+
+Title: Proving MCAPI Executions are Correct Applying SMT Technology to
+Message Passing
+
+Authors: Yu Huang, Eric Mercer and Jay McCarthy
+============================================================================
+                           REVIEWER #1
+============================================================================
+
+
+---------------------------------------------------------------------------
+Reviewer's Scores
+---------------------------------------------------------------------------
+
+                     Overall Evaluation: 2
+                  Reviewer's Confidence: 3
+
+
+---------------------------------------------------------------------------
+Summary
+---------------------------------------------------------------------------
+
+A decision-procedure based approach to validate traces under zero
+and infinite-buffer semantics. The ideas are demonstrated on MCA API
+and also compared against recent work.
+
+---------------------------------------------------------------------------
+Strength
+---------------------------------------------------------------------------
+
+Clear writing, very well described experiments, happens-before is
+encoded using SMT.
+
+---------------------------------------------------------------------------
+Weakness
+---------------------------------------------------------------------------
+
+The utility of the work is unclear, given that traces can be very
+long and there is an O(N^2) algorithm to generate overapproximated
+traces, and later an SMT-solving phase whose time can also explode.
+
+---------------------------------------------------------------------------
+Questions for Authors
+---------------------------------------------------------------------------
+
+* It is not clear why you don't need an NE constraint for multiple senders
+sent to the same end-point (page 4). Explain.
+
+* It is not clear why end-points need to be statically known (figure 5).
+Explain.
+
+* Why can't receives be posted before sends (page 3 wher you say the
+send must occur before receive in the global temporal order)?
+
+---------------------------------------------------------------------------
+Comments
+---------------------------------------------------------------------------
+
+The paper begins with an introduction to MCAPI. It introduces the
+space of executions possible under different buffering semantics.
+It shows how happens-before is captured using constraints. The
+constraint generation is shown with-respect to end-point matches
+and happens-before matches. The obvious monotonicity result is
+shown (adding more match pairs moves the problem towards satisfiability).
+
+It is not clear why you don't need an NE constraint for multiple senders
+sent to the same end-point (page 4).
+
+It is not clear why end-points need to be statically known (figure 5).
+
+The example sizes are inconclusively small (from a message passing program
+point of view).
+
+============================================================================
+                           REVIEWER #2
+============================================================================
+
+
+---------------------------------------------------------------------------
+Reviewer's Scores
+---------------------------------------------------------------------------
+
+                     Overall Evaluation: 2
+                  Reviewer's Confidence: 3
+
+
+---------------------------------------------------------------------------
+Summary
+---------------------------------------------------------------------------
+
+This paper presents a SMT encoding for MCAPI program executions used
+to prove their correctness. The encoding uses match pairs. The
+encoding captures all possible executions allowed by the MCAPI
+specification, using both zero-buffer and infinite-buffer
+semantics. The algorithm to create the encodings takes as input a set
+of possible match pairs and a trace of a MCAPI program. The trace is
+expected to include assumes and assert statements. An SMT solver is
+used to find a solution. If the solution is satisfiable, that means
+that a trace of the MCAPI execution has been found so that the
+user-defined correctness property is violated. An unsatisfiable
+solution means that no possible execution trace violates the
+correctness property. The paper also presents an algorithm to generate
+an over-approximated set of all possible match pairs. The technique is
+compared to previous work on a number of benchmarks.
+
+---------------------------------------------------------------------------
+Strength
+---------------------------------------------------------------------------
+
+Unlike previous work, the proposed encoding captures all possible
+execution traces allowed by the MCAPI specification in a trace of a
+concurrent program execution. For the benchmarks presented in this
+paper, the encoding captures this using 70% fewer clauses. As a
+consequence, the technique is not only more precise but also faster,
+and uses less memory.
+
+---------------------------------------------------------------------------
+Weakness
+---------------------------------------------------------------------------
+
+The main weakness of this paper is the experimental evaluation. One of
+the main contributions of this paper, as pointed out by the authors,
+is that this SMT encoding is able to run in infinite-buffer
+semantics. The discussion focuses on this semantics, however the
+experimental evaluation focuses on the zero-buffer semantics. No
+results are included for infinite-buffer semantics. Furthermore, the
+set of selected benchmarks do not seem realistic. Most of these
+benchmarks correspond to "toy" programs. For the large "leader
+election" program, no information is given about how large this
+program is. Judging by the number of messages, it seems to be about
+the same size as the "toy" program from figure 1 with 5 to 8
+iterations. Even though this work is compared with another existing
+technique, it is difficult to determine how much more effective it is
+in the real world, and whether it scales.
+
+---------------------------------------------------------------------------
+Questions for Authors
+---------------------------------------------------------------------------
+
+The following are mostly suggestions to improve the paper:
+
+1. Include experimental results when using the infinite-buffer
+semantics. As discussed in this paper, the infinite-buffer semantics
+is more challenging. It is mentioned in the paper that this technique
+is the first to support this semantics, thus an experimental
+evaluation must be included and will definitely make the paper
+stronger.
+
+2. Identify additional and different benchmarks. Discuss how
+representative these benchmarks are in the real world.
+
+3. For zero-buffer semantics, wasn't it the case that the solution for
+the example in figure 1 should be UNSAT since the assertion does not
+fail? The results in table 2 show it as SAT.
+
+4. How many "bogus" match pairs were produced for these benchmarks?
+Did they matter in practice?
+
+5. How expensive was it to create the sets of match pairs for these
+benchmarks? This should be part of the experimental evaluation. Would
+other techniques benefit from using your algorithm to create this set?
+
+6. What are the advantages of your technique over using static
+analysis? It seems static analysis has been used to solve related
+problems, but not this particular one. Why did you choose this
+approach over others, in particular static analysis?
+
+7. Reference to Elwakil et al. is made throughout the paper. It would
+be helpful to spend more time explaning what causes their imprecision
+(not including all possible traces). Is it due to a technical
+limitation? Is it because they thought it was good enough? What was
+the reasoning behind their approach? That will also make your
+contributions more clear.
+
+8. You do not mention anything about the nature of the traces used as
+input to your encoding tool. How many different traces are you
+experimenting with for a given program? How is the coverage?
+
+9. What are the clients of your technique? How often are they expected
+to use it? If we focus on the benchmarks presented in this paper,
+taking 72ms vs. 392ms, for example, does not seem like a big deal. Of
+course, this could change depending on how it will be used. However,
+it is clear that the technique is not just more efficient, but also
+more precise. It would still help to know about the expected uses to
+have a better sense of how important efficiency is in this context.
+
+
+---------------------------------------------------------------------------
+Comments
+---------------------------------------------------------------------------
+
+The main weakness of this paper is the experimental evaluation. One of
+the main contributions of this paper is that this SMT encoding is able
+to run in infinite-buffer semantics. In fact, the discussion focuses
+on this semantics, however the experimental evaluation does not
+include any results for infinite-buffer semantics. It is great to see
+the detailed comparison between the proposed technique and an existent
+previous approach, however the comparison focused on the zero-buffer
+semantics. The technique should also be evaluated for the
+infinite-buffer semantics.
+
+It would be good to include some discussion about how large and
+complex MCAPI programs are in the real world. It is difficult to
+determine whether the selected benchmarks are representative. For the
+large traces, it would be good to include the number of lines of
+code. Also, in addition to extending the example from figure 1 to
+include several iterations, it would be great to find other
+examples. It is not clear whether the improvements on running time and
+memory consumption over the previous technique will scale when dealing
+with larger applications.
+
+The results are promising, however to make the case stronger, the
+technique should be evaluated in a larger and more diverse set of
+benchmarks.
+
+============================================================================
+                           REVIEWER #3
+============================================================================
+
+
+---------------------------------------------------------------------------
+Reviewer's Scores
+---------------------------------------------------------------------------
+
+                     Overall Evaluation: 1
+                  Reviewer's Confidence: 3
+
+
+---------------------------------------------------------------------------
+Summary
+---------------------------------------------------------------------------
+
+The paper presents an algorithm for solving the following problem.
+Given a trace of a concurrent program with multiple sequential threads, the
+algorithm decides whether the assert statements in the program are satisfied.
+
+---------------------------------------------------------------------------
+Strength
+---------------------------------------------------------------------------
+
+The experimental results on microbenchmarks show that the new
+algorithm is better than one from previous work by Elwakil and Yang (2010).
+
+---------------------------------------------------------------------------
+Weakness
+---------------------------------------------------------------------------
+
+Below I will give a sketch of why the studied problem is in NP.  I
+think this can lead to a better and simpler algorithm.
+
+---------------------------------------------------------------------------
+Comments
+---------------------------------------------------------------------------
+
+The key notion in the paper is that of a match pair.
+In a trace, a match pair is a pair of a "send" and a later possibly
+matching "receive".  The paper fails to notice that the studied
+algorithmic problem is in NP:
+- First write the trace in static single assignment form, that is, every use
+  of a variable gets a new name.
+- Second, guess the match pairs, which is a guess of polynomial size.
+  Write each guessed match pair as an equation that connects the sent value
+  to the receiving variable.  The reason we can find all the
+  _possible_ match pairs is that the sender always comes before the
+  receiver in the trace.
+- Third, add the assert statements as constraints (as also done by
+  the submitted paper).
+- Fourth, assuming all assert statements are simple like the ones in
+  the paper, check that the resulting constraint system is satisfiable
+  in polynomial time.
+End result: we can solve the problem in NP time.
+
+In the submitted paper, Section 4 fails to notice that we can produce the
+exact listing of possible match pairs.                    Instead
+Section 4 produces
+a
+conservative approximation, which then is fed to the algorithm in Section 3.
+
+I find Sections 3+4 are written in a way that is much more complicated
+than necessary.
+
+The benchmarks used for experimental results are too small to tell
+whether the algorithm is really too approximate in practice and
+whether it scales well.
+
+Given that the paper already uses an SMT-solver, I think the best to
+proceed would be for the authors to phrase a satisfiability problem
+like I sketched above and then apply the SMT-solver.  Additionally, I suggest
+that the authors try to prove that the problem is NP-hard.
+
+Usually, the argument for using an approximation algorithm on
+an NP-complete problem is to gain scalability.
+However, the paper
+has no results on scalability (neither theoretical nor experimental).

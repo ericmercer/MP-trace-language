@@ -18,8 +18,9 @@ for r in list_r
       1.the endpoint of r is equal to the destination endpoint of s, and
       2.the index of r is larger or equal to the index of s, and
       3.the index of r is less or equal to the index of s
-        plus the size of list_s minus the number of sends with the same
-        source and destination endpoints of s
+        plus the number of sends with the same destination endpoint of s 
+        minus the number of sends with the same source and destination 
+        endpoints of s
     then
       add pair (r, s) to match_set
     else
@@ -147,15 +148,15 @@ Note that $\mathtt{R_{0,1}}$ is the first receive operation in endpoint 0, and $
 
 The second step for our algorithm is to linearly traverse both lists to generate match pairs between send and receive commands. Observe that the sends defined with an identical destination endpoint and an identical source endpoint are processed in a FIFO order according to the MCAPI runtime specification. The same is true of receives on a common endpoint in a common task. The FIFO ordering, sometimes referred to as message non-overtaking, lets us prune match pairs that obviously cannot be generated in any valid implementation of the MCAPI runtime.
 
-Let $I_r$ and $I_s$ be the program order indication in the lists of (\ref{equation:rcv}) and (\ref{equation:snd}) respectively and similarly \texttt{R} and \texttt{S} be the corresponding actions. Note that $I_r$ and $I_s$ are increased by 1 for two consecutive receives or sends, respectively. Further, $N_s$ is the number of send actions in the program and $n_s(\mathit{src},\mathit{dst})$ is the number of sends from $\mathit{src}$ to $\mathit{dst}$, where $\mathit{src}$ and $\mathit{dst}$ represent the source and destination endpoints, respectively. A send and receive can be matched if and only if
+Let $I_r$ and $I_s$ be the program order indication in the lists of (\ref{equation:rcv}) and (\ref{equation:snd}) respectively and similarly \texttt{R} and \texttt{S} be the corresponding actions. Note that $I_r$ and $I_s$ are increased by 1 for two consecutive receives or sends, respectively. Further, $n_s(*,\mathit{dst})$ is the number of send actions from any source to $\mathit{dst}$ and $n_s(\mathit{src},\mathit{dst})$ is the number of sends from $\mathit{src}$ to $\mathit{dst}$, where $\mathit{src}$ and $\mathit{dst}$ represent the source and destination endpoints, respectively. A send and receive can be matched if and only if
 \begin{itemize}
 \item[1.] the destination endpoint of $\mathtt{S}$ is identical to the endpoint of $\mathtt{R}$;
 \item[2.] $I_r \geq I_s$;
-\item[3.] and $I_r \leq I_s + (N_s - n_s(\mathit{src},\mathit{dst}))$.
+\item[3.] and $I_r \leq I_s + (n_s(*,\mathit{dst}) - n_s(\mathit{src},\mathit{dst}))$.
 \end{itemize}
 If all rules of the criteria are satisfied for a send and a receive, we build a match pair for the send and the receive in the result set $\mathtt{match\_set}$. In our concrete example, $\mathtt{R_{0,1}}$ is matched with $\mathtt{S_{1,1}}$ or $\mathtt{S_{2,1}}$, but it cannot be matched with $\mathtt{S_{1,3}}$ since the second rule is not satisfied such that the order for $\mathtt{R_{0,1}}$ is less than the order of $\mathtt{S_{1,3}}$. We repeatedly apply the criteria to match sends and receives until we completely traverse the lists in (\ref{equation:rcv}) and (\ref{equation:snd}). The generated set of match pairs for our example in \figref{fig:mcapi1} is imprecise such that some extra match pairs, which we call ``bogus", that cannot exist in the real execution trace are included. In particular, the match pair $(\mathtt{S_{2,1}}\ \mathtt{R_{0,4}})$ is a ``bogus" match pair because it is not possible to order $\mathtt{S_{1,3}}$ before $\mathtt{R_{0,2}}$ since $\mathtt{R_{1,2}}$ can only match with $\mathtt{S_{0,3}}$ that must occur after $\mathtt{R_{0,2}}$. Fortunately, the encoding in this paper is strong enough to preclude that bad match pair in any satisfying solution.
 
 
 Now let us analyze the time complexity of the algorithm. Traversing the tasks linearly takes $O(N)$ to complete, where $N$ is the total lines of code of the program. Traversing the list of receives and the list of sends takes $O(mn)$ to complete, where $m$ is the total number of sends and $n$ is the total number of receives. Note that $m + n \le N$. Totally, the algorithm takes $O(N + mn) \leq O(N + N^2) \approx O(N^2)$ to complete.
 
-%As discussed in the previous section, an over-approximated match set can give the same solution as a complete set does. As our match pair generation algorithm over-approximates the true set of match pairs allowed by the runtime for an MCAPI program trace, when used with our SMT encoding it cannot result in false positives (i.e.,  errors arising from match pairs that cannot happen in any implementation of the MCAPI specification). 
+%As discussed in the previous section, an over-approximated match set can give the same solution as a complete set does. As our match pair generation algorithm over-approximates the true set of match pairs allowed by the runtime for an MCAPI program trace, when used with our SMT encoding it cannot result in false positives (i.e.,  errors arising from match pairs that cannot happen in any implementation of the MCAPI specification).

@@ -1,66 +1,55 @@
 \section{Experiments and Results}
 %In Section 4, we know that a well defined SMT problem can encode all possible execution traces for a CTP given a precise set of match pair. A precise set of match pair contains all possible match pairs that can exist in the real execution, and all match pairs that can not exist in the execution are not included. In other words, every hidden error can be found if it exists in some trace.
-We used the MCA provided reference solution to generate MCAPI program traces. The reference solution uses the \textit{PThread} library to create multiple MCAPI tasks. Our tool takes the trace as input, computes the match-pair set, and outputs the trace encoding. We use the \textit{Yices} SMT solver \cite{dutertre:CAV06} to check the satisfiability of the generated SMT encoding.
+We used the MCA provided reference solution to generate MCAPI program traces. The reference solution uses the \textit{PThread} library to create multiple MCAPI tasks. Our tool takes the trace as input, computes the match-pair set, and outputs the trace encoding. We use the Z3 SMT solver \cite{demoura:tacas08} to check the satisfiability of the generated SMT encoding.
 
-We use \textit{zero-buffer} semantics and compare our results to that in \cite{elwakil:padtad10}.  Two sets of benchmarks are used in the comparison. The first set consists of four ``toy" examples, including the example in \figref{fig:mcapi}. The other three benchmarks are generated manually. \textit{Small1} is a program execution with two tasks, where two sends are in the first task, and two receives are in the second task.  \textit{Small2} is a program execution with only one task, where one send and one receive are contained.  \textit{Small3} is a program execution with three tasks, where three sends are in the first task, two receives are in the second task, and one receive is in the third task. Those examples are very short execution traces. The other set of benchmarks consists of five large program traces. One of them, we call ``leader election", basically elects a leader from several candidates by message passing. The other four program traces, are all extensions to the one in \figref{fig:mcapi}. In particular, extra iterations are added to the original program execution to generate longer execution traces. In all benchmarks, the correctness properties are numerical assertions over variables. The experiments are conducted on a PC with a 1.6 GHz Intel Quad Core processor and 8GB memory running Ubuntu 14.
-
-\begin{table}
-\begin{center}
-\scriptsize
-\begin{tabular}{|c|c|c|c|c|c|}
-    \hline
-     &Program Order&Matches&Assume$\&$Assert&Extra Clauses\\
-    \hline
-    Our Encoding & 11 & 4 & 2 & 0\\
-    Encoding in \cite{elwakil:padtad10} & 22 & 13 & 3 & 8\\
-    \hline
-\end{tabular}
-\end{center}
-\caption{Comparison of two encodings for the MCAPI program execution in \figref{fig:mcapi}.}
-\label{table:program}
-\end{table}
-As for the first set of benchmarks, \tableref{table:program} shows the comparison of our encoding and the encoding in \cite{elwakil:padtad10} on the example in \figref{fig:mcapi}.  Basically, we encode 17 clauses for modeling the program execution in \figref{fig:mcapi}, omitting the definition of variables at the beginning of the encoding. Instead, the encoding in \cite{elwakil:padtad10} has 47 clauses for the same program execution, omitting the definitions as well. The number of clauses that constrain program order, match pairs, assume/asserts, and any other extra uncategorized clauses are also shown in \tableref{table:program}. Program order comprises the bulk of the encoding. The extra clauses in \cite{elwakil:padtad10} come from auxiliary variables in the encoding.
+We launched two series of experiments under \textit{infinite-buffer} semantics. In the first series of experiments, we compare the performance of a program with different sizes of match pairs. We manually generate an MCAPI program where a receiver(Task 0) and fifty senders(Task 1 to Task 50) are created. Each sender sends a message to the receiver. The receiver finally issues an assert that the message from Task 50 is sent to the buffer of the last receive operation of Task 0. Under this scenario, the set of match pairs consists of every combination of a send in task 1 to task 50 and a receive in task 0. We call this precise set of match pairs under this scenario the \textit{Worst-Case} of fifty-message program, which provides many non-deterministic behaviors of program executions. Given the \textit{Worst-Case}, we then reduce the size of match pairs gradually only ensuring that the match pair of the send in Task 50 and the last receive in Task 0 exists so that the assert can be checked. As such, we can further discuss how the size of match pairs change the performance of a program. We launch the second series of experiments in order to evaluate our strategy of encoding for verifying problems that are prevalent in message passing area. The problems consists of two sets of benchmarks that are originally developed for MPI \cite{mpi}. We make changes to those  benchmarks so that they are adapted to MCAPI. The first set \cite{osu_micro_benchmark} launches the bandwidth test and latency test, where a sender and a receiver are created and messages are sent in either a ping-pong or back-to-back fashion. The second set of benchmarks \cite{mpptest_benchmark} uses two programs to test the basic message passing operations. \textit{Cluster} is a program that evaluates a cluster of nodes by sending and receiving messages among each pair of nodes at a time. \textit{Pktuse} is a program where each of the five tasks randomly sends messages to other tasks. The total time and transmission rate is evaluated finally. In all tests, the correctness properties are numerical assertions over variables. The experiments are conducted on a PC with a 2.40 GHz Intel Quad Core processor and 8 GB memory running Ubuntu 14.
 
 \begin{table}
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|c||c|c|c|c|}
+\begin{tabular}{|l|c|c||c|c|c|}
 		\hline
-         \multicolumn{2}{|c||}{Test Programs} & \multicolumn{2}{|c|}{Our Encoding} & \multicolumn{2}{|c|}{Encoding in \cite{elwakil:padtad10}}\\ \hline
-         Name & \# Messages & Property & \# Clauses & Property & \# Clauses \\ \hline
-         EP in \figref{fig:mcapi} & 3 & sat & 17 & unsat & 47 \\
-         \textit{Small1} & 2 & unsat & 8 & unsat & 33 \\
-         \textit{Small2} & 1 & unsat  & 4 & unsat & 18 \\
-         \textit{Small3} & 3 & sat & 11 & unsat & 44 \\
+         \multicolumn{3}{|c||}{Test Programs} & \multicolumn{3}{|c|}{Performance} \\ \hline
+         Name & \# Messages & Matches & Encoding Gen(ms) & Time(ms) & Memory(MB) \\ \hline
+         \textit{manyOne\_100} & 50 & 100 & 568 & 40 & 4.87 \\ 
+         \textit{manyOne\_500} & 50 & 500 & 568 & 90 & 7.82 \\ 
+         \textit{manyOne\_800} & 50 & 800 & 568 & 160 & 9.96 \\ 
+         \textit{manyOne\_850} & 50 & 850 & 568 & 24650 & 30.44 \\ 
+         \textit{manyOne\_900} & 50 & 900 & 568 & 27110 & 28.40 \\ 
+         \textit{manyOne\_1000} & 50 & 1000 & 568 & 41800 & 34.20 \\ 
+         \textit{manyOne\_1400} & 50 & 1400 & 568 & 138130 & 54.74 \\ 
+         \textit{manyOne\_1600} & 50 & 1600 & 568 & 211270 & 65.57 \\ 
+         \textit{manyOne\_2000} & 50 & 2000 & 568 & 504960 & 83.19 \\ 
+         \textit{manyOne\_2500} & 50 & 2500 & 568 & 947160 & 105.29 \\ 
          \hline
 		\end{tabular}
 \end{center}
-\caption{Comparison of two encodings for four ``toy" MCAPI program executions with property and clause number.}
-\label{table:comparison}
+\caption{Comparison of the encodings for an MCAPI program with different settings of match pairs}
+\label{table:first}
 \end{table}
 
-\tableref{table:comparison} shows the properties of our encodings and the encodings in \cite{elwakil:padtad10} on each benchmark.  The SMT solver returns the correct answer of our encoding under \textit{zero-buffer} semantics for each example shown in \tableref{table:comparison}. In particular, our encodings return ``sat" (a satisfiable solution) for the example in \figref{fig:mcapi} and \textit{Small3} since violations are detected for both scenarios. Also, our encodings return ``unsat" (an unsatisfiable solution) for \textit{Small1} and \textit{Small2}, meaning there are no errors in program runtimes. From the results, it is also shown that the encoding in \cite{elwakil:padtad10} does not always encode the correct program behavior. In addition to the correctness properties, the number of clauses shown in \tableref{table:comparison} follows the performance of the SMT solver with fewer clauses leading to better runtime. \tableref{table:comparison} shows that our encoding generates  1/5 -- 1/3  the clauses of that of the encoding in \cite{elwakil:padtad10}. We believe these reductions will generalize to any given program trace and match pair set.
+As for the first series of experiments, \tableref{table:first} shows the comparison of our encodings for a specific example with different settings of match pairs. The first three columns presents the basic data of each encoding, including the name, the number of messages and the size of match pairs. The next three columns shows the performance of each encoding, including the time of generating the encoding, the running time and the memory usage of solving the encoding. Observe that the running time and the memory usage are increased with the number of match pairs. Also, we can see from the fifth column that Z3 handles 800 match pairs much better than 850 match pairs by evaluating the running time. From the results above, it is obvious that the size of match pairs is extremely important for the performance of an encoding. Note that the \textit{Worst-Case} in the last row hardly exists in practice. Thus, a soundly precise set of match pairs leads to better performance. This conclusion also attracts our attention on developing a more efficient method of generating match pairs in future work.
+
 
 \begin{table}
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|c||c|c|c|c|}
+\begin{tabular}{|l|c|c||c|c|c|c|}
 		\hline
-         \multicolumn{2}{|c||}{Test Programs} & \multicolumn{2}{|c|}{Our Encoding} & \multicolumn{2}{|c|}{Encoding in \cite{elwakil:padtad10}}\\ \hline
-         Name & \# Messages & Time(ms) & Memory(MB) & Time(ms) & Memory(MB) \\ \hline
-         \textit{LeaderElect} & 30 & -- & -- &-- &-- \\
-         \textit{5iterations} & 15 & 72 &  18.5195 & 392 & 37.2188 \\
-         \textit{6iterations} & 18 & 72  & 18.918 & 636 & 48.7031 \\
-         \textit{7iterations} & 21 & 80 & 19.375 & 940 & 62.7188 \\
-         \textit{8iterations} & 24 & -- &-- &-- &-- \\
+         \multicolumn{3}{|c||}{Test Programs} & \multicolumn{4}{|c|}{Performance} \\ \hline
+         Name & \# Messages & Matches & Encoding Gen(ms) & Matches Gen(ms) & Time(ms) & Memory(MB) \\ \hline
+         \textit{OSU\_bw} & 3465 & 3465 & 8329 & 540 & 227180 & 1034.84 \\ 
+         \textit{OSU\_latency} & 1290 & 1290 & 5104 & 226 & 63670 & 342.23 \\ 
+         \textit{MPP\_cluster} & 1457 & 1457 & 6306 & 225 & 54760 & 436.21 \\
+         \textit{MPP\_pktuse} & 512 & 45056 & 10190 & 9088 & 7569840 & 1539.90 \\ 
          \hline
 		\end{tabular}
 \end{center}
-\caption{Comparison of two encodings for five ``large" MCAPI program executions with runtime and used memory.}
-\label{table:comparison1}
+\caption{Comparison of the encodings for four examples}
+\label{table:second}
 \end{table}
 
-As for the second set of benchmarks, we also use \textit{zero-buffer} semantics to match \cite{elwakil:padtad10}. The runtime and memory usage for each program execution in \tableref{table:comparison1} are compared. In this series of experiments, the encodings in \cite{elwakil:padtad10} are not capable of resolving all the non-deterministic behaviors without \textit{infinite-buffer} semantics. As such, we revise our encodings for the same scenarios in \textit{zero-buffer} setting in order to obtain the same behaviors of the encodings in \cite{elwakil:padtad10}. \tableref{table:comparison1} shows the experimental results for the ``large" MCAPI program executions. The runtimes and the memory usage of our encodings are smaller than those of the encodings in \cite{elwakil:padtad10} for all benchmarks in \tableref{table:comparison1}. In average, our encodings run eight times faster than the encodings in \cite{elwakil:padtad10} and use two times less memory than the encodings in \cite{elwakil:padtad10}.
+As for the second series of experiments, we compare the performance of four different applications of message passing. \tableref{table:second} shows the results of each encoding. Other than the metrics used in \tableref{table:first}, we add the time of generating match pairs in the fifth column. Note that the time shown in the fourth column includes the time in the fifth column. It is noticeable that the program \textit{OSU\_bw}, \textit{OSU\_latency} and \textit{MPP\_cluster} have very small cost of generating the match pairs. This is because their size of match pairs are equivalent to their number of messages, which implies less non-deterministic behaviors. In contrast, the program \textit{MPP\_pktuse} uses most time to generate the match pairs. As a result, more non-deterministic behaviors are distributed leading to extremely long running time and large memory usage of solving the encoding, even though the number of messages is smaller than those of other examples.
 
-By comparing to the encoding in \cite{elwakil:padtad10} on two series of experiments shown above, our encoding is demonstrated that it can correctly encode the non-determinism of an MCAPI program execution, and can be executed efficiently.
+By comparing the performance of several encodings on two series of experiments shown above, our encoding is demonstrated that the size of match pairs determines the ``complexity" of a program execution. Also, our encoding scales well for programs with large messages if the number of match pairs is acceptable.
 

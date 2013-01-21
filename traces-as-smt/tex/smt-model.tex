@@ -87,17 +87,17 @@
 \texttt{\textit{defs} is not shown;}\\
 \\
 \texttt{\textit{constraints};}\\
-\texttt{00 $\mathtt{R_{0,2}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h1)}$.event}\\
-\texttt{01 $\mathtt{W(\&h1)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{R_{0,5}}$.event}\\
-\texttt{02 $\mathtt{R_{0,5}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h2)}$.event}\\
-\texttt{03 $\mathtt{W(\&h2)}$.event $\mathrm{\prec_{HB}}$ assume.event}\\
-\texttt{04 assume.event $\mathrm{\prec_{HB}}$ assert.event}\\
-\texttt{05 $\mathtt{R_{1,3}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h3)}$.event}\\
-\texttt{06 $\mathtt{W(\&h3)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{S_{1,5}}$.event}\\
-\texttt{07 $\mathtt{S_{1,5}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h4)}$.event}\\
-\texttt{08 $\mathtt{S_{2,4}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h5)}$.event}\\
-\texttt{09 $\mathtt{W(\&h5)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{S_{2,7}}$.event}\\
-\texttt{10 $\mathtt{S_{2,7}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h6)}$.event}\\
+\texttt{00 $\mathtt{event_{R_{0,2}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h1)}}$}\\
+\texttt{01 $\mathtt{event_{W(\&h1)}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{R_{0,5}}}$}\\
+\texttt{02 $\mathtt{event_{R_{0,5}}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h2)}}$}\\
+\texttt{03 $\mathtt{event_{W(\&h2)}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{assume}}$}\\
+\texttt{04 $\mathtt{event_{assume}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{assert}}$}\\
+\texttt{05 $\mathtt{event_{R_{1,3}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h3)}}$}\\
+\texttt{06 $\mathtt{event_{W(\&h3)}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{S_{1,5}}}$}\\
+\texttt{07 $\mathtt{event_{S_{1,5}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h4)}}$}\\
+\texttt{08 $\mathtt{event_{S_{2,4}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h5)}}$}\\
+\texttt{09 $\mathtt{event_{W(\&h5)}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{S_{2,7}}}$}\\
+\texttt{10 $\mathtt{event_{S_{2,7}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h6)}}$}\\
 \texttt{11 (assert (> b 0))}\\
 \texttt{12 (assert (not (= a 4)))}\\
 \\
@@ -116,17 +116,17 @@
 \texttt{\textit{defs} is not shown;}\\
 \\
 \texttt{\textit{constraints};}\\
-\texttt{00 $\mathtt{R_{0,2}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h1)}$.event}\\
-\texttt{01 $\mathtt{W(\&h1)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{R_{0,5}}$.event}\\
-\texttt{02 $\mathtt{R_{0,5}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h2)}$.event}\\
-\texttt{03 $\mathtt{W(\&h2)}$.event $\mathrm{\prec_{HB}}$ assume.event}\\
-\texttt{04 assume.event $\mathrm{\prec_{HB}}$ assert.event}\\
-\texttt{05 $\mathtt{R_{1,3}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h3)}$.event}\\
-\texttt{06 $\mathtt{W(\&h3)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{S_{1,5}}$.event}\\
-\texttt{07 $\mathtt{S_{1,5}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h4)}$.event}\\
-\texttt{08 $\mathtt{S_{2,4}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h5)}$.event}\\
-\texttt{09 $\mathtt{W(\&h5)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{S_{2,7}}$.event}\\
-\texttt{10 $\mathtt{S_{2,7}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h6)}$.event}\\
+\texttt{00 $\mathtt{event_{R_{0,2}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h1)}}$}\\
+\texttt{01 $\mathtt{event_{W(\&h1)}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{R_{0,5}}}$}\\
+\texttt{02 $\mathtt{event_{R_{0,5}}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h2)}}$}\\
+\texttt{03 $\mathtt{event_{W(\&h2)}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{assume}}$}\\
+\texttt{04 $\mathtt{event_{assume}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{assert}}$}\\
+\texttt{05 $\mathtt{event_{R_{1,3}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h3)}}$}\\
+\texttt{06 $\mathtt{event_{W(\&h3)}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{S_{1,5}}}$}\\
+\texttt{07 $\mathtt{event_{S_{1,5}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h4)}}$}\\
+\texttt{08 $\mathtt{event_{S_{2,4}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h5)}}$}\\
+\texttt{09 $\mathtt{event_{W(\&h5)}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{S_{2,7}}}$}\\
+\texttt{10 $\mathtt{event_{S_{2,7}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h6)}}$}\\
 \texttt{11 (assert (> b 0))}\\
 \texttt{12 (assert (not (= a 4)))}\\
 \\
@@ -145,17 +145,17 @@
 \texttt{\textit{defs} is not shown;}\\
 \\
 \texttt{\textit{constraints};}\\
-\texttt{00 $\mathtt{R_{0,2}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h1)}$.event}\\
-\texttt{01 $\mathtt{W(\&h1)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{R_{0,5}}$.event}\\
-\texttt{02 $\mathtt{R_{0,5}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h2)}$.event}\\
-\texttt{03 $\mathtt{W(\&h2)}$.event $\mathrm{\prec_{HB}}$ assume.event}\\
-\texttt{04 assume.event $\mathrm{\prec_{HB}}$ assert.event}\\
-\texttt{05 $\mathtt{R_{1,3}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h3)}$.event}\\
-\texttt{06 $\mathtt{W(\&h3)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{S_{1,5}}$.event}\\
-\texttt{07 $\mathtt{S_{1,5}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h4)}$.event}\\
-\texttt{08 $\mathtt{S_{2,4}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h5)}$.event}\\
-\texttt{09 $\mathtt{W(\&h5)}$.event $\mathrm{\prec_{HB}}$ $\mathtt{S_{2,7}}$.event}\\
-\texttt{10 $\mathtt{S_{2,7}}$.event $\mathrm{\prec_{HB}}$ $\mathtt{W(\&h6)}$.event}\\
+\texttt{00 $\mathtt{event_{R_{0,2}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h1)}}$}\\
+\texttt{01 $\mathtt{event_{W(\&h1)}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{R_{0,5}}}$}\\
+\texttt{02 $\mathtt{event_{R_{0,5}}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h2)}}$}\\
+\texttt{03 $\mathtt{event_{W(\&h2)}}$.event $\mathtt{\prec_{HB}}$ $\mathtt{event_{assume}}$}\\
+\texttt{04 $\mathtt{event_{assume}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{assert}}$}\\
+\texttt{05 $\mathtt{event_{R_{1,3}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h3)}}$}\\
+\texttt{06 $\mathtt{event_{W(\&h3)}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{S_{1,5}}}$}\\
+\texttt{07 $\mathtt{event_{S_{1,5}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h4)}}$}\\
+\texttt{08 $\mathtt{event_{S_{2,4}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h5)}}$}\\
+\texttt{09 $\mathtt{event_{W(\&h5)}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{S_{2,7}}}$}\\
+\texttt{10 $\mathtt{event_{S_{2,7}}}$ $\mathtt{\prec_{HB}}$ $\mathtt{event_{W(\&h6)}}$}\\
 \texttt{11 (assert (> b 0))}\\
 \texttt{12 (assert (not (= a 4)))}\\
 \\
@@ -193,56 +193,49 @@ $\langle\mathtt{R_{1,3}}$, $\mathtt{S_{2,7}}\rangle$\\
 
 The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. The algorithm to create the encoding takes as input a set of possible match pairs and a trace through an MCAPI program with the appropriate assumes and asserts as shown in \figref{fig:trace}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt}(a) is the set of possible match pairs for the program in \figref{fig:mcapi} using our shorthand notation defined in \figref{fig:trace}. The set admits, for example, that $\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$ or $\mathtt{S_{2,4}}$. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system in such a way that the final values of program variables meet the assumption on control flow but violate some assertion.
 
-Before presenting our SMT encoding for a specific example, we need to define auxiliary operators and notations in detail. 
+Before presenting our SMT encoding for a specific example, we need to define auxiliary operators and notations in detail.
 
 \begin{definition}
-The nearest-enclosing wait $\mathrm{NW_R}$ for a receive $\mathrm{R}$ is the nearest following wait operation in an execution trace that witnesses the completion of $\mathrm{R}$.
+The nearest-enclosing wait $\mathrm{NW_R}$ for a receive $\mathrm{R}$ is the nearest wait operation following $\mathrm{R}$ in an execution trace that witnesses the completion of $\mathrm{R}$.
 \end{definition}
 
-The nearest-enclosing wait for a receive asserts that the receive is complete indicating the message has already been in the buffer and that all the previous receives from the same task are complete as well. The intuitive example is shown in \figref{fig:nearest} such that the wait $\mathtt{W{(\&h2)}}$ witnesses the completion of the receive $\mathtt{R_{0,1}}$ and $\mathtt{R_{0,2}}$ in Task 0. As such, the wait $\mathtt{W{(\&h2)}}$ is their nearest-enclosing wait.
-
-\begin{figure}
-\begin{center}
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}[c]{l|l}
-Task 0 & Task 1  \\
+The nearest-enclosing wait for a receive asserts that the receive is complete indicating the message has already been in the buffer and that all the previous receives from the same task are complete as well. The intuitive example below shows that the wait $\mathtt{W{(\&h2)}}$ witnesses the completion of the receive $\mathtt{R_{0,1}}$ and $\mathtt{R_{0,2}}$ in Task 0. As such, the wait $\mathtt{W{(\&h2)}}$ is their nearest-enclosing wait.
+\[
+\begin{array}{l|l}
+\;\;\;\;\;\;\;\;\mathtt{Task\ 0}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{Task\ 1}\;\;\;\;\;\;\;\; \\
 \hline
-$\mathtt{R_{0,1}(*,\&h1)}$ & $\mathtt{S_{1,1}(0,\&h3)}$\\
-$\mathtt{R_{0,2}(*,\&h2)}$ & $\mathtt{W{(\&h3)}}$ \\
-$\mathtt{W{(\&h2)}}$ & $\mathtt{S_{1,2}(0,\&h4)}$ \\
-& $\mathtt{W{(\&h4)}}$\\
-
-\end{tabular}
-\end{center}
-\caption{Another MCAPI concurrent program}
-\label{fig:nearest}
-\end{figure}
+\;\;\;\;\;\;\;\;\mathtt{R_{0,1}(*,\&h1)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{S_{1,1}(0,\&h3)}\;\;\;\;\;\;\;\; \\
+\;\;\;\;\;\;\;\;\mathtt{R_{0,2}(*,\&h2)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{W{(\&h3)}}\;\;\;\;\;\;\;\; \\
+\;\;\;\;\;\;\;\;\mathtt{W{(\&h2)}}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{S_{1,2}(0,\&h4)}\;\;\;\;\;\;\;\; \\
+\;\;\;\;\;\;\;\;\mathtt{W{(\&h1)}}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{W{(\&h4)}}\;\;\;\;\;\;\;\; \\
+\end{array}
+\]
 
 \begin{definition}
-The send operation $\mathtt{S}$ is represented as a tuple $(M,e,value,event)$ such that $\mathit{M}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event}$$ \in \mathbb{N}$ where $\mathbb{N}$ is the set of natural numbers. $M$ represents the event of a matched receive, $e$ represents the endpoint, $value$ is the value being sent and $event$ indicates the program order.
+The send operation $\mathtt{S}$ is defined as a tuple $(M,e,value,event)$ such that $\mathit{M}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event}$$ \in \mathbb{N}$ where $\mathbb{N}$ is the set of natural numbers. $M$ represents the event of a matched receive, $e$ represents the endpoint, $value$ is the value being sent and $event$ indicates the program order.
 \label{def:snd}
 \end{definition}
 
 \begin{definition}
-The receive operation $\mathtt{R}$ is represented as a tuple $(M,e,value,event,NW)$ such that $\mathit{M}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event}$, $\mathit{NW}$$ \in \mathbb{N}$ where $\mathbb{N}$ is the set of natural numbers. $M$ represents the event of a matched send, $e$ represents the endpoint, $value$ is the value being received $event$ indicates the program order and $\mathit{NW}$ is the nearest-enclosing wait for the receive.
+The receive operation $\mathtt{R}$ is defined as a tuple $(M,e,value,event,NW)$ such that $\mathit{M}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event}$, $\mathit{NW}$$ \in \mathbb{N}$ where $\mathbb{N}$ is the set of natural numbers. $M$ represents the event of a matched send, $e$ represents the endpoint, $value$ is the value being received $event$ indicates the program order and $\mathit{NW}$ is the nearest-enclosing wait for the receive.
 \label{def:rcv}
 \end{definition}
 
 \defref{def:snd} and \defref{def:rcv} are essential to our SMT encoding such that each field must be assigned by the SMT solver in a way that is consistent with all the constraints in the encoding. Such constraints include the \emph{Happens-Before} relation in \defref{def:hb}, the match pair encoding in \defref{def:match} and the message non-overtaking rules.
 
 \begin{definition}
-The \emph{Happens-Before}$(\mathtt{HB})$ relation is denoted as $\mathrm{\prec_{HB}}$ that asserts two operations are ordered.
+The \emph{Happens-Before} $(\mathtt{HB})$ relation operator is denoted $\mathrm{\prec_{HB}}$ that asserts two operations are ordered.
 \label{def:hb}
 \end{definition}
 
-The \texttt{HB} operator takes two events $a$ and $b$ as operands where $a,b \in \mathbb{N}$ and $\mathbb{N}$ is the set of natural numbers. The statement $a\ \mathrm{\prec_{HB}}\ b$ indicates that the event $a$ happens before $b$ in an execution trace. In our SMT encoding, every location in an execution trace is assigned an event, for example, $\mathit{event}_{op}$ is the event for the operation $\mathit{op}$,  and the \texttt{HB} operator orders those locations (i.e., program order, etc.). Basically, the \texttt{HB} operator asserts that two receives(sends) with common endpoints from the same source are ordered. Given that a send is immediately completed and the completion of a receive must be witnessed  by the nearest-enclosing wait, this operator also asserts, for any matched pair, that the send happens before the nearest-enclosing wait of the matched receive.
+The \texttt{HB} operator takes two events $a$ and $b$ as operands where $a,b \in \mathbb{N}$ and $\mathbb{N}$ is the set of natural numbers. The expression $a\ \mathrm{\prec_{HB}}\ b$ indicates that the event $a$ happens before $b$ in an execution trace. In our SMT encoding, every location in an execution trace is assigned an event, for example, $\mathit{event}_{op}$ is the event for the operation $\mathit{op}$,  and the \texttt{HB} operator orders those locations (i.e., program order, etc.). Basically, the \texttt{HB} operator asserts that two receives(sends) with common endpoints from the same source are ordered. Given that a send is immediately completed and the completion of a receive must be witnessed  by the nearest-enclosing wait, this operator also asserts, for any matched pair, that the send happens before the nearest-enclosing wait of the matched receive.
 
 \begin{definition}
-The match pair of a send $\mathtt{R}$ and a receive $\mathtt{S}$ is a pair $\langle\mathtt{R}, \mathtt{S}\rangle$, where the field $M$, $value$ and $e$ of the record $\mathtt{R}$ and $\mathtt{S}$ must be consistent. Also, the $\mathtt{HB}$ relation $event_{\mathtt{S}}\ \mathrm{\prec_{HB}}\ NW_{\mathtt{R}}$ must be satisfied.
+The match pair for a receive $\mathtt{R}$ and a send $\mathtt{S}$ is denoted $\langle\mathtt{R}, \mathtt{S}\rangle$, where the field $M$, $value$ and $e$ of the record $\mathtt{R}$ and $\mathtt{S}$ must be consistent. Also, the $\mathtt{HB}$ relation $event_{\mathtt{S}}\ \mathrm{\prec_{HB}}\ NW_{\mathtt{R}}$ must be satisfied.
 \label{def:match}
 \end{definition}
 
-As discussed above, the match pair in \defref{def:match} ensures that a receive is matched with a send by assigning each field a value. It also asserts that no two sends(receives) can match an identical receive(send). Note that the encoding is going to use the ``$\cfgnt{M}$"  value of a send in conjunction with the \texttt{HB} realtion to enforce message non-overtaking when messages are sent from the same source. Consider a simple example below that sends two messages from a Task 0 to Task 1,
+As discussed above, the match pair in \defref{def:match} ensures that a receive is matched with a send by assigning each field an identical value. It also asserts that no two sends(receives) can match an identical receive(send). Note that the encoding is going to use the ``$\cfgnt{M}$"  value of a send in conjunction with the \texttt{HB} realtion to enforce message non-overtaking when messages are sent from the same source. Consider a simple example below that sends two messages from a Task 0 to Task 1,
 \[
 \begin{array}{l|l}
 \;\;\;\;\;\;\;\;\mathtt{Task\ 0}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{Task\ 1}\;\;\;\;\;\;\;\; \\
@@ -254,12 +247,12 @@ As discussed above, the match pair in \defref{def:match} ensures that a receive 
 \end{array}
 \]
 The ``$\cfgnt{M}$" values in the send records will be assigned to the order tracking events for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ in the final encoding. Message non-overtaking from transactions on common endpoints is encoded by forcing the send events to be received in program order using the \texttt{HB} relation as below in our simple example:
-\[\cfgnt{M}_\mathtt{S_{0,1}}\ \prec_{HB}\ \cfgnt{M}_\mathtt{S_{0,2}}\]
+\[\cfgnt{M}_\mathtt{S_{0,1}}\ \mathrm{\prec_{HB}}\ \cfgnt{M}_\mathtt{S_{0,2}}\]
 
 Prior SMT models of MCAPI program executions implicitly compute
-match pairs by adding possible happens-before relations on sends and
+match pairs by adding possible \emph{Happens-Before} relations on sends and
 receives with the conditions under which those orderings are
-valid. The SMT solver is then asked to resolve the happens-before
+valid. The SMT solver is then asked to resolve the \emph{Happens-Before}
 relation by choosing specific orders of sends and receives. Match pair
 encoding, as presented in this work, though it has the same
 computational complexity as order based encoding (you still need to
@@ -271,7 +264,7 @@ The presentation of the SMT encoding is structured as
 \[\mathit{smt}\ =\ (\mathit{defs}\ \mathit{constraints}\ \mathit{match})\]
 where the field $\mathit{defs}$ represents all definitions of the send, receive operations and the variables; The field $\mathit{constraints}$ represents all constraint clauses, including the assert clauses and the clauses built by the \texttt{HB} relations; and the field $\mathit{match}$ represents the set of match pairs.
 
-The input for generating the SMT encoding is an execution trace of an MCAPI program together with a set of match pairs. The first trace in \figref{fig:trace} with the set of match pairs in \figref{fig:smt}(a) is such an example. Given an input, the algorithm for generating our encoding is enumerated as follows. For convenience, we use the notation ``\texttt{.event}" following each command to represent the \textit{event} field in our encoding.
+The input for generating the SMT encoding is an execution trace of an MCAPI program together with a set of match pairs. The first trace in \figref{fig:trace} with the set of match pairs in \figref{fig:smt}(a) is such an example. Given an input, the algorithm for generating our encoding is enumerated as follows. For convenience, we use the notation $\mathtt{event_{op}}$ following each command $\mathtt{op}$ to represent the \textit{event} field of $\mathtt{op}$ in our encoding.
 \begin{enumerate}
 \item create event variables for every location in the execution trace. Further create send and receive records for all appropriate locations in the trace. Put these in the $\mathit{def}$ section;
 \item for each assume, add a statement to $\mathit{constraints}$, and for each assert, add a negated assert to $\mathit{constraints}$;
@@ -289,8 +282,8 @@ The input for generating the SMT encoding is an execution trace of an MCAPI prog
 \end{tabular}
 \end{center}
 \caption{A match pair set and SMT encoding of the system in \figref{fig:mcapi}.
-(a) The match pairs based on endpoints. (b) The SMT encoding where \texttt{HB} creates a
-happens-before constraint, \texttt{MATCH} creates a match pair constraint, and \texttt{NE} creates a constraint to preclude the use of conflicting match pairs.}
+(a) The match pairs based on endpoints. (b) The SMT encoding where $\mathtt{\prec_{HB}}$ creates a
+\emph{Happens-Before} constraint, a pair surrounded by $\langle$ and $\rangle$ creates a match pair constraint, and $\mathtt{assume}$ and $\mathtt{assert}$ creates an assume and assert, respectively.}
 \label{fig:smt}
 \end{figure}
 
@@ -330,8 +323,7 @@ Consider the MCAPI program in \figref{fig:mcapi} as an example.
 example in \figref{fig:mcapi} generated from different sets of possible match pairs, such that \figref{fig:smt_trace}(a) encodes trace 1 in \figref{fig:trace} and \figref{fig:smt_trace}(b) encodes trace 2 in \figref{fig:trace}. By solving the encodings in \figref{fig:smt_trace}(a) and (b) for trace 1 and 2 in \figref{fig:trace} respectively, we get an unsatisfiable solution for \figref{fig:smt_trace}(a), and a satisfiable solution for \figref{fig:smt_trace}(b). As we discussed in Section 2, trace 1 is an execution trace without failure of the assertion, and trace 2 is the one that fails the assertion. %We can see that the encodings in \figref{fig:smt_trace} (a) and (b) correctly encodes trace 1 and 2 in \figref{fig:trace}, respectively.
 Compare both encodings with that in \figref{fig:smt}(b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the set of match pairs. In particular, the input set of match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset of that in \figref{fig:smt}(b). As discussed above, the encoding in \figref{fig:smt}(b) captures the non-deterministic behavior of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in \figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on the encoding in either \figref{fig:smt_trace}(a) or (b). In other words, adding more match pairs can only move the $\mathrm{ANS}$ from $\mathrm{\cfgt{UNSAT}}$ to $\mathrm{\cfgt{SAT}}$.
 
-The formal proof of Theorem 1 is in the long version of our paper at ``http://students.cs.byu.edu/$\sim$yhuang2/downloads\\/paper.pdf". The proof defines a formal operational semantics given by a term rewriting system using a \textit{CESK}\footnote{The \textit{CESK} machine state is represented with a \textbf{C}ontrol string, \textbf{E}nvironment, \textbf{S}tore, and \textbf{K}ontinuation.} style machine only the machine is augmented to include additional structure for modeling message passing. The operational framework defines how to execute a program, following the specified trace, and defines when that execution is a
-success (causes no assertion violation), a failure (causes an assertion violation), infeasible (causes an assume to not hold), or an error (execution is not allowed by the MCAPI semantics.). Further, the machine generates the terms of the SMT encoding as it rewrites the machine states. The proof defines a combination operator and shows that several SMT encodings can be combined such that the combined SMT encoding returns ``SAT" if one of those encodings has a satisfiable solution.  As such, Theorem 1 is formally proved by applying the combination operator for $\smt_{\alpha}$ and $\smt_{\beta}$.
+The formal proof of Theorem 1 is in the long version of our paper at ``http://students.cs.byu.edu/$\sim$yhuang2/downloads\\/paper.pdf". The proof defines a formal operational semantics given by a term rewriting system using a \textit{CESK}\footnote{The \textit{CESK} machine state is represented with a \textbf{C}ontrol string, \textbf{E}nvironment, \textbf{S}tore, and \textbf{K}ontinuation.} style machine only the machine is augmented to include additional structure for modeling message passing. The operational framework defines how to execute a program, following the specified trace, and defines when that execution is a success (causes no assertion violation), a failure (causes an assertion violation), infeasible (causes an assume to not hold), or an error (execution is not allowed by the MCAPI semantics.). Further, the machine generates the terms of the SMT encoding as it rewrites the machine states. The proof defines a combination operator and shows that several SMT encodings can be combined such that the combined SMT encoding returns ``SAT" if one of those encodings has a satisfiable solution.  As such, Theorem 1 is formally proved by applying the combination operator for $\smt_{\alpha}$ and $\smt_{\beta}$.
 
 Given $\mathit{set(match_{\alpha})}$ and $\mathit{set(match_{\beta})}$ in the theorem above a complete set of match pairs and an over-approximated set, respectively, we can further prove that $\mathrm{ANS}(\smt_{\alpha})$ $ = $ $\mathrm{ANS}(\smt_{\beta})$ by giving the following theorem. Note that a match pair $(R, S) \in \mathit{set(match_{\beta})}/\mathit{set(match_{\alpha})}$ is called ``bogus", since it cannot exist in a real execution of the program.
 \\

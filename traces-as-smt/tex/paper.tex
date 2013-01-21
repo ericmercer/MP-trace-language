@@ -3,7 +3,7 @@
 % for Lecture Notes in Computer Science,
 % version 2.4 for LaTeX2e as of 16. April 2010
 %
-\documentclass[preprint]{llncs}
+\documentclass[preprint]{acm_proc_article-sp}
 %
 \usepackage{comment}
 \usepackage{mathpartir}
@@ -34,11 +34,12 @@
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\thmref}[1]{Theorem~\ref{#1}}
+\newdef{definition}{Definition}
 
 %
 \begin{document}
 %
-\pagestyle{headings}  % switches on printing of running heads%
+%\pagestyle{headings}  % switches on printing of running heads%
 %
 \title{Proving MCAPI Executions are Correct}
 \subtitle{Applying SMT Technology to Message Passing}

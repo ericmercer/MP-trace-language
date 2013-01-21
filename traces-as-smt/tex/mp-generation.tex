@@ -18,8 +18,8 @@ for r in list_r
       1.the endpoint of r is equal to the destination endpoint of s, and
       2.the index of r is larger or equal to the index of s, and
       3.the index of r is less or equal to the index of s
-        plus the number of sends with the same destination endpoint of s 
-        minus the number of sends with the same source and destination 
+        plus the number of sends with the same destination endpoint of s
+        minus the number of sends with the same source and destination
         endpoints of s
     then
       add pair (r, s) to match_set
@@ -91,7 +91,7 @@ The algorithm generates the over-approximated match pair set by matching each pa
 \end{array}
 \label{equation:rcv}
 \end{equation}
-The list in (\ref{equation:rcv}) keeps record of the receive commands uniquely identified by the endpoint $\mathit{e}_x$, where $x$ is the number of the endpoint. The integer in the first field of each pair indicates the program order of the receive commands within each task on the specified endpoint. Note that the receive command with lower program order should be served first in the program runtime. The receive command in the second field of the list is defined as a record $R$ in equation \ref{equation:record} of the previous section. The notations $\mathtt{R_{0,1}}$, $\mathtt{R_{0,2}}$, etc. represent the unique identifiers for the receives. Recall that we operate on a program trace so there are no loops and all instances of send and receive operations are uniquely identified.
+The list in (\ref{equation:rcv}) keeps record of the receive commands uniquely identified by the endpoint $\mathit{e}_x$, where $x$ is the number of the endpoint. The integer in the first field of each pair indicates the program order of the receive commands within each task on the specified endpoint. Note that the receive command with lower program order should be served first in the program runtime. The receive command in the second field of the list is defined as a record $\mathtt{R}$ in \defref{def:rcv} of the previous section. The notations $\mathtt{R_{0,1}}$, $\mathtt{R_{0,2}}$, etc. represent the unique identifiers for the receives. Recall that we operate on a program trace so there are no loops and all instances of send and receive operations are uniquely identified.
 \begin{equation}
 \footnotesize \begin{array}{l}
  ``dst" \;\;\;\; ``src" \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; ``src"\\
@@ -102,18 +102,22 @@ The list in (\ref{equation:rcv}) keeps record of the receive commands uniquely i
 \end{array}
 \label{equation:snd}
 \end{equation}
-Also, we keep record of the send commands using the second list in (\ref{equation:snd}) that is uniquely identified by the destination endpoint $\mathit{e}_x$. Each sublist for the destination endpoint is uniquely identified by the source endpoint $\mathit{e}_y$. Similarly, the integer in the first field of each pair indicates the program order of the send command within the same task from a common source and to a common endpoint. The send command in the second field of the list is defined as a record $S$ in equation \ref{equation:record} of the previous section. The notations $\mathtt{S_{1,1}}$, $\mathtt{S_{1,2}}$, etc. represent the unique identifiers for the sends.
+Also, we keep record of the send commands using the second list in (\ref{equation:snd}) that is uniquely identified by the destination endpoint $\mathit{e}_x$. Each sublist for the destination endpoint is uniquely identified by the source endpoint $\mathit{e}_y$. Similarly, the integer in the first field of each pair indicates the program order of the send command within the same task from a common source and to a common endpoint. The send command in the second field of the list is defined as a record $S$ in \defref{def:snd} of the previous section. The notations $\mathtt{S_{1,1}}$, $\mathtt{S_{1,2}}$, etc. represent the unique identifiers for the sends.
 
 \begin{figure}
 \begin{center}
 \setlength{\tabcolsep}{2pt}
-\begin{tabular}[c]{c|c|c}
+\begin{tabular}[c]{l|l|l}
 Task 0 & Task 1 & Task 2 \\
 \hline
 $\mathtt{R_{0,1}(*,\&h1)}$ & $\mathtt{S_{1,1}(0,\&h5)}$ & $\mathtt{S_{2,1}(0,\&h8)}$\\
+$\mathtt{W(\&h1)}$&$\mathtt{W(\&h5)}$&$\mathtt{W(\&h8)}$\\
 $\mathtt{R_{0,2}(*,\&h2)}$ & $\mathtt{R_{1,2}(*,\&h6)}$ & \\
+$\mathtt{W(\&h2)}$&$\mathtt{W(\&h6)}$&\\
 $\mathtt{S_{0,3}(1,\&h3)}$ & $\mathtt{S_{1,3}(0,\&h7)}$ & \\
+$\mathtt{W(\&h3)}$&$\mathtt{W(\&h7)}$&\\
 $\mathtt{R_{0,4}(*,\&h4)}$ & & \\
+$\mathtt{W(\&h4)}$&&\\
 
 %\scalebox{1}{\usebox{\boxtaskzero}} &
 %\scalebox{1}{\usebox{\boxtaskone}} &

@@ -6,22 +6,21 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 
 \begin{table}
 \begin{center}
-\setlength{\tabcolsep}{2pt}
 \scriptsize
 \begin{tabular}{|c|c|c|}
 		\hline
          \multicolumn{1}{|c|}{Test Programs} & \multicolumn{2}{|c|}{Performance} \\ \hline
           Choices &  Time(s) & Memory(MB) \\ \hline
-           &  0.040 & 4.87 \\
-           &  0.090 & 7.82 \\
-           &  0.160 & 9.96 \\
-           &  24.650 & 30.44 \\
-           &  27.110 & 28.40 \\
-          &  41.800 & 34.20 \\
-          &  138.130 & 54.74 \\
-          &  211.270 & 65.57 \\
-           &  504.960 & 83.19 \\
-           &  947.160 & 105.29 \\
+           2 &  0.040 & 4.87 \\
+           $\sim$4E5 &  0.090 & 7.82 \\
+           $\sim$5E8 &  0.160 & 9.96 \\
+           $\sim$2E13 &  24.650 & 30.44 \\
+           $\sim$3E14 &  27.110 & 28.40 \\
+            $\sim$2E18 &  41.800 & 34.20 \\
+          $\sim$3E29 &  138.130 & 54.74 \\
+          $\sim$3E35 &  211.270 & 65.57 \\
+          $\sim$8E47 &  504.960 & 83.19 \\
+          $\sim$3E64 &  947.160 & 105.29 \\
          \hline
 		\end{tabular}
 \end{center}
@@ -40,10 +39,10 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 		\hline
          \multicolumn{3}{|c|}{Test Programs} & \multicolumn{4}{|c|}{Performance} \\ \hline
          Name & \# Mesg & Choices & EG(s) & MG(s) & Time(s) & Memory(MB) \\ \hline
-         \textit{LE} & 620 & & 1.49 & 0.051 & 0.73 & 33.41  \\
-         \textit{Router} & 200 & & 0.417 & 0.032 & 1.67 & 15.03  \\
-         \textit{MultiM} & 100 &  & 0.632 & 0.436 &  1006.49 & 135.19  \\
-         \textit{pktuse} & 512 & 45056(?) & 10.190 & 9.088 & 7569.840 & 1539.90 \\
+         \textit{LE} & 620 & 1 & 1.49 & 0.051 & 0.73 & 33.41  \\
+         \textit{Router} & 200 & $\sim$6E2 & 0.417 & 0.032 & 1.67 & 15.03  \\
+         \textit{MultiM} & 100 & $\sim$1E40 & 0.632 & 0.436 &  1006.49 & 135.19  \\
+         \textit{pktuse} & 512 & $\sim$1E81 & 10.190 & 9.088 & 7569.840 & 1539.90 \\
          \hline
 		\end{tabular}
 \end{center}

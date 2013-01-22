@@ -6,21 +6,22 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 
 \begin{table}
 \begin{center}
+\setlength{\tabcolsep}{2pt}
 \scriptsize
 \begin{tabular}{|c|c|c|}
 		\hline
          \multicolumn{1}{|c|}{Test Programs} & \multicolumn{2}{|c|}{Performance} \\ \hline
           Choices &  Time(s) & Memory(MB) \\ \hline
-          2! &  0.040 & 4.87 \\
-          10! &  0.090 & 7.82 \\
-          16! &  0.160 & 9.96 \\
-          17! &  24.650 & 30.44 \\
-          18! &  27.110 & 28.40 \\
-         20! &  41.800 & 34.20 \\
-         28! &  138.130 & 54.74 \\
-         32! &  211.270 & 65.57 \\
-          40! &  504.960 & 83.19 \\
-          50! &  947.160 & 105.29 \\
+           &  0.040 & 4.87 \\
+           &  0.090 & 7.82 \\
+           &  0.160 & 9.96 \\
+           &  24.650 & 30.44 \\
+           &  27.110 & 28.40 \\
+          &  41.800 & 34.20 \\
+          &  138.130 & 54.74 \\
+          &  211.270 & 65.57 \\
+           &  504.960 & 83.19 \\
+           &  947.160 & 105.29 \\
          \hline
 		\end{tabular}
 \end{center}
@@ -33,14 +34,15 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 
 \begin{table}
 \begin{center}
+\setlength{\tabcolsep}{2pt}
 \scriptsize
-\begin{tabular}{|l|c|c||c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|c|c|}
 		\hline
          \multicolumn{3}{|c||}{Test Programs} & \multicolumn{4}{|c|}{Performance} \\ \hline
          Name & \# Mesg & Choices & EG(s) & MG(s) & Time(s) & Memory(MB) \\ \hline
-         \textit{LE} & 220 &  & 0.390 & 0.016 &  &  \\
-         \textit{Router} &  &  &  &  &  &  \\
-         \textit{Multi} & 100 &  & 0.632 & 0.436 &  1006.49 & 135.19  \\
+         \textit{LE} & 620 & & 1.49 & 0.051 & 0.73 & 33.41  \\
+         \textit{Router} & 200 & & 0.417 & 0.032 & 1.67 & 15.03  \\
+         \textit{MultiM} & 100 &  & 0.632 & 0.436 &  1006.49 & 135.19  \\
          \textit{pktuse} & 512 & 45056(?) & 10.190 & 9.088 & 7569.840 & 1539.90 \\
          \hline
 		\end{tabular}
@@ -48,9 +50,9 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 \caption{Comparison of the encodings for four examples}
 \label{table:second}
 \end{table}
-We launch the second series of experiments in order to evaluate our encoding strategy for verifying problems in message passing applications. The first program, we call ``Leader Election", basically elects a leader from several candidates by message passing. The second program implements a simple router algorithm that each node sends multiple messages to the previous and the next node respectively for updating its routing table. This process does not end until all the routing tables are updated. The third program extends the example in \figref{fig:mcapi1} such that extra iterations are added to the original program execution to generate longer execution trace. The last program \textit{Pktuse} is from the benchmark \cite{mpptest_benchmark} that each of the five tasks randomly sends several messages to other tasks.
+We launch the second series of experiments in order to evaluate our encoding strategy for verifying problems in message passing applications. The first program \textit{LE} basically elects a leader from several candidates by message passing. The second program \textit{Router} implements a simple router algorithm that each node sends multiple messages to the previous and the next node respectively for updating its routing table. This process does not end until all the routing tables are updated. The third program \textit{MultiM} extends the example in \figref{fig:mcapi1} such that extra iterations are added to the original program execution to generate longer execution trace. The last program \textit{Pktuse} is from the benchmark \cite{mpptest_benchmark} that each of the five tasks randomly sends several messages to other tasks.
 
-\tableref{table:second} shows the results of running our encodings. Other than the metrics used in \tableref{table:first}, we add the time of generating the encoding and the match pairs in the third and fourth column respectively. Note that the time shown in the third column includes the time in the fourth column. It is noticeable that the program \textit{OSU\_bw}, \textit{OSU\_latency} and \textit{MPP\_cluster} have very small cost of generating the match pairs. This is because their size of match pairs are equivalent to their number of messages, which implies less non-deterministic behaviors. In contrast, the program \textit{MPP\_pktuse} uses most time to generate the match pairs. As a result, more non-deterministic behaviors are distributed leading to extremely long running time and large memory usage of solving the encoding, even though the number of messages is smaller than those of other examples.
+\tableref{table:second} shows the results of running our encodings. Other than the metrics used in \tableref{table:first}, we add the time of generating the encoding and the match pairs in the third and fourth column respectively. Note that the time shown in the third column includes the time in the fourth column. It is noticeable that the program \textit{LE} and \textit{Router} have small number of choices in resolving the program behavior even though the number of messages is large. Therefore, the SMT solver performs very small cost for those problems. In contrast, the program \textit{MultiM} has much more choices in resolving the behavior but less messages, leading to a longer running time and larger memory usage in the SMT solver. The last program \textit{pktuse} uses much longer time to generate the match pairs because of both of the large number of messages and choices. As a result, more non-deterministic behaviors are captured leading to extremely long running time and large memory usage in solving the encoding.
 
-By comparing the performance of diverse encodings on two series of experiments shown above, our encoding is demonstrated that the size of match pairs determines the ``complexity" of a program execution. Also, our encoding scales well for programs with large messages if the number of match pairs is acceptable.
+By comparing the performance of diverse encodings on two series of experiments shown above, our encoding is demonstrated that the number of messages and choices in resolving the program behavior determines the ``complexity" of a program execution. Also, our encoding scales well for programs with large number of messages and numerous match pairs.
 

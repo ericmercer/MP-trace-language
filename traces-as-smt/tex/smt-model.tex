@@ -194,12 +194,11 @@ $\langle\mathtt{R_{1,3}}$, $\mathtt{S_{2,7}}\rangle$\\
 The novelty of the SMT encoding in this paper is its use of match pairs rather than the state-based or order-based encoding of prior work~\cite{elwakil:padtad10,elwakil:atva10}. The algorithm to create the encoding takes as input a set of possible match pairs and a trace through an MCAPI program with the appropriate assumes and asserts as shown in \figref{fig:trace}. A match pair is the coupling of a receive to a particular send. \figref{fig:smt}(a) is the set of possible match pairs for the program in \figref{fig:mcapi} using our shorthand notation defined in \figref{fig:trace}. The set admits, for example, that $\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$ or $\mathtt{S_{2,4}}$. The SMT encoding in this paper asks the SMT solver to resolve the match pairs for the system in such a way that the final values of program variables meet the assumption on control flow but violate some assertion.
 
 Before presenting our SMT encoding for a specific example, we need to define auxiliary operators and notations in detail.
-
-\begin{definition}
-The nearest-enclosing wait $\mathrm{NW_R}$ for a receive $\mathrm{R}$ is the nearest wait operation following $\mathrm{R}$ in an execution trace that witnesses the completion of $\mathrm{R}$.
+\noindent\begin{definition}
+\noindent The nearest-enclosing wait $\mathrm{NW_R}$ for a receive $\mathrm{R}$ is the nearest wait operation following $\mathrm{R}$ in an execution trace that witnesses the completion of $\mathrm{R}$.
 \end{definition}
 
-The nearest-enclosing wait for a receive asserts that the receive is complete indicating the message has already been in the buffer and that all the previous receives from the same task are complete as well. The intuitive example below shows that the wait $\mathtt{W{(\&h2)}}$ witnesses the completion of the receive $\mathtt{R_{0,1}}$ and $\mathtt{R_{0,2}}$ in Task 0. As such, the wait $\mathtt{W{(\&h2)}}$ is their nearest-enclosing wait.
+The nearest-enclosing wait for a receive asserts that the receive is complete indicating the message has already been in the buffer and that all the previous receives from the same task are complete as well. This constraint is enforced by the message non-overtaking requirement in the MCAPI specification. The intuitive example below shows that the wait $\mathtt{W{(\&h2)}}$ witnesses the completion of the receive $\mathtt{R_{0,1}}$ and $\mathtt{R_{0,2}}$ in Task 0. As such, the wait $\mathtt{W{(\&h2)}}$ is their nearest-enclosing wait.
 \[
 \begin{array}{l|l}
 \;\;\;\;\;\;\;\;\mathtt{Task\ 0}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{Task\ 1}\;\;\;\;\;\;\;\; \\
@@ -217,7 +216,7 @@ The send operation $\mathtt{S}$ is defined as a tuple $(M,e,value,event)$ such t
 \end{definition}
 
 \begin{definition}
-The receive operation $\mathtt{R}$ is defined as a tuple $(M,e,value,event,NW)$ such that $\mathit{M}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event}$, $\mathit{NW}$$ \in \mathbb{N}$ where $\mathbb{N}$ is the set of natural numbers. $M$ represents the event of a matched send, $e$ represents the endpoint, $value$ is the value being received $event$ indicates the program order and $\mathit{NW}$ is the nearest-enclosing wait for the receive.
+The receive operation $\mathtt{R}$ is defined as a tuple $(M,e,value,event,NW)$ such that $\mathit{M}$, $\mathit{e}$, $\mathit{value}$, $\mathit{event}$, $\mathit{NW}$$ \in \mathbb{N}$. $M$ represents the event of a matched send, $e$ represents the endpoint, $value$ is the value being received, $event$ indicates the program order and $\mathit{NW}$ is the nearest-enclosing wait for the receive.
 \label{def:rcv}
 \end{definition}
 
@@ -228,7 +227,7 @@ The \emph{Happens-Before} $(\mathtt{HB})$ relation operator is denoted $\mathrm{
 \label{def:hb}
 \end{definition}
 
-The \texttt{HB} operator takes two events $a$ and $b$ as operands where $a,b \in \mathbb{N}$ and $\mathbb{N}$ is the set of natural numbers. The expression $a\ \mathrm{\prec_{HB}}\ b$ indicates that the event $a$ happens before $b$ in an execution trace. In our SMT encoding, every location in an execution trace is assigned an event, for example, $\mathit{event}_{op}$ is the event for the operation $\mathit{op}$,  and the \texttt{HB} operator orders those locations (i.e., program order, etc.). Basically, the \texttt{HB} operator asserts that two receives(sends) with common endpoints from the same source are ordered. Given that a send is immediately completed and the completion of a receive must be witnessed  by the nearest-enclosing wait, this operator also asserts, for any matched pair, that the send happens before the nearest-enclosing wait of the matched receive.
+The \texttt{HB} relation takes two events $a$ and $b$ as operands where $a,b \in \mathbb{N}$. The expression $a\ \mathrm{\prec_{HB}}\ b$ indicates that the event $a$ happens before $b$ in an execution trace. In our SMT encoding, every location in an execution trace is assigned an event, for example, $\mathit{event}_{op}$ is the event for the operation $\mathit{op}$,  and the \texttt{HB} operator orders those locations (i.e., program order, etc.). Basically, the \texttt{HB} relation asserts that two receives(sends) with common endpoints from the same source are ordered. Given that a send is immediately completed and the completion of a receive must be witnessed  by the nearest-enclosing wait, this operator also asserts, for any matched pair, that the send happens before the nearest-enclosing wait of the matched receive.
 
 \begin{definition}
 The match pair for a receive $\mathtt{R}$ and a send $\mathtt{S}$ is denoted $\langle\mathtt{R}, \mathtt{S}\rangle$, where the field $M$, $value$ and $e$ of the record $\mathtt{R}$ and $\mathtt{S}$ must be consistent. Also, the $\mathtt{HB}$ relation $event_{\mathtt{S}}\ \mathrm{\prec_{HB}}\ NW_{\mathtt{R}}$ must be satisfied.

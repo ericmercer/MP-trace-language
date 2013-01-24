@@ -14,7 +14,7 @@ structures, and functions that can be used to perform simple message passing
 operations between different computing entities within a device. Messages can be
 passed across persistent channels that force an ordering of the messages, or
 they can be passed to specific \emph{endpoints} within the system. The specification places few ordering constraints on messages passed from one
-endpoint to another. This freedom introduces into the system possibilities that two or more messages are racing if the order of their arrival at the destinations are non-deterministic \cite{netzer:spdt96}. Without a way to explore this non-determinism in the MCAPI runtime, it is not possible to test and debug the program executions.
+endpoint to another. This freedom introduces into the system possibilities that two or more messages are racing if the order of their arrival at the destinations are non-deterministic \cite{netzer:spdt96}. From our observation, few MCAPI applications have this non-determinism in practice. However, if it is implemented, it is not possible to test and debug the program executions without a way to explore this non-determinism in the MCAPI runtime.
 
 Sharma et al. created a method of using concrete execution to verify MCAPI
 programs, but it was later discovered that this method does not completely

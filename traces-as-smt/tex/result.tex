@@ -11,16 +11,16 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 		\hline
          \multicolumn{1}{|c|}{Test Programs} & \multicolumn{2}{|c|}{Performance} \\ \hline
           Choices &  Time & Memory(MB) \\ \hline
-           2 &  0.040 & 4.87 \\
-           $\sim$4E5 &  0.090 & 7.82 \\
-           $\sim$5E8 &  0.160 & 9.96 \\
-           $\sim$2E13 &  24.650 & 30.44 \\
-           $\sim$3E14 &  27.110 & 28.40 \\
-            $\sim$2E18 &  41.800 & 34.20 \\
-          $\sim$3E29 &  138.130 & 54.74 \\
-          $\sim$3E35 &  211.270 & 65.57 \\
-          $\sim$8E47 &  504.960 & 83.19 \\
-          $\sim$3E64 &  947.160 & 105.29 \\
+           2 & <00:00:01 & 4.87 \\
+           $\sim$4E5 &  <00:00:01 & 7.82 \\
+           $\sim$5E8 &  <00:00:01 & 9.96 \\
+           $\sim$2E13 &  00:00:24 & 30.44 \\
+           $\sim$3E14 &  00:00:27 & 28.40 \\
+            $\sim$2E18 &  00:00:41 & 34.20 \\
+          $\sim$3E29 &  00:02:18 & 54.74 \\
+          $\sim$3E35 &  00:03:31 & 65.57 \\
+          $\sim$8E47 &  00:08:24 & 83.19 \\
+          $\sim$3E64 &  00:15:47 & 105.29 \\
          \hline
 		\end{tabular}
 \end{center}
@@ -28,7 +28,7 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 \label{table:first}
 \end{table}
 
-\tableref{table:first} shows the comparison of our encodings for a specific example with different settings of match pairs. The first column presents the number of runtime choices to resolve the non-determinism. The next two columns show the performance of each encoding, including the running time and the memory usage to solve the encoding. Observe that the running time and the memory usage are increased with the number of match pairs. Also, we can see from the second column that Z3 handles 800 match pairs much better than 850 match pairs by evaluating the running time. From the results above, it is obvious that the size of match pairs is extremely important for the performance of an encoding. Note that the \textit{Worst-Case} in the last row hardly exists in practice. Thus, a soundly precise set of match pairs leads to better performance. This conclusion also attracts our attention on developing a more efficient method of generating match pairs in future work.
+\tableref{table:first} shows the comparison of our encodings for a specific example with different settings of match pairs. The first column presents the number of runtime choices to resolve the non-determinism. The next two columns show the performance of each encoding, including the running time and the memory usage to solve the encoding. Note that we report the running time in the format of $\mathrm{Hours:Minius:Seconds}$. Observe that the running time and the memory usage are increased with the number of match pairs. Also, we can see from the second column that Z3 handles 800 match pairs much better than 850 match pairs by evaluating the running time. From the results above, it is obvious that the size of match pairs is extremely important for the performance of an encoding. Note that the \textit{Worst-Case} in the last row hardly exists in practice. Thus, a soundly precise set of match pairs leads to better performance. This conclusion also attracts our attention on developing a more efficient method of generating match pairs in future work.
 
 
 \begin{table}
@@ -39,10 +39,10 @@ We launched two series of experiments under \textit{infinite-buffer} semantics. 
 		\hline
          \multicolumn{3}{|c|}{Test Programs} & \multicolumn{4}{|c|}{Performance} \\ \hline
          Name & \# Mesg & Choices & EG(s) & MG(s) & Time & Memory(MB) \\ \hline
-         \textit{LE} & 620 & 1 & 1.49 & 0.051 & 0.73 & 33.41  \\
-         \textit{Router} & 200 & $\sim$6E2 & 0.417 & 0.032 & 1.67 & 15.03  \\
-         \textit{MultiM} & 100 & $\sim$1E40 & 0.632 & 0.436 &  1006.49 & 135.19  \\
-         \textit{pktuse} & 512 & $\sim$1E81 & 10.190 & 9.088 & 7569.840 & 1539.90 \\
+         \textit{LE} & 620 & 1 & 1.49 & 0.051 & <00:00:01 & 33.41  \\
+         \textit{Router} & 200 & $\sim$6E2 & 0.417 & 0.032 & 00:00:02 & 15.03  \\
+         \textit{MultiM} & 100 & $\sim$1E40 & 0.632 & 0.436 &  00:16:40 & 135.19  \\
+         \textit{pktuse} & 512 & $\sim$1E81 & 10.190 & 9.088 & 02:06:09 & 1539.90 \\
          \hline
 		\end{tabular}
 \end{center}
@@ -53,5 +53,5 @@ We launch the second series of experiments in order to evaluate our encoding str
 
 \tableref{table:second} shows the results of running our encodings. Other than the metrics used in \tableref{table:first}, we add the time of generating the encoding and the match pairs in the third and fourth column respectively. Note that the time shown in the third column includes the time in the fourth column. It is noticeable that the program \textit{LE} and \textit{Router} have small number of choices in resolving the program behavior even though the number of messages is large. Therefore, the SMT solver performs very small cost for those problems. In contrast, the program \textit{MultiM} has much more choices in resolving the behavior but less messages, leading to a longer running time and larger memory usage in the SMT solver. The last program \textit{pktuse} uses much longer time to generate the match pairs because of both of the large number of messages and choices. As a result, more non-deterministic behaviors are captured leading to extremely long running time and large memory usage in solving the encoding.
 
-By comparing the performance of diverse encodings on two series of experiments shown above, our encoding is demonstrated that the number of messages and choices in resolving the program behavior determines the ``complexity" of a program execution. Also, our encoding scales well for programs with large number of messages and numerous match pairs.
+As discussed in the introduction, the MCAPI programs has a small percentage as to have much non-determinism in practice. \textit{LE} in \tableref{table:second} is such an example where only one choice exists in runtime, even though all the tasks send several messages to each other. Once the non-determinism is implemented in an application, however, our tool provides a way to resolve multiple choices(the range of the choices can be massive) by an SMT solver without generating the entire set of executions and verifying them separately. By comparing the performance of diverse encodings on two series of experiments shown above, our encoding is demonstrated that the number of messages and choices in resolving the program behavior determines the ``complexity" of a program execution. Also, our encoding scales well for programs with large number of messages and numerous match pairs.
 

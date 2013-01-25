@@ -8,8 +8,8 @@ across platforms.  Correctness in such an API is difficult to reason
 about manually, and testing against reference solutions is equally
 difficult as reference solutions implement an unknown set of allowed
 behaviors, and programmers have no way to directly control API
-internals to expose or reproduce errors.  This paper encodes an MCAPI
-execution as an SMT problem, which if satisfiable, yields a feasible
+internals to expose or reproduce errors.  This paper provides a way to encode an MCAPI
+execution as an Satisfiability Modulo Theory(SMT) problem, which if satisfiable, yields a feasible
 execution schedule on the same trace,
 such that it resolves non-determinism in the MCAPI runtime in the way that it now fails user provided assertions.
 Such an encoding is useful for test, debug, and
@@ -19,5 +19,4 @@ MCAPI executions, when compared to other encoding strategies, is
 simpler to reason about, results in significantly fewer terms in the
 SMT problem, and captures feasible behaviors that are ignored in
 previously published techniques. Further, to our knowledge, this is the first SMT encoding  that is able to run in \textit{infinite-buffer} semantics, meaning the runtime has unlimited internal buffering as opposed to no internal buffering. %In other words, our encoding with infinite-buffer controls more non-deterministic behaviors at runtime.
-Our results demonstrate that our SMT encoding uses $70\%$ fewer clauses of that of the existing technique. In addition, our encoding runs on average eight times faster and uses two times less memory than the existing technique on the benchmarks in our experiment.
-
+Our results demonstrate that our SMT encoding uses fewer clauses of that of the existing technique. Our encoding also runs faster and uses less memory than the existing technique. Further, our encoding scales well for programs with large number of messages and massive non-deterministic behaviors. 

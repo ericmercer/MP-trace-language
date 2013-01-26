@@ -3,36 +3,73 @@ Embedded devices fill all sorts of crucial roles in our lives. They exist as
 medical devices, as network infrastructure, and they control our automobiles.
 Embedded devices continue to become more powerful as computing hardware becomes
 smaller and more modular. It is now becoming commonplace to find multiple
-processing units inside a single device. The Multicore Association (MCA) \cite{mca} is an
+processing units inside a single device. The Multicore Association (MCA) is an
 industry group that has formed to define specifications for low-level
-communication, resource management, and task management for
-multicore devices.
+communication, resource management, and task management for embedded heterogeneous
+multicore devices \cite{mca}.
 
-One specification that the MCA has released is the Multicore Association
-Communications API (MCAPI) \cite{mcapi}. The specification defines basic data type, data
-structures, and functions that can be used to perform simple message passing
-operations between different computing entities within a device. Messages can be
-passed across persistent channels that force an ordering of the messages, or
-they can be passed to specific \emph{endpoints} within the system. The specification places few ordering constraints on messages passed from one
-endpoint to another. This freedom introduces the possibility of a race condition of two or more messages if the order of their arrival at the destinations are non-deterministic \cite{netzer:spdt96}. From our observation, few MCAPI applications have this non-determinism in practice. However, if the non-determinism is implemented, it is not possible to test and debug the program executions without a way to explore it in the MCAPI runtime.
+One specification that the MCA has released is the Multicore
+Association Communications API (MCAPI) \cite{mcapi}. The specification
+defines types and functions for simple message passing operations between different
+computing entities within a device. Messages can be passed across
+persistent channels that force an ordering of the messages, or they
+can be passed to specific \emph{endpoints} within the system. The
+specification places few ordering constraints on messages passed from
+one endpoint to another. This freedom introduces the possibility of a race between multiple messages to common endpoints thus giving rise to non-deterministic behavior in the runtime\cite{netzer:spdt96}. If an
+application has non-determinism, it is not possible
+to test and debug such an application without a way to directly (or
+indirectly) control the MCAPI runtime.
 
-Sharma et al. created a method of using concrete execution to verify MCAPI
-programs, but it was later discovered that this method does not completely
-explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. The method provides match pairs -- couplings for potential sends and receives that we use in our work. Instead of exploring all relevant interleavings of a program in the concrete execution in \cite{sharma:fmcad09}, Wang et al. provided a symbolic algorithm that verifies each partitioned concurrent trace program (CTP) with shared memory semantics using a satisfiability solver \cite{wang:fse09}. Elwakil et al. also defined a method of representing MCAPI program executions as SMT problems building on the method of \cite{wang:fse09} adapting it to message passing, but this method does not capture all allowed MCAPI program executions \cite{elwakil:padtad10}. Further, this method assumes that the user is able to provide the exact set of match pairs. Such an assumption is not reasonable for large complex program traces. In this paper, however, we provide an algorithm that generates an over-approximated set of match pairs. In order to prevent the problems discussed above, this paper discusses a new method that provides both efficiency and correctness.
+There are two ways to implement the MCAPI semantics:
+\textit{infinite-buffer} semantics (the message is copied into a
+runtime buffer on the API call) and \textit{zero-buffer} semantics
+(the message has no buffering)
+\cite{sarvani:fm09}.  An infinite-buffer semantics provides
+more non-deterministic behaviors in matching send and receives because
+the runtime can arbitrarily delay a send to create interesting (and
+unexpected) send reorderings. The zero-buffer semantics
+follow intuitive message orderings as a send and receive essentially
+rendezvous.
 
-There are two ways to implement the MCAPI semantics for matching sends to receives including an \textit{infinite-buffer} semantics (the message is copied into a runtime provided buffer on the API call) and a \textit{zero-buffer} semantics (the message is copied into a endpoint provided buffer) \cite{sarvani:fm09}.  An \textit{infinite-buffer} semantics provides more non-deterministic behaviors because a particular endpoint can receive more messages under the circumstance of \textit{infinite-buffer} semantics while the \textit{zero-buffer} semantics can only allow one message to be received by a specific endpoint at a time. We present an encoding for MCAPI program executions that works for both \textit{zero-buffer} and \textit{infinite-buffer} semantics that requires fewer terms than \cite{elwakil:padtad10} but includes all possible program executions unlike \cite{elwakil:padtad10}.  In other words, the solution for our encoding provides efficiency. Our encoding uses match pairs from \cite{sharma:fmcad09} that capture the non-determinism of program executions. Most importantly, this method correctly captures all possible executions allowed by the MCAPI specification in a trace of a concurrent program execution as an SMT problem enabling the exploration of inherent non-determinism that may exist in any MCAPI runtime implementation.
-Our main contributions in this paper include:
+Sharma et al. propose a method of indirectly controlling the MCAPI
+runtime to verify MCAPI programs under zero-buffer semantics, but it
+was later discovered that this method does not completely explore the
+entire execution space of certain kinds of MCAPI programs
+\cite{sharma:fmcad09}. A key insight of the approach, however, is in
+its use of match pairs--couplings for potential sends and receives.
+Wang \textit{et al.} propose an alternative method for resolving
+non-determinism for program verification using symbolic methods in the context
+of shared memory systems \cite{wang:fse09}. The work observes a
+program trace, builds a partial order from that trace called a
+concurrent trace program (CTP), and then creates an SMT problem from
+the CTP that if satisfied indicates a property violation. Elwakil \textit{et
+al.} extend the work of Wang \textit{et al.} to message passing in zero-buffer semantics, but the
+proposed encoding does not capture all allowed MCAPI program
+executions \cite{elwakil:padtad10}. Further, the method assumes that
+the user is able to provide the exact set of match pairs. Such an
+assumption is not reasonable for large complex program traces. 
+
+ This paper presents an SMT encoding for MCAPI program executions that
+ works for both zero and infinite buffer semantics. Further, the
+ encoding requires fewer terms to capture all possible program
+ behavior when compared to other proposed methods.  As a result, the
+ SMT encoding in this paper is both correct in that it enumerates all
+ possible executions allowed by the MCAPI specification in either zero
+ or infinite buffer semantics, and it is efficient since it uses
+ dramatically fewer terms in the encoding to reduce the memory and
+ running time in the SMT solver. To summarize, the main contributions
+ in this paper are
 
 \begin{enumerate}
 %\item An MCAPI program that introduces non-deterministic behavior.
 %\item A trace language framework that simulates and verifies an execution trace of an MCAPI program.
 %\item A modified trace language framework that generates an SMT problem for a single trace in the machine executions.
-\item  A correct and efficient SMT encoding of an MCAPI program execution that detects all program errors if the provided match pairs are precise or over approximated.
-\item  An $O(N^2)$ algorithm to generate an over-approximation of possible match-pairs, where $N$ is the size of the execution trace in lines of code.
+\item  a correct and efficient SMT encoding of an MCAPI program execution that detects all program errors if the provided match pairs are precise or over approximated under zero or infinite buffer semantics; and
+\item  an $O(N^2)$ algorithm to generate an over-approximation of possible match-pairs, where $N$ is the size of the execution trace in lines of code.
 \end{enumerate}
 
 The rest of the paper is organized as follows:
-Section 2 presents an MCAPI program execution in which two program traces exist due to non-determinism in the MCAPI runtime. Section 3 defines an SMT encoding of an MCAPI program execution that captures non-determinism in message order by defining the set of possible match pairs between sends and receives on common endpoints. It is proved that an over-approximated match set in our SMT encoding of an MCAPI program execution can reflect the actual execution traces as the true set does. Section 4 provides a solution to the outstanding problem in other encodings of generating feasible match pairs to use in the encoding. It presents a $O(N^2)$ algorithm that over-approximates the precise match set, where $N$ is the size of the execution trace in lines of code. Section 5 presents the experimental results that show our encoding to be correct and efficient under both \textit{zero-buffer} and \textit{infinite-buffer}, as other existing encodings omit critical program behaviors, require more SMT clauses and only support \textit{zero-buffer} semantics. Section 6 discusses related
+Section 2 presents an MCAPI program execution in which two program traces exist due to non-determinism in the MCAPI runtime. Section 3 defines an SMT encoding of an MCAPI program execution that captures non-determinism in message order by defining the set of possible match pairs between sends and receives on common endpoints. It is proved that an over-approximated match set in our SMT encoding of an MCAPI program execution can reflect the actual execution traces as the true set does. Section 4 provides a solution to the outstanding problem in other encodings of generating feasible match pairs to use in the encoding. It presents a $O(N^2)$ algorithm that over-approximates the precise match set, where $N$ is the size of the execution trace in lines of code. Section 5 presents the experimental results that show our encoding to be correct and efficient under both \textit{zero-buffer} and \textit{infinite-buffer} semantics, as other existing encodings omit critical program behaviors, require more SMT clauses and only support \textit{zero-buffer} semantics. Section 6 discusses related
 work, and Section 7 presents our conclusions and future work.
 
 

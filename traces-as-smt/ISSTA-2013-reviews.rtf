@@ -1,0 +1,181 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf370
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs24 \cf2 From: ISSTA 2013 <issta2013@easychair.org>\
+Subject: ISSTA 2013 notification for paper 94\
+Date: May 1, 2013 08:13:17 MDT\
+To: Eric Mercer <egm@byu.edu>\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf2 \
+\pard\pardeftab720
+\cf2 Dear Eric,\
+\
+Thank you for your submission to the ISSTA 2013 technical program. The program committee met on April \
+29th and 30th in Windsor to consider its decisions. \
+\
+I very much regret to inform you that your submission was not accepted for inclusion in the ISSTA 2013 \
+technical program. \
+\
+Your paper was discussed at the PC meeting by the reviewers and all those other PC members who had no \
+conflicts of interest. Points in favour of and against acceptance were discussed. The reviews of your paper \
+are enclosed. I hope that these reviews will be helpful in developing your work. The reviews of your paper \
+may have been updated since the version you will have seen and for which you had an opportunity to \
+respond. I regret that I am unable to enter into any correspondence with authors concerning the decisions \
+about papers, nor can I discuss with you further the content of the reviews.\
+\
+The quality and number of submissions this year has been very high. Overall, 32 papers out of the 124 \
+submissions were accepted (25.8%). The level of submission (124 submissions) is a record high number of \
+submissions for ISSTA.\
+\
+With very best wishes and commiserations,\
+\
+\
+\
+Mark Harman,\
+ISSTA 2013 PC Chair.\
+\
+\
+----------------------- REVIEW 1 ---------------------\
+PAPER: 94\
+TITLE: Proving MCAPI Executions are Correct Applying SMT Technology to Message Passing\
+AUTHORS: Yu Huang, Eric Mercer and Jay McCarthy\
+\
+\
+----------- REVIEW -----------\
+The authors propose to use a claimed-novel match-pair encoding to reduce\
+the testing, debugging and verification of multi-core message passing\
+(MCAPI) systems. Violations yield test cases with resolved non-determinism,\
+and the match-pair encoding allows for reasoning about both zero-buffer and\
+infinite-buffer semantics (the SMT solver is forced to compute a total\
+order on events). The approach is shown to be scalable and efficient\
+compared to a comparable technique. At least two previous approaches have\
+failed (e.g., failed to explore the search space or failed to capture the\
+full program semantics), attesting to the challenge of the problem. \
+\
+When reading and evaluating the paper, I was primarily concerned with\
+the Efficiency, Correctness and Novelty of the proposed approach.\
+\
+Efficiency: I found the experiments in Section 5 to be compelling (e.g.,\
+"our SMT encoding uses 70% fewer clauses of that of [10], and runs on\
+average eight times faster and uses half the memory of [10]"). The paper\
+would be strengthened, however, by spending more time on some key aspects\
+of experimental design. (1) Why are the test problems indicative? That is,\
+if I were to some MCAPI work in my basement and wanted to verify it, what\
+confidence do I have that the performance of your technique on your test\
+problems would be similar to the performance of your technique on my\
+real-world basement problems? You indicate: "We used the MCA provided\
+reference solution to generate MCAPI program traces." Yes, but from what\
+scenarios? Why are those indicative? Similarly, you do a good job of\
+trouncing you baseline, [10]. The experimental section should include\
+additional text indicating why [10] is the best available baseline and not\
+a straw opponent. \
+\
+Correctness: Theorem 1 and 2 address this issue directly. This is of\
+particular concern because the introduction establishes that at least two\
+pieces of previous work were later found to be unsatisfactory in various\
+ways. I checked the tech report for the long version of the proof and would\
+have appreciated a machine-checkable version (e.g., Figure 10 and friends\
+as a text file that could be passed as input to an automated proof checker\
+or term-rewriting system). Lacking such mechanical aid, I did not\
+hand-check the proofs and must be satisfied with the glancing judgment that\
+the authors appear to have have done their homework. In any event, the\
+submission proper would be improved by adding a few additional sentences to\
+explicate the key claim "that several SMT encodings can be combined such\
+that the combined SMT encoding returns SAT if one of those encodings has a\
+satisfiable solution". \
+\
+Novelty: Here the paper reaches an interesting divide. Novelty might be\
+assessed in terms of the results of the encoding or in terms of the\
+encoding itself. For the former, the paper does a good job of establishing\
+claims such as "our encoding is the first encoding that correctly captures\
+the non-deterministic behaviors of an MCAPI program execution under\
+infinite- buffer semantics allowed in the MCAPI specification." However,\
+the paper text does not do an adequate job of establishing, for a general\
+audience, that the idea of the encoding is novel. This is perhaps best\
+illustrated by two potentially-conflicting quotes: \
+\
+"The novelty of the SMT encoding in this paper is its use of match pairs\
+rather than the state-based or order-based encoding of prior work [10, 9]."\
+vs. "Sharma et al. propose [...] use of match pairs -- couplings for\
+potential sends and receives."\
+\
+A quick check of the Sharma paper [19] suggests that they do propose a\
+notions of matching and pairs in a dynamic formal verification system. The\
+related work section in this submission appears to spend only three\
+sentences on [19], and the primary differentiation is that "it does\
+not include all possible traces allowed by the MCAPI specification."\
+However, that would appear to be a correctness claim, rather than a novelty\
+claim. That is, the submission as written does not argue that the encoding\
+is *novel*, it just argues that the previous implementation was not\
+perfect. Since this is critical to the overall novelty of the submission's\
+contribution, the argument surrounding it should be made much clearer. \
+\
+I like this paper quite a bit, but in each key area something non-trivial\
+is missing (e.g., benchmark and baseline justification for Efficiency; a\
+machine-checkable proof for Correctness; and a firm discussion of whether\
+or not the match-pair encoding is actually Novel). \
+\
+\
+Minor details: Was Figure 1 really the smallest and simplest motivating\
+example that would serve the purpose?\
+\
+\
+----------------------- REVIEW 2 ---------------------\
+PAPER: 94\
+TITLE: Proving MCAPI Executions are Correct Applying SMT Technology to Message Passing\
+AUTHORS: Yu Huang, Eric Mercer and Jay McCarthy\
+\
+\
+----------- REVIEW -----------\
+The paper presents a technique for testing message passing programs written with the MCAPI interface. The technique executes the program once, records a trace of events, encodes this trace into an SMT formula whose satisfying assignments would show program bugs, and uses SMT solvers to search for such assignments. The evaluation uses one micro benchmark and four small programs. To my understanding, no bugs were found.\
+\
+There could be an interesting new result in this paper, but the presentation would need to greatly improve for this paper to be acceptable at ISSTA.\
+\
+First, it's necessary to clarify what is the key new idea compared to the previous work. The novelty is not described in enough detail, and the results are not experimentally compared with the previous work. Others have previously encoded traces of events into SMT formulas. This paper presents an encoding different the previous encodings, but I can't pinpoint what is the key insight. Is it the generation of matching pairs (Section 4)? How did the others treat those matching pairs? Is it that this paper considers all pairs for O(N^2)? Is it the use of plus and minus in Figure 5, Step 3.?\
+\
+Related work says that "the previous section" showed how [9,10] do the encoding, but I can't find that in the previous section. There is only a brief comparison with [10] on some toy example. Does the comparison use their tool, or did you reimplement their encoding in your tool? What are the key differences in the encodings?\
+\
+The related work paragraphs on [20] and [19] are also not clear. What traces/interleavings are not included by [20] and [19]? For [20], one issue that's mentioned is that ISP is for MPI programs. How does MPI differ from MCAPI? Does your technique work for MPI? Or is theirs more general? The references do not include this paper on MPI: Ganesh Gopalakrishnan, Robert M. Kirby, Stephen F. Siegel, Rajeev Thakur, William Gropp, Ewing L. Lusk, Bronis R. de Supinski, Martin Schulz, Greg Bronevetsky: Formal analysis of MPI-based parallel programs. Commun. ACM 54(12): 82-91 (2011)\
+\
+The abstract says that "programmers have no way to directly control API internals", but from relates work it seems that MCC [19] does control the internals.\
+\
+Second, the formal treatment is lacking. Formalizing the stages in "The infinite-budder SMT encoding precedes.." would make it easier for others to reproduce this work. For stage 6., why does `assume' produce `assert'? In "For zero-buffer semantics...", it is unclear to me how exactly some orderings are precluded. For over-approximation, why is an error from the over-approximated set guaranteed to be real? For example, what if we allowed any send to match any receive but intend zero-buffer semantics? How would that not have "bogus" matches? Theorem 1 doesn't appear all that interesting: it's easy to see that relaxing the constraints can make them satisfiable. The key questions here are whether 1) the satisfiable solution found is real (precision) and 2) unsat implies that there is no error (soundness). This paper does not show the proof for 1). It may be http://students.cs.byu.edu/huang2/downloads/paper.pdf, but the paper should be self-contained, especially that there was s!\
+pace (1.5 pages until the page limit of 11 pages, and a lot of white space).\
+\
+Third, the evaluation would need to be more extensive. The issue of comparing with some previous work was already mentioned. It'd be good to show for tables 1 and 2, what are the sizes of the generated SMT formulas: how many variables? how many clauses? What is the generation time vs. solving time? Are programs executed for multiple traces? Can some (seeded) bugs be found? Where do the numbers of 800 and 850 match pairs come from? From the intro, "Section 5 presents the experimental results\
+that show our encoding to be correct", but how can experiments show correctness?\
+\
+Only four small programs are used in the evaluation. Are there any real MCAPI applications? What examples are distributed with the standard implementation of an MCAPI library or simulator?\
+\
+Fourth, many small formatting issues distract from the reading. For example, figures (such as 1, 2, 3) are far from the text where they're described. Font for the indexes in Figure 3 is tiny and hard to read. The paper is A4 rather than Letter size. The pseudocode in Figure 5 should be formatted better. It's hard to follow right now. Formula (2) on page 7 is also hard to read. For Figure 1, having a less abstract and more realistic program would make it easier to understand what goes on. The term "non-overtaking property" is used from page 3, but it is not mentioned until page 7 that it means FIFO for channels.\
+\
+There are also many typos:\
+test, debug, and verification => testing, debugging, and verification\
+senda => sends\
+semantics follow => semantics follows\
+formally at BYU => formerly at BYU\
+a over-approximated => an over-approximated\
+Minius => Minutes\
+less messages => fewer messages\
+et al. provides => et al. provide\
+Bjrner => Bjorner\
+\
+\
+----------------------- REVIEW 3 ---------------------\
+PAPER: 94\
+TITLE: Proving MCAPI Executions are Correct Applying SMT Technology to Message Passing\
+AUTHORS: Yu Huang, Eric Mercer and Jay McCarthy\
+\
+\
+----------- REVIEW -----------\
+This paper presents an approach for encoding MCAPI execution traces as SMT problems. Thus, whether a pair of send and receive match each other can be verified via an SMT solver. This paper further presents an algorithm to efficiently generate match pairs on the basis of the SMT encoding. This paper also reports some empirical results of the proposed approach, demonstrating the scalability of the proposed approach and its superiority over a previous SMT encoding of MCAPI execution traces. In general, I like this paper. However, I think there are several places that can be further improved.\
+\
+First, I have the following major concern. The authors claim that the proposed SMT encoding can support both the infinite-buffer semantic and the zero-buffer semantic. The authors even argue that this is a major advantage of the proposed approach over the previous work [10]. However, it is quite unclear how the proposed approach supports these two different semantics. For a different semantic, either the SMT encoding or the match-pair generation algorithm should be different. Otherwise, I don\'92t know how the proposed approach can differentiate these two semantics. Note that a different semantic actually represents a different way of implementation. For supporting both ways of implementation, an approach should be able to differentiate the two semantics. I hope the authors could make this point clear in their response to my review.\
+\
+Second, the presentation of the experiments and results seems to be quite ad hoc. This may pose an obstacle for repeating the reported experiments. For example, it is unclear how many programs and how many execution traces of each were used in the experiments. It is also unclear how the answers were verified in the experiments. The authors state that the work in [10] produces some incorrect answers. How do we know those answers are incorrect? What is the exact number of these incorrect answers? Does the approach reported in this paper also produce incorrect answers? If so, how do we know them to be incorrect? If not, how do we know that the answers are all correct? Please provide more details.\
+\
+Third, I feel the presentation of the approach not very intuitive. Theorems 1 and 2 seem to indicate that the so-called over approximation actually produces exact results. But it is still unclear to me why the over approximation can have such a property. Maybe, it is due to the properties of the traces. Another example is the SMT encoding shown in Figure 3 and Figure 4. I don\'92t know if the encoding is in the format for a particular SMT solver, but for a reader not familiar with SMT solvers, I don\'92t think the meaning of the SMT encoding is clear by itself. There is also no detailed explanation in the text.\
+\
+}

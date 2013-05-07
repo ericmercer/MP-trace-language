@@ -3,7 +3,7 @@
 % for Lecture Notes in Computer Science,
 % version 2.4 for LaTeX2e as of 16. April 2010
 %
-\documentclass[preprint]{acm_proc_article-sp}
+\documentclass[conference]{IEEEtran}
 %
 \usepackage{comment}
 \usepackage{mathpartir}
@@ -35,32 +35,25 @@
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\thmref}[1]{Theorem~\ref{#1}}
-\newdef{definition}{\noindent Definition}
+
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
 
 %
 \begin{document}
 %
 %\pagestyle{headings}  % switches on printing of running heads%
 %
-\title{Proving MCAPI Executions are Correct}
-\subtitle{Applying SMT Technology to Message Passing}
-%\titlerunning{SMT for MCAPI Executions}
+\title{Proving MCAPI Executions are Correct using SMT}
 
-\numberofauthors{3}
-\author{
-\alignauthor 
-Yu Huang\\
-\affaddr{Brigham Young University} \\
-    \email{yuHuang@byu.edu}
-\alignauthor
-Eric Mercer\\
-\affaddr{Brigham Young University} \\
-    \email{egm@byu.edu}
-\alignauthor
-Jay McCarthy \thanks{Special thanks to Christopher Fischer, formally at BYU and now at Amazon}\\
-\affaddr{Brigham Young University} \\
-    \email{jay@byu.edu}
-}
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{\authorblockN{Yu Huang, Eric Mercer and Jay McCarthy}
+\authorblockA{Department of Computer Science\\
+Brigham Young University\\
+Provo, UT 84602\\
+Email: \{yu,egm,jay\}@byu.edu}}
 
 \maketitle
 

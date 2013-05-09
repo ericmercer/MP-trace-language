@@ -78,8 +78,6 @@
 \newcommand{\recv}{\ensuremath{\mathrm{\mu}}}
 \newcommand{\send}{\ensuremath{\mathrm{\nu}}}
 
-
-
 \newsavebox{\boxSMTa}
 \begin{lrbox}{\boxSMTa}
 \normalsize
@@ -169,8 +167,6 @@ $\langle\mathtt{R_{0,5}}$, $\mathtt{S_{1,5}}\rangle$\\
 $\langle\mathtt{R_{1,3}}$, $\mathtt{S_{2,7}}\rangle$\\
 \end{tabular}
 \end{lrbox}
-
-
 
 
 \section{SMT Model}\label{sec:smt}
@@ -343,7 +339,7 @@ to return the solution of an SMT problem, such that $\mathrm{\cfgt{SAT}}$ repres
 The SMT encoding defined above is used to capture the non-deterministic behaviors of an MCAPI program execution by giving a complete set of match pairs. As we discussed in the previous section, the MCAPI program in \figref{fig:mcapi} contains two outcomes of execution as defined in the MCAPI specification under the infinite-buffer semantics. The SMT encoding we present in \figref{fig:smt}(b) captures both execution traces, since the set of match pairs in \figref{fig:smt}(a) is a complete set where all matches that can occur in the real execution for our running example in \figref{fig:mcapi} are included, and all matches that cannot occur in the real execution are not included. Further, the following theorem states that we can over-approximate the true set of match pairs and still prove correctness. If there is no error with the over-approximated set, then there is no error arising from non-determinism in the runtime on that program execution. If there is an error from the over-approximated set, that error is also guaranteed to be a real error in the program runtime. Note that two SMT problems $\smt_{\alpha}$ and $\smt_{\beta}$ in the following theorem have identical $\mathit{defs}$ and $\mathit{constraints}$ sets, and differ only by match set.
 \\
 \\
-\textbf{Theorem 1.}
+\begin{theorem}
 The relation for the solutions of two SMT problems $\smt_{\alpha}$ $= (\mathit{defs}$ $\mathit{constraints}$ $\mathit{match}_{\alpha})$ and $\smt_{\beta}$ $= (\mathit{defs}$ $\mathit{constraints}$ $\mathit{match_{\beta}})$ is,
 \[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
 where $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$. Note that $\mathit{set(match)}$ represents the input set of match pairs in the $\mathit{match}$ field.
@@ -363,26 +359,49 @@ where $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$. Note
 (a) The SMT encoding for Trace 1 in \figref{fig:trace}. (b) The SMT encoding for Trace 2 in \figref{fig:trace}.}
 \label{fig:smt_trace}
 \end{figure}
-\\
-\textbf{Proof Sketch.}
+\end{theorem}
+\begin{proof}[Proof Sketch]
 Consider the MCAPI program in \figref{fig:mcapi} as an example.
 \figref{fig:smt_trace}(a) and (b) are two different SMT encodings for our running
 example in \figref{fig:mcapi} generated from different sets of possible match pairs, such that \figref{fig:smt_trace}(a) encodes trace 1 in \figref{fig:trace} and \figref{fig:smt_trace}(b) encodes trace 2 in \figref{fig:trace}. By solving the encodings in \figref{fig:smt_trace}(a) and (b) for trace 1 and 2 in \figref{fig:trace} respectively, we get an unsatisfiable solution for \figref{fig:smt_trace}(a), and a satisfiable solution for \figref{fig:smt_trace}(b). As we discussed in Section 2, trace 1 is an execution trace without failure of the assertion, and trace 2 is the one that fails the assertion. %We can see that the encodings in \figref{fig:smt_trace} (a) and (b) correctly encodes trace 1 and 2 in \figref{fig:trace}, respectively.
-Compare both encodings with that in \figref{fig:smt}(b), we find that the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical except for the set of match pairs. In particular, the input set of match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset of that in \figref{fig:smt}(b). As discussed above, the encoding in \figref{fig:smt}(b) captures the non-deterministic behaviors of our running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in \figref{fig:trace} into one single SMT problem. Thus, an SMT solver will return a satisfiable solution for the encoding in \figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in \figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on the encoding in either \figref{fig:smt_trace}(a) or (b). In other words, adding more match pairs can only move the $\mathrm{ANS}$ from $\mathrm{\cfgt{UNSAT}}$ to $\mathrm{\cfgt{SAT}}$.
+Compare both encodings with that in \figref{fig:smt}(b), we find that
+the fields $\mathit{defs}$ and $\mathit{constraints}$ are identical
+except for the set of match pairs. In particular, the input set of
+match pairs of either \figref{fig:smt_trace}(a) or (b) is the subset
+of that in \figref{fig:smt}(b). As discussed above, the encoding in
+\figref{fig:smt}(b) captures the non-deterministic behaviors of our
+running program in \figref{fig:mcapi}, which encodes trace 1 and 2 in
+\figref{fig:trace} into one single SMT problem. Thus, an SMT solver
+will return a satisfiable solution for the encoding in
+\figref{fig:smt}(b). Thus, $\mathrm{ANS}$ on the encoding in
+\figref{fig:smt}(b) is greater than or equal to the $\mathrm{ANS}$ on
+the encoding in either \figref{fig:smt_trace}(a) or (b). In other
+words, adding more match pairs can only move the $\mathrm{ANS}$ from
+$\mathrm{\cfgt{UNSAT}}$ to $\mathrm{\cfgt{SAT}}$.
+\end{proof}
 
-The formal proof of Theorem 1 is in the long version of our paper\footnote{\texttt{http://students.cs.byu.edu/$\sim$yhuang2/downloads\\/paper.pdf}}. The proof defines a formal operational semantics given by a term rewriting system using a \textit{CESK}\footnote{The \textit{CESK} machine state is represented with a \textbf{C}ontrol string, \textbf{E}nvironment, \textbf{S}tore, and \textbf{K}ontinuation.} style machine only the machine is augmented to include additional structure for modeling message passing. The operational framework defines how to execute a program, following the specified trace, and defines when that execution is a success (causes no assertion violation), a failure (causes an assertion violation), infeasible (causes an assume to not hold), or an error (execution is not allowed by the MCAPI semantics.). Further, the machine generates the terms of the SMT encoding as it rewrites the machine states. The proof defines a combination operator and shows that several SMT encodings can be combined such that the combined SMT encoding returns $\mathrm{\cfgt{SAT}}$ if one of those encodings has a satisfiable solution.  As such, Theorem 1 is formally proved by applying the combination operator for $\smt_{\alpha}$ and $\smt_{\beta}$.
+The formal proof of \thmref{thm:1} is in the long version of our paper\footnote{\texttt{http://students.cs.byu.edu/$\sim$yhuang2/downloads\\/paper.pdf}}. The proof defines a formal operational semantics given by a term rewriting system using a \textit{CESK}\footnote{The \textit{CESK} machine state is represented with a \textbf{C}ontrol string, \textbf{E}nvironment, \textbf{S}tore, and \textbf{K}ontinuation.} style machine only the machine is augmented to include additional structure for modeling message passing. The operational framework defines how to execute a program, following the specified trace, and defines when that execution is a success (causes no assertion violation), a failure (causes an assertion violation), infeasible (causes an assume to not hold), or an error (execution is not allowed by the MCAPI semantics.). Further, the machine generates the terms of the SMT encoding as it rewrites the machine states. The proof defines a combination operator and shows that several SMT encodings can be combined such that the combined SMT encoding returns $\mathrm{\cfgt{SAT}}$ if one of those encodings has a satisfiable solution.  As such, Theorem 1 is formally proved by applying the combination operator for $\smt_{\alpha}$ and $\smt_{\beta}$.
 
 Assume $\mathit{set(match_{\alpha})}$ and $\mathit{set(match_{\beta})}$ in the theorem above a complete set of match pairs and an over-approximated set, respectively, we can further prove that $\mathrm{ANS}(\smt_{\alpha})$ $ = $ $\mathrm{ANS}(\smt_{\beta})$ by giving the following theorem. Note that a match pair $\langle \mathtt{R},\mathtt{S}\rangle \in \mathit{set(match_{\beta})}/\mathit{set(match_{\alpha})}$ is called ``bogus", since it cannot exist in a real execution of the program.
 \\
-\\
-\textbf{Theorem 2.}
+\begin{theorem} \label{thm:two}
 Any match pair $\langle \mathtt{R}, \mathtt{S}\rangle$ used in a satisfying assignment of an SMT encoding $\smt$ is a valid match pair and reflects an actual possible MCAPI program execution.
-\\
-\textbf{Proof.}
-Proof by contradiction. Assume that $\langle \mathtt{R}, \mathtt{S}\rangle$ is a ``bogus" match pair that causes $\mathrm{ANS}(\smt) = \cfgt{SAT}$. Since $\langle \mathtt{R}, \mathtt{S}\rangle$ is not a valid match pair, match $\mathtt{R}$ and $\mathtt{S}$ requires program order, message non-overtaking, or no-multiple match to be violated. In other words, the $\mathtt{HB}$ constraints encoded in $\smt$ are not satisfied. Based on the fact above, the answer of $\smt$ is $\cfgt{UNSAT}$ and it contradicts the previous hypothesis. Thus, $\langle \mathtt{R}, \mathtt{S}\rangle$ is a valid match pair in $\smt$ and reflects an actual possible MCAPI program execution. $\Box$
+\end{theorem}
+\begin{proof}
+Proof by contradiction. Assume that $\langle \mathtt{R},
+\mathtt{S}\rangle$ is a ``bogus" match pair that causes
+$\mathrm{ANS}(\smt) = \cfgt{SAT}$. Since $\langle \mathtt{R},
+\mathtt{S}\rangle$ is not a valid match pair, match $\mathtt{R}$ and
+$\mathtt{S}$ requires program order, message non-overtaking, or
+no-multiple match to be violated. In other words, the $\mathtt{HB}$
+constraints encoded in $\smt$ are not satisfied. Based on the fact
+above, the answer of $\smt$ is $\cfgt{UNSAT}$ and it contradicts the
+previous hypothesis. Thus, $\langle \mathtt{R}, \mathtt{S}\rangle$ is
+a valid match pair in $\smt$ and reflects an actual possible MCAPI
+program execution.
+\end{proof}
 
-
-By proving Theorem 2, we infer that a ``bogus" match pair can only cause an unsatisfying assignment of an SMT problem. Further, if $\mathit{set(match_{\alpha})}$ and $\mathit{set(match_{\beta})}$ reflect a complete set and a over-approximated set respectively, the answers of $\smt_{\alpha}$ and $\smt_{\beta}$ discussed above are equal since any ``bogus" match pair involved in $\smt_{\beta}$ is only used in unsatisfying assignments.
+By proving \thmref{thm:two}, we infer that a ``bogus" match pair can only cause an unsatisfying assignment of an SMT problem. Further, if $\mathit{set(match_{\alpha})}$ and $\mathit{set(match_{\beta})}$ reflect a complete set and a over-approximated set respectively, the answers of $\smt_{\alpha}$ and $\smt_{\beta}$ discussed above are equal since any ``bogus" match pair involved in $\smt_{\beta}$ is only used in unsatisfying assignments.
 
 
 

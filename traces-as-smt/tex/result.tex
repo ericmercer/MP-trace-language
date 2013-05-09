@@ -15,7 +15,7 @@ The intent of the scalability study is to understand how performance is affected
 \begin{table}
 \begin{center}
 \scriptsize
-\caption{Scaling as a function of non-determinism}
+\caption{Scaling as a function of non-determinism \label{table:first}}
 \begin{tabular}{|c|c|c|c|}
 		\hline
          \multicolumn{2}{|c|}{Test Programs} & \multicolumn{2}{|c|}{Performance} \\ \hline
@@ -28,7 +28,6 @@ The intent of the scalability study is to understand how performance is affected
          \hline
 		\end{tabular}
 \end{center}
-\label{table:first}
 \end{table}
 
 The study takes an initial program of $N = 30$, so 31 threads, and varies $N$ to see how the SMT solver scales. A small $N$ is an easy program while a large $N$ is a hard program. \tableref{table:first} shows how the new encoding scales with hardness. The first column is the number of messages, or $N$, and the second column is the number of feasible match-pair subsets that correctly match every receive to a unique send. As expected, running time and memory consumption increase non-linearly with hardness. The case where $N=70$ represents having 70 concurrent messages in flight from 70 different threads of execution. Such a scenario is not entirely uncommon in a high performance computing application, and it appears the new encoding is able to reasonably scale to such a level of concurrency. As a final note, the number of messages is not the deciding factor in hardness for the new encoding; rather, hardness is measured by the number of feasible match-sets. As is shown in the next section, some programs are easy, even if there are many messages, while other programs are hard, even though there are only a few messages.
@@ -37,7 +36,7 @@ The study takes an initial program of $N = 30$, so 31 threads, and varies $N$ to
 \begin{center}
 \setlength{\tabcolsep}{2pt}
 \scriptsize
-\caption{Performance on selected benchmarks}
+\caption{Performance on selected benchmarks \label{table:second}}
 \begin{tabular}{|l|c|c|c|c|c|c|}
 		\hline
          \multicolumn{3}{|c|}{Test Programs} & \multicolumn{4}{|c|}{Performance} \\ \hline
@@ -49,7 +48,6 @@ The study takes an initial program of $N = 30$, so 31 threads, and varies $N$ to
          \hline
 		\end{tabular}
 \end{center}
-\label{table:second}
 \end{table}
 
 \subsection{Typical Benchmark Programs}

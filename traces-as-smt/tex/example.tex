@@ -4,17 +4,18 @@
 \newsavebox{\boxTZero}
 \begin{lrbox}{\boxTZero}
 \begin{minipage}[t]{0.8\linewidth}
+\small
 \begin{alltt}
 00 initialize(NODE_0,&v,&s);
-01 e0 = create_endpoint(PORT_0,&s);
+01 e0=create_endpoint(PORT_0,&s);
 
 02 msg_recv_i(e0,A,sizeof(A),&h1,&s);
 03 wait(&h1,&size,&s,MCAPI_INF);
-04 a = atoi(A);
+04 a=atoi(A);
 
 05 msg_recv_i(e0,B,sizeof(B),&h2,&s);
 06 wait(&h2,&size,&s,MCAPI_INF);
-07 b = atoi(B);
+07 b=atoi(B);
 
 08 if(b > 0);
 09  assert(a == 4);
@@ -43,10 +44,11 @@
 \newsavebox{\boxTOne}
 \begin{lrbox}{\boxTOne}
 \begin{minipage}[t]{0.8\linewidth}
+\small
 \begin{alltt}
 00 initialize(NODE_1,&v,&s);
-01 e1 = create_endpoint(PORT_1,&s);
-02 e0 = get_endpoint(NODE_0,PORT_0,&s);
+01 e1=create_endpoint(PORT_1,&s);
+02 e0=get_endpoint(NODE_0,PORT_0,&s);
 
 03 msg_recv_i(e1,C,sizeof(C),&h3,&s);
 04 wait(&h3,&size,&s,MCAPI_INF);
@@ -75,11 +77,12 @@
 \newsavebox{\boxTTwo}
 \begin{lrbox}{\boxTTwo}
 \begin{minipage}[t]{0.8\linewidth}
+\small
 \begin{alltt}
 00 initialize(NODE_2,&v,&s);
-01 t2 = create_endpoint(PORT_2,&s);
-02 t0 = get_endpoint(NODE_0,PORT_0,&s);
-03 t1 = get_endpoint(NODE_1,PORT_1,&s);
+01 t2=create_endpoint(PORT_2,&s);
+02 t0=get_endpoint(NODE_0,PORT_0,&s);
+03 t1=get_endpoint(NODE_1,PORT_1,&s);
 
 04 msg_send_i(e2,e0,"4",2,N,&h5,&s);
 05 wait(&h5,&size,&s,MCAPI_INF);

@@ -3,28 +3,25 @@
 \begin{lrbox}{\boxalgorithm}
 \begin{minipage}[c]{1.4\linewidth}
 \begin{alltt}
-//initialization
+// initialization
 input an MCAPI program
-initialize list_r by traversing each task of the program and storing
-each receive command
-initialize list_s by traversing each task of the program and storing
-each send command
+initialize list_r
+initialize list_s
 
-//check each receive and send with the same endpoint
+// check each receive and send with the same endpoint
 for r in list_r
   for s in list_s
-    //check matching criteria for r and s
+    // check matching criteria for r and s
     if
-      1.the endpoint of r is equal to the destination endpoint of s, and
-      2.the index of r is larger or equal to the index of s, and
-      3.the index of r is less or equal to the index of s
-        plus the number of sends with the same destination endpoint of s
-        minus the number of sends with the same source and destination
-        endpoints of s
+      1. endpoint(r) = destination endpoint(s)
+      2. index(r) >= index(s)
+      3. index(r) =< index(s) 
+                     + count(sends(dest=s))
+                     - count(sends(src=s, dest=s))
     then
       add pair (r, s) to match_set
     else
-      do next iteration
+      continue
     end if
   end for
 end for

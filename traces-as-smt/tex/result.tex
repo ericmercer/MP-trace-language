@@ -1,5 +1,5 @@
 \section{Experiments and Results}
-To assess the new encoding in this paper, three experiments with results are presented: a comparison to prior SMT encodings on a zero-buffer semantics, a scalability study on the effects of non-determinism in the execution time on infinite buffer semantics, and an evaluation on typical benchmark programs again with infinite buffer semantics. All of the experiments use the Z3 SMT solver (\cite{demoura:tacas08}) and are measured on a 2.40 GHz Intel Quad Core processor with 8 GB memory running Ubuntu 14.
+To assess the new encoding in this paper, three experiments with results are presented: a comparison to prior SMT encodings on a zero-buffer semantics, a scalability study on the effects of non-determinism in the execution time on infinite buffer semantics, and an evaluation on typical benchmark programs again with infinite buffer semantics. All of the experiments use the Z3 SMT solver (\cite{demoura:tacas08}) and are measured on a 2.40 GHz Intel Quad Core processor with 8 GB memory running Windows 7.
 
 The initial program trace for the experiments is generated using MCA provided reference solution with fixed input to isolate all non-determinism to how sends and receives are matched in the runtime. This statement means that the experiments only consider one path of control flow through the program. Complete coverage of the program for verification purposes would need to generate input to exercise different control flow paths.  Where appropriate, the time to generate the match-pair sets from the input trace is reported separately. 
 
@@ -10,10 +10,7 @@ The zero-buffer encoding in this paper is compared directly to the order-based e
 
 \subsection{Scalability Study}
 
-The intent of the scalability study is to understand how performance is affected by the number of messages in the program trace and the level of non-determinism in choosing match-pairs where multiple sends are able to match to multiple receives. The program for this study consists of 51 threads. The first thread receives 50 messages containing integer values and then asserts that every message did not receive a specific value. In other words, a violation is one where each message has a specific value.  The remaining 50 threads send a message, each containing a different unique integer value, to the first thread. This program represents the worst-case scenario for non-determinism in a message passing program as any send is able to match with any receive in the runtime and the assertion is only violated when each send is paired with a specific receive. The SMT solver must search through the multitude of match-pairs to the single precise subset of match-pairs that trigger the violation.
-
-The study takes this initial program of 51 threads and varies the number of match pairs used in the encoding to reduce the non-determinism that must be resolved by the SMT solver so the program can be made hard (i.e., a lot of possibilities) or easy (i.e., a few possibilities). For example, the worst-case is when there are 2500 match pairs (50 sends times 50 receives). In this scenario, there are many feasible subsets of match-pairs that match every receive to a unique send, one of which violates the assertion. Suppose now that the original set of 2500 match pairs is reduced to only 100 match pairs, and of these 100 match-pairs there are exactly two subsets that are feasible, one of which violates the assertion. In this way, it is possible to vary the number of match-pair subsets that represent a feasible pairing of every send and receive making it harder or easier for the SMT solver to find the violating subset. All 2500 match-pairs is a \emph{hard} problem while \emph{100} match-pairs is an easy problem.
-
+The intent of the scalability study is to understand how performance is affected by the number of messages in the program trace and the level of non-determinism in choosing match-pairs where multiple sends are able to match to multiple receives. The programs for this study consist of a simple pattern of a single thread to receive messages and $N$ threads to send messages. The single thread sequentially receives $N$ messages containing integer values and then asserts that every message did not receive a specific value. In other words, a violation is one where each message has a specific value.  The remaining $N$ threads send a message, each containing a different unique integer value, to the single thread that receives. These programs represent the worst-case scenario for non-determinism in a message passing program as any send is able to match with any receive in the runtime, and the assertion is only violated when each send is paired with a specific receive. The SMT solver must search through the multitude of match-pairs, $N \times N$, to find the single precise subset of match-pairs that triggers the violation. In this program structure, there are $N!$ feasible ways to match $N$ sends to $N$ receives.
 
 \begin{table}
 \begin{center}
@@ -22,24 +19,19 @@ The study takes this initial program of 51 threads and varies the number of matc
 \begin{tabular}{|c|c|c|c|}
 		\hline
          \multicolumn{2}{|c|}{Test Programs} & \multicolumn{2}{|c|}{Performance} \\ \hline
-          Match Pairs & Feasible Sets &  Time (hh:mm:ss) & Memory(MB) \\ \hline
-100 &          2      &    $<$00:00:01    &     4.94 \\
-500 &       $\sim$4E5 &    $<$00:00:01    &     7.95 \\
-800 &       $\sim$5E8 &    $<$00:00:01    &        10.11 \\
-850 &       $\sim$2E13 &    $<$00:00:01   &      10.43 \\
-900 &       $\sim$3E14 &    $<$00:00:01   &      10.70 \\
-1000 &      $\sim$2E18  &   00:00:35       &     31.07 \\
-1400 &      $\sim$3E29  &   00:02:12       &     51.48 \\
-1600 &     $\sim$3E35   &  00:03:24        &    62.32 \\
-2000 &     $\sim$8E47   &  00:07:00        &    80.35 \\
-2500 &     $\sim$3E64   &  00:12:23        &    91.97 \\
+          $N$ & Feasible Sets &  Time (hh:mm:ss) & Memory(MB) \\ \hline
+30& 30!($\sim$3E32)& 00:00:36&        20.11 \\
+40& 40!($\sim$8E47)& 00:03:22&        47.12 \\
+50& 50!($\sim$3E64)& 00:16:11&       102.65 \\
+60& 60!($\sim$8E81)& 00:47:29&       189.53 \\
+70& 70!($\sim$1E100)& 02:00:30&         364.25  \\
          \hline
 		\end{tabular}
 \end{center}
 \label{table:first}
 \end{table}
 
-\tableref{table:first} shows how the new encoding scales with hardness. The first column is the number of potential match-pairs and the second column is the number of feasible match-pair subsets that correctly match every receive to a unique send. As expected, running time and memory consumption increase with hardness.
+The study takes an initial program of $N = 30$, so 31 threads, and varies $N$ to see how the SMT solver scales. A small $N$ is an easy program while a large $N$ is a hard program. \tableref{table:first} shows how the new encoding scales with hardness. The first column is the number of messages, or $N$, and the second column is the number of feasible match-pair subsets that correctly match every receive to a unique send. As expected, running time and memory consumption increase with hardness. At the case where $N=70$ represents having 70 concurrent messages in flight from 70 different threads of execution. Such a scenario is not entirely uncommon in a high performance computing application, and it appears the new encoding is able to reasonably scale with such a level of concurrency.
 
 \begin{table}
 \begin{center}

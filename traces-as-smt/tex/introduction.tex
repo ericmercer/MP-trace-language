@@ -20,15 +20,14 @@ application has non-determinism, it is not possible
 to test and debug such an application without a way to directly (or
 indirectly) control the MCAPI runtime.
 
-There are two ways to implement the MCAPI semantics:
-infinite-buffer semantics (the message is copied into a
-runtime buffer on the API call) and zero-buffer semantics
-(the message has no buffering)
-\cite{sarvani:fm09}.  An infinite-buffer semantics provides
-more non-deterministic behaviors in matching senda and receives because
-the runtime can arbitrarily delay a send to create interesting (and
-unexpected) send reorderings. The zero-buffer semantics
-follow intuitive message orderings as a send and receive essentially
+There are two ways to implement the MCAPI semantics: infinite-buffer
+semantics (the message is copied into a runtime buffer on the API
+call) and zero-buffer semantics (the message has no buffering)
+\cite{sarvani:fm09}.  An infinite-buffer semantics provides more
+non-deterministic behaviors in matching send and receives because the
+runtime can arbitrarily delay a send to create interesting (and
+unexpected) send reorderings. The zero-buffer semantics follow
+intuitive message orderings as a send and receive essentially
 rendezvous.
 
 Sharma et al. propose a method of indirectly controlling the MCAPI

@@ -1,0 +1,19 @@
+* TODO Fix Fig 1 format
+* TODO Clarify the point of this:
+  "Please note that the encoding in this paper does not utilize the
+  wait for sends as part of how it manages the different buffering
+  semantics."
+* TODO Clarify if this assumption is okay:
+  "Further, this paper assumes that each receive operation has a
+  nearest enclosing wait in the trace."
+* TODO Clarify "that only when the sends target a common endpoint."
+* TODO defref uses numbers that aren't displayed
+* TODO Fix fig 5 format
+* TODO Add sub-sections/paragraphs to section III
+* TODO Remove every "Note" and "Recall" and "Also"
+* TODO Table reference in V.B is bogus
+* TODO Section 5.B lacks a "so what". 
+  Perhaps the point should be that even given no information, it
+  still finishes in 12 minutes
+* TODO Section 5.C has a "Figure 6" alone
+* TODO Table reference in V.C is bogus

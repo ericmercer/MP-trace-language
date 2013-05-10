@@ -30,7 +30,8 @@
 * DONE Reformat the typical program explanations into a list structure
   since we have space.
   CLOSED: [2013-05-09 Thu 17:54]
-* TODO (egm) Break figure 2 into two figures that use the short-hand directly 
+* DONE (egm) Break figure 2 into two figures that use the short-hand directly 
+  CLOSED: [2013-05-10 Fri 08:05]
   and drop the long-notation completely. 
 * TODO (egm) Change line numbers in figure 1 to use the first line as the
   thread id. update text to match. Use hex in task 0.

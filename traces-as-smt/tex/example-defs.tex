@@ -1,0 +1,160 @@
+% ---------------------------------------------------------------------
+% Save boxes for the various figures in the example section
+% ---------------------------------------------------------------------
+\newsavebox{\boxTZero}
+\begin{lrbox}{\boxTZero}
+\begin{minipage}[t]{0.8\linewidth}
+\small
+\begin{alltt}
+00 initialize(NODE_0,&v,&s);
+01 e0=create_endpoint(PORT_0,&s);
+
+02 msg_recv_i(e0,A,sizeof(A),&h1,&s);
+03 wait(&h1,&size,&s,MCAPI_INF);
+04 a=atoi(A);
+
+05 msg_recv_i(e0,B,sizeof(B),&h2,&s);
+06 wait(&h2,&size,&s,MCAPI_INF);
+07 b=atoi(B);
+
+08 if(b > 0);
+09  assert(a == 4);
+
+10 finalize(&s);
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxATZero}
+\begin{lrbox}{\boxATZero}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+08 0_0         (0_0 (rcvi rcvA 0 a))
+09 (0_1 (0 1)) (0_1 (wait rcvA))
+
+10 0_2         (0_2 (rcvi rcvB 0 b))
+11 (0_3 (0 2)) (0_3 (wait rcvB))
+
+12 0_4         (0_4 (assume (> b 0)))
+13 0_5         (0_5 (assert (= a 4)))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxTOne}
+\begin{lrbox}{\boxTOne}
+\begin{minipage}[t]{0.8\linewidth}
+\small
+\begin{alltt}
+00 initialize(NODE_1,&v,&s);
+01 e1=create_endpoint(PORT_1,&s);
+02 e0=get_endpoint(NODE_0,PORT_0,&s);
+
+03 msg_recv_i(e1,C,sizeof(C),&h3,&s);
+04 wait(&h3,&size,&s,MCAPI_INF);
+
+05 msg_send_i(e1,e0,"1",2,N,&h4,&s);
+06 wait(&h4,&size,&s,MCAPI_INF);
+
+07 finalize(&s);
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxATOne}
+\begin{lrbox}{\boxATOne}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+04 1_0         (1_0 (rcvi rcvC 1 c))
+05 (1_1 (1 2)) (1_1 (wait rcvC))
+
+06 1_2         (1_2 (sndi snd3 1 0 0x1))
+07 1_3         (1_3 (wait snd3))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxTTwo}
+\begin{lrbox}{\boxTTwo}
+\begin{minipage}[t]{0.8\linewidth}
+\small
+\begin{alltt}
+00 initialize(NODE_2,&v,&s);
+01 t2=create_endpoint(PORT_2,&s);
+02 t0=get_endpoint(NODE_0,PORT_0,&s);
+03 t1=get_endpoint(NODE_1,PORT_1,&s);
+
+04 msg_send_i(e2,e0,"4",2,N,&h5,&s);
+05 wait(&h5,&size,&s,MCAPI_INF);
+
+06 msg_send_i(e2,e1,"Go",3,N,&h6,&s);
+07 wait(&h6,&size,&s,MCAPI_INF);
+
+08 finalize(&s);
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+\newsavebox{\boxATTwo}
+\begin{lrbox}{\boxATTwo}
+\begin{minipage}[t]{0.65\linewidth}
+\begin{alltt}
+00 2_0        (2_0 (sndi snd1 2 0 0x4))
+01 2_1        (2_1 (wait snd1))
+
+02 2_2        (2_2 (sndi snd2 2 1 0x476f00))
+03 2_3        (2_3 (wait snd2))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+
+
+\newsavebox{\boxSMT}
+\begin{lrbox}{\boxSMT}
+\begin{minipage}[c]{0.4\linewidth}
+\begin{alltt}
+(HB rcvA_loc wait_rcvA_loc)
+(HB wait_rcvA_loc rcvB_loc)
+(HB rcvB_loc wait_rcvB_loc)
+(HB wait_rcvB_loc assume_loc)
+(HB assume_loc assert_loc)
+(HB rcvC_loc wait_rcvC_loc)
+(HB wait_rcvC_loc snd3_loc)
+(HB snd3_loc wait_snd3_loc)
+(HB snd1_loc wait_snd1_loc)
+(HB wait_snd1_loc snd2_loc)
+(HB snd2_loc wait_snd2_loc)
+
+(or (MATCH rcvA snd3)
+    (MATCH rcvA snd1))
+(or (MATCH rcvB  snd1)
+    (MATCH rcvB snd3))
+(NE rcvA rcvB)
+
+(MATCH rcvC snd2)
+
+(assert (> b 0))
+(assert (not (= a 4)))
+\end{alltt}
+\end{minipage}
+\end{lrbox}
+% ---------------------------------------------------------------------
+% END Save boxes
+% ---------------------------------------------------------------------
+
+\newcommand\examplefig1{
+\begin{figure*}[t]
+\begin{center}
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}[t]{c|c|c}
+Task 0 & Task 1 & Task 2 \\
+\hline
+\scalebox{0.8}{\usebox{\boxTZero}}&
+\scalebox{0.8}{\usebox{\boxTOne}} &
+\scalebox{0.8}{\usebox{\boxTTwo}}\\
+\end{tabular}
+\end{center}
+\caption{An MCAPI concurrent program execution}
+\label{fig:mcapi}
+\end{figure*}
+}

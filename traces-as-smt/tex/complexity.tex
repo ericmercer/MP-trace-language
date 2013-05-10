@@ -1,0 +1,45 @@
+\section{NP Completeness Proof} 
+
+\begin{definition}
+\textbf{VAMPI}: Verifying User Provided Assertion Violation in an MCAPI program.\\
+INSTANCE: A set of constants D, a set of variables X, a finite set processes P, and a set of partial orders $\prec$ over
+send, receive and assert operations.\\
+QUESTION: Is there a coherent schedule S for the operations of P that violates the user provided assertions?
+\label{def:np1}
+\end{definition}
+
+\begin{proof}
+\end{proof}
+
+\begin{figure*}
+\begin{center}
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}[t]{|llll|}
+\hline
+\multicolumn{4}{|l|}{\textbf{SAT:} $\mathit{U\equiv\{u_1,u_2,...,u_m\}}$}\\
+              \multicolumn{4}{|l|}{$\mathit{C\equiv\{c_1,c_2,...,c_n\}}$}\\
+              \multicolumn{4}{|l|}{$\mathit{Q\equiv\{c_1\wedge c_2\wedge ...\wedge c_n\}}$}\\
+\hline
+\multicolumn{4}{|l|}{\textbf{VAMPI:} $\mathit{P\equiv\{p_1,p_2,p_3,p_{u_1},...,p_{u_m}\}}$}\\
+                \multicolumn{4}{|l|}{$\mathit{X\equiv\{x_1,...,x_m,x_{c_1+1},...,x_{c_1+m},...,x_{c_n+1},...,x_{c_n+m}\}}$}\\
+                \multicolumn{4}{|l|}{$\mathit{D\equiv\{d_{u_1},...,d_{u_m},\bar{d_{u_1}},...,\bar{d_{u_m}},d_{c_1},...,d_{c_n},\bar{d_{c_1}},...,\bar{d_{c_n}}\}}$}\\
+                \multicolumn{4}{|l|}{$\mathit{D_l\equiv}$ An ordered list of values $\mathit{d_c}$ for each literal $\mathit{l}$, such that $\mathit{l\in c}$}\\
+                \multicolumn{4}{|l|}{$\mathit{\bar{D_l}\equiv}$ An ordered list of values $\mathit{\bar{d_c}}$ for each literal $\mathit{l}$, such that $\mathit{l\notin c}$}\\
+$p_1$&$p_2$&$p_{u_i}$&$p_3$\\
+\hline
+$S_{1,1}(d_{u_1},p_{u_1},r_1)$&$S_{2,1}(\bar{d_{u_1}},p_{u_1},r'_1)$&$R_{u_i,1}(x_i,*,r_i)$&$R_{3,1}(x_{c_1+1},*,r_1)$\\
+...&...&$R_{u_i,2}(x_i,*,r'_i)$&...\\
+$S_{1,m}(d_{u_m},p_{u_m},r_m)$&$S_{2,m}(\bar{d_{u_m}},p_{u_m},r'_m)$&if($x_i=\bar{d_{u_i}}$)\{&$R_{3,m}(x_{c_1+m},*,r_m)$\\
+&&$S_{u_i,4}(D_i[1],p_3,r_{i_1})$&...\\
+&&...&$R_{3,(n-1)*m+1}(x_{c_n+1},*,r_{(n-1)*m+1})$\\
+&&$S_{u_i,3+n}(D_i[n],p_3,r_{i_n})$\}&...\\
+&&if($x_i=d_{u_i}$)\{&$R_{3,n*m}(x_{c_n+m},*,r_{n*m})$\\
+&&$S_{u_i,5+n}(\bar{D_i[1]},p_3,r'_{i_1})$&$\mathit{assert}(\bigvee_{1\leq i\leq m}(x_{c_1+i}=d_{c_1}))$\\
+&&...&...\\
+&&$S_{u_i,4+2n}(\bar{D_i[n]},p_3,r'_{i_n})$\}&$\mathit{assert}(\bigvee_{1\leq i\leq m}(x_{c_n+i}=d_{c_n}))$\\
+\hline
+\end{tabular}
+\end{center}
+\caption{General SAT to VAMPI reduction}
+\label{fig:vampi}
+\end{figure*}

@@ -12,8 +12,11 @@
   CLOSED: [2013-05-09 Thu 13:40]
 * DONE Fix fig 5 format
   CLOSED: [2013-05-09 Thu 13:47]
-* TODO Add sub-sections/paragraphs to section III
+* DONE Add sub-sections/paragraphs to section III
+  CLOSED: [2013-05-10 Fri 07:45]
+* TODO reflow section 3
 * TODO Remove every "Note" and "Recall" and "Also"
+* TODO remove "this paper", "our paper", etc
 * TODO Normalize fig 5 with section description
 * TODO move figures & tables closer to prose that talks about them
 * DONE Table reference in V.B is bogus

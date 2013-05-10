@@ -489,7 +489,14 @@ $\smt_{\alpha}$ and $\smt_{\beta}$ in the following theorem have
 identical $\mathit{defs}$ and $\mathit{constraints}$ sets, and differ
 only by match set.
 
-\begin{figure}
+\begin{theorem}
+The relation for the solutions of two SMT problems $\smt_{\alpha}$ $= (\mathit{defs}$ $\mathit{constraints}$ $\mathit{match}_{\alpha})$ and $\smt_{\beta}$ $= (\mathit{defs}$ $\mathit{constraints}$ $\mathit{match_{\beta}})$ is,
+\[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
+where $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$. Note that $\mathit{set(match)}$ represents the input set of match pairs in the $\mathit{match}$ field.
+\label{thm:1}
+\end{theorem}
+
+\begin{figure}[h]
 \begin{center}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}[c]{cc}
@@ -504,13 +511,6 @@ only by match set.
 (a) The SMT encoding for Trace 1 in \figref{fig:trace}. (b) The SMT encoding for Trace 2 in \figref{fig:trace}.}
 \label{fig:smt_trace}
 \end{figure}
-
-\begin{theorem}
-The relation for the solutions of two SMT problems $\smt_{\alpha}$ $= (\mathit{defs}$ $\mathit{constraints}$ $\mathit{match}_{\alpha})$ and $\smt_{\beta}$ $= (\mathit{defs}$ $\mathit{constraints}$ $\mathit{match_{\beta}})$ is,
-\[\mathrm{ANS}(\smt_{\alpha}) \leq \mathrm{ANS}(\smt_{\beta})\]
-where $\mathit{set(match_{\alpha})} \subseteq \mathit{set(match_{\beta})}$. Note that $\mathit{set(match)}$ represents the input set of match pairs in the $\mathit{match}$ field.
-\label{thm:1}
-\end{theorem}
 
 \begin{proof}[Proof Sketch]
 Consider the MCAPI program in \figref{fig:mcapi} as an example.

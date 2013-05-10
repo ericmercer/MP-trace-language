@@ -18,7 +18,8 @@
 * TODO Remove every "Note" and "Recall" and "Also"
 * TODO remove "this paper", "our paper", etc
 * TODO Normalize fig 5 with section description
-* TODO move figures & tables closer to prose that talks about them
+* DONE move figures & tables closer to prose that talks about them
+  CLOSED: [2013-05-10 Fri 08:13]
 * DONE Table reference in V.B is bogus
   CLOSED: [2013-05-09 Thu 13:42]
 * TODO Section 5.B lacks a "so what". 

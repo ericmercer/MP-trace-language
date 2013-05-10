@@ -1,23 +1,27 @@
 * DONE Fix Fig 1 format
   CLOSED: [2013-05-09 Thu 13:51]
-* TODO Clarify the point of this:
+* DONE Clarify the point of this:
+  CLOSED: [2013-05-10 Fri 13:35]
   "Please note that the encoding in this paper does not utilize the
   wait for sends as part of how it manages the different buffering
   semantics."
-* TODO Clarify if this assumption is okay:
+* DONE Clarify if this assumption is okay:
+  CLOSED: [2013-05-10 Fri 13:35]
   "Further, this paper assumes that each receive operation has a
   nearest enclosing wait in the trace."
-* TODO Clarify "that only when the sends target a common endpoint."
+* DONE Clarify "that only when the sends target a common endpoint."
+  CLOSED: [2013-05-10 Fri 13:36]
 * DONE defref uses numbers that aren't displayed
   CLOSED: [2013-05-09 Thu 13:40]
 * DONE Fix fig 5 format
   CLOSED: [2013-05-09 Thu 13:47]
 * DONE Add sub-sections/paragraphs to section III
   CLOSED: [2013-05-10 Fri 07:45]
-* TODO reflow section 3
+* DONE reflow section 3
+  CLOSED: [2013-05-10 Fri 13:35]
 * TODO Remove every "Note" and "Recall" and "Also"
 * TODO remove "this paper", "our paper", etc
-* TODO Normalize fig 5 with section description
+* TODO Normalize fig 7 with section description
 * DONE move figures & tables closer to prose that talks about them
   CLOSED: [2013-05-10 Fri 08:13]
 * DONE Table reference in V.B is bogus

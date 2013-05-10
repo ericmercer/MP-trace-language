@@ -1,11 +1,12 @@
 PAPER=paper
-all: remake ${PAPER}.tex ${PAPER}.pdf proof
+TEXS=paper.tex example-defs.tex introduction.tex example.tex smt-model.tex mp-generation.tex result.tex related-work.tex conclusion.tex complexity.tex
+all: remake ${TEXS} ${PAPER}.tex ${PAPER}.pdf proof
 
-proof: *.tex
-	checkwriting $^
+proof: ${TEXS}
+	#checkwriting $^
 
 %.dvi: %.tex
-	slatex $^
+	latex $^
 	bibtex ${PAPER}
 
 %.ps: %.dvi
@@ -13,14 +14,6 @@ proof: *.tex
 
 %.pdf: %.ps
 	ps2pdf $^ $@
-
-%.tex: %.scrbl
-	raco make $^
-	scribble --latex $^
-
-%.html: %.scrbl
-	raco make $^
-	scribble --html $^
 
 remake:
 	rm -f ${PAPER}.pdf

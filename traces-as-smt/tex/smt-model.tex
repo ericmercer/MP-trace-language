@@ -132,24 +132,19 @@
 \begin{lrbox}{\boxSMTc}
 \normalsize
 \begin{tabular}[t]{l}
-\texttt{\textit{defs} is not shown;}\\
-\\
-\texttt{\textit{constraints};}\\
-\texttt{00 $\mathit{event_\mathtt{R_{0,2}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{W(\&h1)}}$}\\
-\texttt{01 $\mathit{event_\mathtt{R_{0,5}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{W(\&h2)}}$}\\
-\texttt{02 $\mathit{event_\mathtt{R_{0,2}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{R_{0,5}}}$}\\
-\texttt{03 $\mathit{event_\mathtt{R_{1,3}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{W(\&h3)}}$}\\
-\texttt{04 $\mathit{event_\mathtt{S_{1,5}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{W(\&h4)}}$}\\
-\texttt{05 $\mathit{event_\mathtt{S_{2,4}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{W(\&h5)}}$}\\
-\texttt{06 $\mathit{event_\mathtt{S_{2,7}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{event_\mathtt{W(\&h6)}}$}\\
-\texttt{07 ($\mathit{assert}$ (> b 0))}\\
-\texttt{08 ($\mathit{assert}$ (not (= a 4)))}\\
-\\
-\texttt{\textit{match};}\\
-\texttt{09} $\langle\mathtt{R_{0,2}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,2}}$,$\mathtt{S_{1,5}}\rangle$\\
-\texttt{10} $\langle\mathtt{R_{0,5}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,5}}$,$\mathtt{S_{1,5}}\rangle$\\
-\texttt{11} $\langle\mathtt{R_{1,3}}$,$\mathtt{S_{2,7}}\rangle$\\
-
+\texttt{..} \\
+\texttt{01 $\mathit{order_\mathtt{R_{0,2}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h1)}}$}\\
+\texttt{02 $\mathit{order_\mathtt{R_{0,5}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h2)}}$}\\
+\texttt{03 $\mathit{order_\mathtt{R_{0,2}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{R_{0,5}}}$}\\
+\texttt{04 $\mathit{order_\mathtt{R_{1,3}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h3)}}$}\\
+\texttt{05 $\mathit{order_\mathtt{S_{1,5}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h4)}}$}\\
+\texttt{06 $\mathit{order_\mathtt{S_{2,4}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h5)}}$}\\
+\texttt{07 $\mathit{order_\mathtt{S_{2,7}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h6)}}$}\\
+\texttt{08} \texttt{($\mathit{assert}$ (> b 0))}\\
+\texttt{09} \texttt{($\mathit{assert}$ (not (= a 4)))}\\
+\texttt{10} $\langle\mathtt{R_{0,2}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,2}}$,$\mathtt{S_{1,5}}\rangle$\\
+\texttt{11} $\langle\mathtt{R_{0,5}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,5}}$,$\mathtt{S_{1,5}}\rangle$\\
+\texttt{12} $\langle\mathtt{R_{1,3}}$,$\mathtt{S_{2,7}}\rangle$
 \end{tabular}
 \end{lrbox}
 
@@ -157,7 +152,6 @@
 \begin{lrbox}{\boxMP}
 \normalsize
 \begin{tabular}[t]{l}
-\\\\\\\\\\\\\\\\\\
 $\langle\mathtt{R_{0,2}}$, $\mathtt{S_{2,4}}\rangle$\\
 $\langle\mathtt{R_{0,2}}$, $\mathtt{S_{1,5}}\rangle$\\
 \\
@@ -191,7 +185,7 @@ some assertion. In essence, the SMT solver completes a partial order
 on events into a total order that determines the final match pair
 relationships.
 
-\subsection{Definitions}
+\subsection{Definitions} \label{sec:smt-defns}
 
 The encoding needs to express the partial order imposed by the MCAPI
 semantics as SMT constraints. The partial order is based on a
@@ -452,48 +446,23 @@ completion of $\mathtt{R}$ in execution.
 
 \subsection{Example}
 
---- XXX ---
-
-As an intuitive example, we revisit the example in
-\figref{fig:mcapi}. In order to prevent $\mathtt{R_{1,3}}$ from being matched
-with $\mathtt{S_{2,6}}$ before $\mathtt{R_{0,2}}$ is matched with
-$\mathtt{S_{2,4}}$, add
-$\mathit{event}_\mathtt{W(\&h1)}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{event}_\mathtt{S_{1,5}}$.
-
-\begin{figure}
+\begin{figure}[t]
 \begin{center}
-\setlength{\tabcolsep}{20pt}
-\begin{tabular}[t]{cc}
-\scalebox{0.7}{\usebox{\boxMP}} &
-\scalebox{0.7}{\usebox{\boxSMTc}} \\\\
-(a) & (b)
-\end{tabular}
+\usebox{\boxSMTc}
 \end{center}
-\caption{A match pair set and SMT encoding of the system in \figref{fig:mcapi}.
-(a) The match pairs based on endpoints. (b) The SMT encoding where $\mathtt{\prec_\mathtt{HB}}$ creates a
-\emph{Happens-Before} constraint, a pair surrounded by $\langle$ and $\rangle$ creates a match pair constraint, and $\mathtt{assume}$ and $\mathtt{assert}$ creates an assume and assert, respectively.}
-\label{fig:smt}
+\caption{SMT Encoding} \label{fig:smt-encode}
 \end{figure}
 
-\figref{fig:smt}(b) is the final encoding for the trace which is
-explained here. The encoding is divided into three sections:
-\textit{SMT = \{defs constraints match\}}. Stage 1 is not shown
-because the definitions are not novel to our solution; suffice to say
-that variables are created as defined. The constraints section is
-created by stages 2-7. Lines \texttt{00} - \texttt{06} reflect program
-orders in the trace. Lines \texttt{07} and \texttt{08} for the assume
-and assert commands of the original execution trace in
-\figref{fig:trace}. The first assert on line \texttt{07} (line
-\texttt{14} at trace 1) prevents the SMT solver from finding solutions
-that are not consistent with control flow which requires ``$b \ge
-0$". The second assert on line \texttt{08} is negated as the goal is
-to find schedules that violate the property. Finally, stage 8
-generates the $\mathit{match}$ ``area" of the SMT encoding. In
-particular, we send the set of match pairs in \figref{fig:smt}(a) to
-the algorithm and generate each match pair and collect those on the
-same receive into a disjunction on line \texttt{09} - \texttt{11}.
+\figref{fig:smt-encode} shows the encoding of \figref{fig:mcapi} as an
+SMT problem using the match pairs shown in lines \texttt{09} through
+\texttt{11}. We elide the basic definition of the variables discussed
+in \secref{sec:smt-defns}. The first seven lines reflect the program
+order constraints, the eight and ninth lines show the assertions,
+while the final three lines show the match pair constraints.
 
 \subsection{Correctness}
+
+--- XXX ---
 
 Other than the basic structure of the SMT encoding, we use the
 function

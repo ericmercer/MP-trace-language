@@ -170,72 +170,87 @@ $\langle\mathtt{R_{1,3}}$, $\mathtt{S_{2,7}}\rangle$\\
 
 \section{SMT Encoding}\label{sec:smt}
 
-The novelty of the SMT encoding in this paper is its use of match
-pairs rather than the state-based or order-based encoding of prior
-work~\cite{elwakil:padtad10,elwakil:atva10}. The algorithm to create
-the encoding takes as input a set of possible match pairs and a trace
-through an MCAPI program with the appropriate assumes and asserts as
-shown in \figref{fig:trace}.
+Our SMT encoding is based on (1) a trace of events during an execution
+of an MCAPI program including control-flow assumptions and property
+assertions, such as \figref{fig:trace1} and (2) a set of possible
+match pairs.
 
 A match pair is the coupling of a receive to a particular
 send. \figref{fig:smt}(a) is the set of possible match pairs for the
-program in \figref{fig:mcapi} using our shorthand notation defined in
-\figref{fig:trace}. The set admits, for example, that
-$\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$ or
-$\mathtt{S_{2,4}}$.
+program in \figref{fig:mcapi} using our shorthand notation. The set
+admits, for example, that $\mathtt{R_{0,2}}$ can be matched with
+either $\mathtt{S_{1,5}}$ or $\mathtt{S_{2,4}}$.
 
-The SMT encoding in this paper asks the SMT solver to resolve the
-match pairs for the system in such a way that the final values of
-program variables meet the assumption on control flow but violate some
-assertion. This resolution by the SMT solver is accomplished by having
-the solver complete a partial order on events into a total order that
-determines final match-pair relationships.
+This match pair-based encoding, rather than state-based or order-based
+encoding~\cite{elwakil:padtad10,elwakil:atva10}, is novel.
+
+The purpose of the SMT encoding is to force the SMT solver to resolve
+the match pairs for the system in such a way that the final values of
+program variables meet the assumptions on control flow but violate
+some assertion. In essence, the SMT solver completes a partial order
+on events into a total order that determines the final match pair
+relationships.
 
 \subsection{Definitions}
 
-Our encoder creates a number of SMT terms for each operation in the
-trace.
+The encoding needs to express the partial order imposed by the MCAPI
+semantics as SMT constraints. The partial order is based on a
+\emph{Happens-Before} relation over events:
 
-\begin{definition}[Wait]
-For a wait operation \texttt{W}, we create a corresponding variable
-$\mathit{event}_\mathtt{W} \in \mathbb{N}$, where $\mathbb{N}$ is the
-set of natural numbers. This variable will be assigned by the solver
-to its location in the total order of the program trace.
-\label{def:event}
+\begin{definition}[Happens-Before]
+The \emph{Happens-Before} $(\mathtt{HB})$ relation denoted as
+$\mathrm{\prec_\mathtt{HB}}$ is a partial order.
+\label{def:hb}
 \end{definition}
 
-\begin{definition}[Send]
-For every send operation $\mathtt{S}$ we create a tuple of variables
-$(M,\mathit{event}, e,\mathit{value})$ such that $\mathit{M}$,
-$\mathit{event}$, $\mathit{e}$, $\mathit{value}$ $ \in
-\mathbb{N}$. $M$ and $\mathit{event}$ will eventually be assigned, by
-the SMT solver, the point in the total order of the corresponding
-matching receive event and the point at which this send appears in the
-total order of the same trace. The variables $e$ and $\mathit{value}$
-are assigned the endpoint and actual value contained in the send
-operation.
-\label{def:snd}
+Given two events, $A$ and $B$, if $A$ must complete before $B$ in a
+valid program execution, then $A$ $\mathrm{\prec_{\mathtt{HB}}}$ $B$
+will be an SMT constraint.
+
+The constraints on this relation are derived from the program source
+and match pairs. In order to specify the constraints from the program
+source, we must map each operation to a order variable. For example,
+
+\begin{definition}[Wait] \label{def:event}
+For a wait operation \texttt{W}, the only relevant information is when
+it occurs, so we create a variable $\mathit{order}_\mathtt{W}$.
 \end{definition}
 
-\begin{definition}[Nearest-Enclosing Wait]
-The nearest-enclosing wait for a receive witnesses the completion of
-the receive indicating that the message is delivered and that all the
-previous receives in the same task issued earlier are complete as
-well.
-\label{def:nw}
+However, it is not enough to represent all events as simple numbers
+that will be ordered in this way. This would not allow the solver to
+discover what values would flow across communication primitives, for
+example. Instead, we represent each event in the trace as a set of SMT
+variables that record the pertinent information about the event. For
+example,
+
+\begin{definition}[Send] \label{def:snd}
+For every send operation $\mathtt{S}$, we create four variables:
+\begin{compactenum}
+\item $M_\mathtt{S}$, the order of the matching receive event;
+
+\item $\mathit{order}_\mathtt{S}$, the order of the send;
+
+\item $e_\mathtt{S}$, the endpoint; and,
+
+\item $\mathit{value}_\mathtt{S}$, the transmitted value.
+\end{compactenum}
 \end{definition}
 
-This constraint is required by the message non-overtaking property in
-the MCAPI specification. 
+The most complex operation in MCAPI is a receive. Since receives are
+inherently asynchronous, it is not possible to represent them
+atomically. Instead, we need to associate each receive with a wait
+where the program expects the operation to be completed by. A single
+wait can be associated with many receives due to \emph{the message
+  non-overtaking property} required by MCAPI. We refer to this wait as
+the \emph{nearest-enclosing wait}.
 
-The example below shows that the wait $\mathtt{W{(\&h2)}}$ witnesses
-the completion of the receive $\mathtt{R_{0,1}}$ and
-$\mathtt{R_{0,2}}$ in Task 0. As such, the wait $\mathtt{W{(\&h2)}}$
-is their nearest-enclosing wait. Please note that the encoding in this
-paper does not utilize the wait for sends as part of how it manages
-the different buffering semantics. Further, this paper assumes that
-each receive operation has a nearest enclosing wait in the trace.
+\begin{definition}[Nearest-Enclosing Wait] \label{def:nw}
+A wait that witnesses the completion of a receive by indicating that
+the message is delivered and that all the previous receives in the
+same task issued earlier are complete as well.
+\end{definition}
 
+\begin{figure}[h]
 \[
 \begin{array}{l|l}
 \;\;\;\;\;\;\;\;\mathtt{Task\ 0}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{Task\ 1}\;\;\;\;\;\;\;\; \\
@@ -246,97 +261,139 @@ each receive operation has a nearest enclosing wait in the trace.
 \;\;\;\;\;\;\;\;\mathtt{W{(\&h1)}}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{W{(\&h4)}}\;\;\;\;\;\;\;\; \\
 \end{array}
 \]
+\caption{Nearest-enclosing Wait example} \label{fig:nw}
+\end{figure}
 
-\begin{definition}[Receive]
-For every receive operation $\mathtt{R}$ we create a tuple of
-variables $(M,\mathit{value},\mathit{event},e,\mathit{NW})$ similar to
-send. In the receive case, $M$, $\mathit{value}$ and $\mathit{event}$
-will eventually be assigned, by the SMT solver, the point in the total
-order of the corresponding send event with its sent value and the
-point at which this receive appears in the total order of the same
-trace. The variables $e$ and $\mathit{NW}$ are assigned the endpoint
-and the corresponding variable representing the point in the total
-order of the nearest enclosing wait.
-\label{def:rcv}
-\end{definition}
+\figref{fig:nw} shows that the wait $\mathtt{W{(\&h2)}}$
+witnesses the completion of the receive $\mathtt{R_{0,1}}$ and
+$\mathtt{R_{0,2}}$ in Task 0. Thus, $\mathtt{W{(\&h2)}}$ is their
+nearest-enclosing wait.
 
-For convenience, we use $\mathtt{op} \in \{\mathtt{S}, \mathtt{R},
-\mathtt{W}\}$ as a subscript to indicate variables associated with different
-operations in the trace such as $\mathit{event}_\mathtt{op}$,
-$M_{\mathtt{op}}$, $e_{\mathtt{op}}$, $value_{\mathtt{op}}$,
-etc.\footnote{For brevity the presentation omits the subscript and
-  parameter details in the \texttt{S}, \texttt{R}, and \texttt{W}
-  operations, but these details are used to uniquely identify each
-  operation in the figures and examples.}
+We assume that every receive operation has a nearest-enclosing
+wait. This assumption disallows a few a misbehaving programs, those
+that receive but never wait for the operation to complete before
+continuing.  (We could use the same assumption for sends, since MCAPI
+allows waiting on send operations as well, but we deal with send
+buffering differently.)
 
-\begin{definition}[Happens-Before]
-The \emph{Happens-Before} $(\mathtt{HB})$ relation denoted as $\mathrm{\prec_\mathtt{HB}}$ is a partial order defined over variables. Given any two variables for event order $event_{\mathtt{op}}$ and $event_{\mathtt{op'}}$, $event_{\mathtt{op}}$ $\mathrm{\prec_{\mathtt{HB}}}$ $event_{\mathtt{op'}}$ if and only if $\mathtt{op}$ must complete before $\mathtt{op'}$ in a valid program execution.
-\label{def:hb}
-\end{definition}
+Given this definition, we can define the pertinent information of a
+receive:
 
-\begin{definition}[Match Pair]
-For a send $\mathtt{S}=(M_\mathtt{S},\mathit{event}_\mathtt{S}, e_\mathtt{S},\mathit{value}_\mathtt{S})$ and a receive $\mathtt{R}=(M_\mathtt{R},\mathit{value}_\mathtt{R}, \mathit{event}_\mathtt{R}, e_\mathtt{R},\mathit{NW}_\mathtt{R})$, a match pair, $\langle\mathtt{R}, \mathtt{S}\rangle$, is created by adding the constraints
+\begin{definition}[Receive] \label{def:rcv}
+For every receive operation $\mathtt{R}$ we create five variables:
 \begin{compactenum}
-\item $M_{\mathtt{R}} = event_{\mathtt{S}}$
-\item $M_{\mathtt{S}} = event_{\mathtt{R}}$
-\item $e_{\mathtt{R}} = e_{\mathtt{S}}$
-\item $value_{\mathtt{R}} = value_{\mathtt{S}}$ and
-\item $event_{\mathtt{S}}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{NW}_{\mathtt{R}}$
+\item $M_\mathtt{R}$, the order of the matching send event;
+
+\item $\mathit{order}_\mathtt{R}$, the order of the receive;
+
+\item $e_\mathtt{R}$, the endpoint;
+
+\item $\mathit{value}_\mathtt{R}$, the received valued; and,
+
+\item $\mathit{nw}_\mathtt{R}$, the order of the nearest enclosing wait.
 \end{compactenum}
-\label{def:match}
 \end{definition}
 
-A match-pair only allows the SMT solver to use compatible send/receive
-pairs, but more critically, the added ordering in the \texttt{HB}
-relation ensures that the send completes before the witness to the
-receive to enable the infinite-buffer semantics. There are no other
-constraints on a send beyond program order and that only when the
-sends target a common endpoint. In such a situation, we use the
-\texttt{HB} relation between the sends to prevent message overtaking in
-any final total order from the SMT solver.
+\subsection{Constraints}
 
-\subsection{Infinite Buffer Semantics}
+These definitions so far merely establish the pertinent information
+about each event in the trace as SMT variables. We must also express
+the constraints on those variables.
 
-The infinite-buffer SMT encoding proceeds in several stages given a
-trace and potential match-pairs. Intuitively, the \texttt{HB} relation
-asserts that sends and receives with common endpoints and in the same
-task follow program order (stages 2 and 3); a receive operation must
-happen before its nearest-enclosing wait (stage 4); sends must be
-received in the same order they are sent (stage 5); control flow is
-enforced and assert violations are detected (stages 6 and 7); and
-finally, only one match-pair can be resolved for any given receive
-(stage 8).
+The most trivial kind of constraint are those for control-flow
+assumptions.
 
-\paragraph*{Step 1} Create all the necessary variables for the sends,
-receives, waits, and other program variables in the trace and
-initialize the static fields of the send and receive variables.
+\begin{definition}[Assumption] \label{def:assm}
+For every assumption $\mathtt{A}$, we add it as an SMT assertion.
+\end{definition}
 
-\paragraph*{Step 2} For each thread, if there are multiple send
+It may seem strange to turn \emph{assumptions} into a
+\emph{assertions}, but from a constraint perspective, the assumption
+that we have already observed some property (during control-flow) is
+equivalent to instructing the SMT solver to treat it is inviolate
+truth, or assertion.
+
+The next level of constraint complexity comes from property
+assertions. These correspond to the invariants of the program. Our
+goal is to discover if they can be violated, so we instruct the SMT
+solver to seek for a way to satisfy their \emph{negation} given all
+the other constraints.
+
+\begin{definition}[Property Assertion] \label{def:assert}
+For every property assertion $\mathtt{P}$, we add $\neg \mathtt{P}$ as
+an SMT assertion.
+\end{definition}
+
+Finally, we must express each match pair as a set of SMT
+constraints. Informally, a match pair equates the shared components of
+a send and receive and constrains the send to occur before the
+nearest-enclosing wait of the receive. Formally:
+
+\begin{definition}[Match Pair] \label{def:match}
+A match pair, $\langle\mathtt{R}, \mathtt{S}\rangle$, for a receive
+$\mathtt{R}$ and a send $\mathtt{S}$ corresponds to the constraints:
+\begin{compactenum}
+\item $M_{\mathtt{R}} = \mathit{order}_{\mathtt{S}}$
+\item $M_{\mathtt{S}} = \mathit{order}_{\mathtt{R}}$
+\item $e_{\mathtt{R}} = e_{\mathtt{S}}$
+\item $\mathit{value}_{\mathtt{R}} = \mathit{value}_{\mathtt{S}}$ and
+\item $\mathit{order}_{\mathtt{S}}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{nw}_{\mathtt{R}}$
+\end{compactenum}
+\end{definition}
+
+However, these match pair constraints are not simply unioned. If we
+were to do that, then we would be constraining the system such that a
+single receive were paired with multiple sends if both were valid
+match pairs. Therefore, we combine all the constraints for a receive's
+match pairs into a single disjunction:
+
+\begin{definition}[Receive Matches]
+For each receive $\mathtt{R}$, if $\langle\mathtt{R},
+\mathtt{S}_0\rangle$ through $\langle\mathtt{R}, \mathtt{S}_n\rangle$
+are match pairs, then $\bigvee_{i}^{n} \langle\mathtt{R},
+\mathtt{S}_i\rangle$ is used as an SMT constraint.
+\end{definition}
+
+This encoding of the input ensures that the SMT solver can only use
+compatible send/receive pairs and ensures that sends happen ``before''
+receives.
+
+\subsection{More \emph{Happens-Before} Constraints}
+
+The encoding is not sufficient, though. We must extend it with
+additional constraints on the \emph{Happens-Before} relation, which we
+do in four steps. We must ensure that sends to common endpoints occur
+in program order in a single task (step 1); similarly for receives
+(step 2); receives occur before their nearest-enclosing wait (step 3);
+and, that sends are received in the order they are sent (step 4).
+
+\paragraph*{Step 1} For each thread, if there are multiple send
 operations, say $\mathtt{S}$ and $\mathtt{S^\prime}$, from that thread
 to a common endpoint, $e_\mathtt{S} = e_\mathtt{S^\prime}$, then those
-sends must follow program order: $\mathit{event}_\mathtt{S}$
-$\prec_\mathtt{HB}$ $\mathit{event}_\mathtt{S^\prime}$.
+sends must follow program order: $\mathit{order}_\mathtt{S}$
+$\prec_\mathtt{HB}$ $\mathit{order}_\mathtt{S^\prime}$.
 
-\paragraph*{Step 3} For each thread, if there are multiple receive
+\paragraph*{Step 2} For each thread, if there are multiple receive
 operations, say $\mathtt{R}$ and $\mathtt{R^\prime}$, from that thread
 to a common endpoint, $e_\mathtt{S} = e_\mathtt{S^\prime}$, then those
-receives must follow program order: $\mathit{event}_\mathtt{R}$
-$\prec_\mathtt{HB}$ $\mathit{event}_\mathtt{R^\prime}$.
+receives must follow program order: $\mathit{order}_\mathtt{R}$
+$\prec_\mathtt{HB}$ $\mathit{order}_\mathtt{R^\prime}$.
 
-\paragraph*{Step 4} For every receive \texttt{R} and its nearest
-enclosing wait \texttt{W}, $\mathit{event}_\mathtt{R}$
-$\prec_\mathtt{HB}$ $\mathit{event}_\mathtt{W}$.
+\paragraph*{Step 3} For every receive \texttt{R} and its nearest
+enclosing wait \texttt{W}, $\mathit{order}_\mathtt{R}$
+$\prec_\mathtt{HB}$ $\mathit{order}_\mathtt{W}$.
 
-\paragraph*{Step 5} For any pair of sends $\mathtt{S}$ and
+\paragraph*{Step 4} For any pair of sends $\mathtt{S}$ and
 $\mathtt{S'}$ on common endpoints, $e_{\mathtt{S}}=e_{\mathtt{S'}}$,
 such that
-$\mathit{event}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{event}_\mathtt{S'}$,
+$\mathit{order}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{order}_\mathtt{S'}$,
 then those sends must be received in the same order:
 $M_{\mathtt{S}}\ \mathrm{\prec_{\mathtt{HB}}}\ M_{\mathtt{S'}}$.
 
-Consider a simple example below that sends two messages from a Task 0
-to Task 1,
+For example, consider two tasks where Task 0 sends two messages to
+Task 1 as shown in \figref{fig:step4}.
 
+\begin{figure}[h]
 \[
 \begin{array}{l|l}
 \;\;\;\;\;\;\;\;\mathtt{Task\ 0}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{Task\ 1}\;\;\;\;\;\;\;\; \\
@@ -347,72 +404,55 @@ to Task 1,
 \;\;\;\;\;\;\;\;\mathtt{W(\&h2)}\;\;\;\;\;\;\;\; & \;\;\;\;\;\;\;\; \mathtt{W(\&h4)}\;\;\;\;\;\;\;\; \\
 \end{array}
 \]
+\caption{Send Ordering Example} \label{fig:step4}
+\end{figure}
 
-The \texttt{M} variables in the send tuples will be assigned to the
-order tracking events for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ by
-the match-pairs selected by the SMT solver. The constraints added in
-stage 5 force the send events to be received in program order using
-the \texttt{HB} relation which for our simple example yields
+The \texttt{M} variables from the sends will be assigned to the orders
+for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ by the match-pairs
+selected by the SMT solver. The constraints added in this step force
+the send to be received in program order using the \texttt{HB}
+relation which for this example yields
 $\cfgnt{M}_\mathtt{S_{0,1}}\ \mathrm{\prec_\mathtt{HB}}\ \cfgnt{M}_\mathtt{S_{0,2}}$.
-
-\paragraph*{Step 6} For every assume representing control flow
-resolution, add an assert constraint.
-
-\paragraph*{Step 7} For every assert representing a checked property,
-add its negated form as a constraint since our goal is to resolve
-non-determinism in match-pairs in a way that violates the assertion
-while following the same control flow.
-
-\paragraph*{Step 8} For every match pair $\langle\mathtt{R},
-\mathtt{S}\rangle$, add the constraints from $\langle\mathtt{R},
-\mathtt{S}\rangle$ in \defref{def:match} to the encoding. If a receive
-can match to multiple potential sends $\langle\mathtt{R},
-\mathtt{S}\rangle$ and $\langle\mathtt{R}, \mathtt{S^\prime}\rangle$,
-combine the sets of constraints in a disjunction: $\langle\mathtt{R},
-\mathtt{S}\rangle$ $\vee$ $\langle\mathtt{R},
-\mathtt{S^\prime}\rangle$.
 
 \subsection{Zero Buffer Semantics}
 
-For zero-buffer semantics, we further constrain the encoding to
-preclude orderings that can only occur with buffering.
+The constraints presented so far correspond to an infinite-buffer
+semantics, because we do not constrain how many messages may be ``in
+transit'' at once. We can add additional, orthogonal, constraints to
+restrict such behavior and enforce a zero-buffer semantics. There are
+two kinds of such constraints.
 
-\begin{definition}[Matching Dependent Relation]
-A matching dependent relation denoted as $\rightarrow$ over two match
-pairs $\langle\mathtt{R}, \mathtt{S}\rangle$ and $\langle\mathtt{R'},
-\mathtt{S'}\rangle$ is satisfied if and only if
+First, for each thread, if there are two sends $\mathtt{S}$ and
+$\mathtt{S'}$ such that
+$\mathit{order}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{order}_\mathtt{S'}$,
+and $\mathtt{S}$ and $\mathtt{S'}$ can both match a receive
+$\mathtt{R}$, then we add the following constraint to the encoding:
+$\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S'}}$
+where $\mathtt{W(\&h)}$ is a wait function that witnesses the
+completion of $\mathtt{R}$ in execution.
+
+Second, for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$, if
+there is a receive $\mathtt{R}$ such that
+
 \begin{compactenum}
 \item $\mathtt{R'}$ is a preceding receive over $\mathtt{S}$ in an
   identical thread; Or
+
 \item there exists a match pair $\langle\mathtt{R''},
   \mathtt{S''}\rangle$ such that $\langle\mathtt{R}, \mathtt{S}\rangle
   \rightarrow \langle\mathtt{R''}, \mathtt{S''}\rangle$ and
   $\langle\mathtt{R''}, \mathtt{S''}\rangle \rightarrow
   \langle\mathtt{R'}, \mathtt{S'}\rangle$.
 \end{compactenum}
-\end{definition}
 
-The zero-buffer SMT encoding proceeds in two stages given a generated
-infinite-buffer SMT encoding:
-
-\paragraph*{Step 9} For each thread, if there are two sends
-$\mathtt{S}$ and $\mathtt{S'}$ such that
-$\mathit{event}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{event}_\mathtt{S'}$,
-and $\mathtt{S}$ and $\mathtt{S'}$ can both match a receive
-$\mathtt{R}$, then add the following HB relation to the encoding:
-$event_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ event_{\mathtt{S'}}$
-where $\mathtt{W(\&h)}$ is a wait function that witnesses the
-completion of $\mathtt{R}$ in execution.
-
-\paragraph*{Step 10} For each pair of sends $\mathtt{S}$ and $\mathtt{S'}$, if there
-is a receive $\mathtt{R}$ such that $\langle\mathtt{R},
-\mathtt{S'}\rangle\rightarrow\langle\mathtt{R}, \mathtt{S}\rangle$,
-add the following HB relation to the encoding:
-$event_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ event_{\mathtt{S'}}$
+Then we add the following constraint to the encoding:
+$\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S'}}$
 where $\mathtt{W(\&h)}$ is a wait function that witnesses the
 completion of $\mathtt{R}$ in execution.
 
 \subsection{Example}
+
+--- XXX ---
 
 As an intuitive example, we revisit the example in
 \figref{fig:mcapi}. In order to prevent $\mathtt{R_{1,3}}$ from being matched

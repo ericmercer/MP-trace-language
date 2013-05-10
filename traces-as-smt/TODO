@@ -38,6 +38,7 @@
 * DONE (egm) Break figure 2 into two figures that use the short-hand directly 
   CLOSED: [2013-05-10 Fri 08:05]
   and drop the long-notation completely. 
+* TODO (egm) Fix section 2 text to discuss broken up figures 2 and 3 (lines = context switches)
 * TODO (egm) Change line numbers in figure 1 to use the first line as the
   thread id. update text to match. Use hex in task 0.
 * TODO (egm) Read section IV and make suggestions for formatting and

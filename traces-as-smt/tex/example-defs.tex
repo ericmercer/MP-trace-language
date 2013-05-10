@@ -20,7 +20,7 @@
 08 if(b > 0);
 09  assert(a == 4);
 
-10 finalize(&s);
+0a finalize(&s);
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -46,17 +46,17 @@
 \begin{minipage}[t]{0.8\linewidth}
 \small
 \begin{alltt}
-00 initialize(NODE_1,&v,&s);
-01 e1=create_endpoint(PORT_1,&s);
-02 e0=get_endpoint(NODE_0,PORT_0,&s);
+10 initialize(NODE_1,&v,&s);
+11 e1=create_endpoint(PORT_1,&s);
+12 e0=get_endpoint(NODE_0,PORT_0,&s);
 
-03 msg_recv_i(e1,C,sizeof(C),&h3,&s);
-04 wait(&h3,&size,&s,MCAPI_INF);
+13 msg_recv_i(e1,C,sizeof(C),&h3,&s);
+14 wait(&h3,&size,&s,MCAPI_INF);
 
-05 msg_send_i(e1,e0,"1",2,N,&h4,&s);
-06 wait(&h4,&size,&s,MCAPI_INF);
+15 msg_send_i(e1,e0,"1",2,N,&h4,&s);
+16 wait(&h4,&size,&s,MCAPI_INF);
 
-07 finalize(&s);
+17 finalize(&s);
 \end{alltt}
 \end{minipage}
 \end{lrbox}
@@ -79,18 +79,18 @@
 \begin{minipage}[t]{0.8\linewidth}
 \small
 \begin{alltt}
-00 initialize(NODE_2,&v,&s);
-01 t2=create_endpoint(PORT_2,&s);
-02 t0=get_endpoint(NODE_0,PORT_0,&s);
-03 t1=get_endpoint(NODE_1,PORT_1,&s);
+20 initialize(NODE_2,&v,&s);
+21 t2=create_endpoint(PORT_2,&s);
+22 t0=get_endpoint(NODE_0,PORT_0,&s);
+23 t1=get_endpoint(NODE_1,PORT_1,&s);
 
-04 msg_send_i(e2,e0,"4",2,N,&h5,&s);
-05 wait(&h5,&size,&s,MCAPI_INF);
+24 msg_send_i(e2,e0,"4",2,N,&h5,&s);
+25 wait(&h5,&size,&s,MCAPI_INF);
 
-06 msg_send_i(e2,e1,"Go",3,N,&h6,&s);
-07 wait(&h6,&size,&s,MCAPI_INF);
+26 msg_send_i(e2,e1,"Go",3,N,&h6,&s);
+27 wait(&h6,&size,&s,MCAPI_INF);
 
-08 finalize(&s);
+28 finalize(&s);
 \end{alltt}
 \end{minipage}
 \end{lrbox}

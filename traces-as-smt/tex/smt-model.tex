@@ -286,7 +286,7 @@ For every receive operation $\mathtt{R}$ we create five variables:
 \subsection{Constraints}
 
 These definitions so far merely establish the pertinent information
-about each event in the trace as SMT variables. We must also express
+about each event in the trace as SMT variables. It is necessary to also express
 the constraints on those variables.
 
 The most trivial kind of constraint are those for control-flow
@@ -524,7 +524,7 @@ This is a contradiction: either the SMT solver would not return an
 assignment or the match pair was actually valid.
 \end{proof}
 
-The correctness of our technique also relies on completeness:
+The correctness of our technique relies on completeness:
 
 \begin{theorem}[Completeness]
 For all programs, $p$, and traces, $t$, $\mathcal{SEM}(p, t) =

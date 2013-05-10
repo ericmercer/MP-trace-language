@@ -1,5 +1,34 @@
 \section{Conclusions and Future Work}
-We have presented an SMT encoding of an MCAPI program execution that uses match pairs rather than the state-based or order-based encoding in the prior work. Unlike the existing method of SMT encoding, our encoding is the first encoding that correctly captures the non-deterministic behaviors of an MCAPI program execution under infinite-buffer semantics allowed in the MCAPI specification. In this paper, we proved that we can generate such an encoding by giving an execution trace and a complete set of match pairs. Further, we have proved that the same results can be obtained even if the match pairs are over-approximated as input. Also, we have provided an algorithm with $O(N^2)$ time complexity that over-approximates the true set of match pairs, where $N$ is the total number of code lines of the program. By comparing to the existing work in \cite{elwakil:padtad10} for a set of ``toy" examples under zero-buffer, our encoding is capable of capturing correct behaviors of an MCAPI program execution and providing efficient solutions. As for the experiment results, we have demonstrated that our encoding scales well for programs with large number of messages and numerous match pairs under infinite-buffer semantics. Also, zero-buffer semantics can be adapted if required.
+The paper presents an SMT encoding of an MCAPI program execution that
+uses match pairs directly rather than the state-based or order-based
+encoding in the prior work. The encoding is generated from a given
+execution trace and a set of potential match pairs that can be
+over-approximated. The encoding takes extra precaution in the forming
+the SMT problem to preclude bogus match pairs in any
+over-approximation of the match pair input set. Critically, the
+encoding is the first to correctly capture the non-deterministic
+behaviors of an MCAPI program execution under infinite-buffer
+semantics.
 
-The precision of the set of match pairs is essential to the efficiency of SMT encodings. Currently we have an over-approximated generation method which still keeps several ``bogus" match pairs in the generated set. New methods for generating a much more precise set of match pair are required. Also The method of DPOR are considered to combine with our SMT encoding to generate the execution traces. We can then use the SMT encoding to further improve the DPOR technique.
+The paper further defines an algorithm with $O(N^2)$ time complexity
+to over-approximate the true set of match pairs, where $N$ is the
+total number of code lines of the program. A comparison to prior work,
+\cite{elwakil:padtad10}, for a set of ``toy" examples under
+zero-buffer semanics shows the new encoding capable and efficient in
+capturing correct behaviors of an MCAPI program execution. Experiments
+further show that the encoding scales to programs with large amount of
+non-determinism in how sends are match to receives.
+
+The results show that a large match-pair set does affect the runtime
+performance of the encoding in the SMT problem even if the encoding is
+sound under an over-approximation. Future work explores new methods
+for generating a much more precise set of match pairs. The encoding is
+dependent on an input execution trace of the program. Future work
+explores integrating the encoding into a model checker. The model
+checker generates a program trace that is encoded and verified. The
+result is then used to inform the model checker as to where it needs
+to backtrack to generate a new execution trace. The goal is to use the
+trace verification to construct a better partial order reduction in
+the model checker.
+
 

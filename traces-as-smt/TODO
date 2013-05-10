@@ -19,7 +19,8 @@
   CLOSED: [2013-05-10 Fri 07:45]
 * DONE reflow section 3
   CLOSED: [2013-05-10 Fri 13:35]
-* TODO Remove every "Note" and "Recall" and "Also"
+* DONE Remove every "Note" and "Recall" and "Also"
+  CLOSED: [2013-05-10 Fri 15:55]
 * TODO remove "this paper", "our paper", etc
 * TODO Normalize fig 7 with section description
 * DONE move figures & tables closer to prose that talks about them

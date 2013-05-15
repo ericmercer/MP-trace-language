@@ -15,7 +15,7 @@ computing entities within a device. Messages can be passed across
 persistent channels that force an ordering of the messages, or they
 can be passed to specific \emph{endpoints} within the system. The
 specification places few ordering constraints on messages passed from
-one endpoint to another. This freedom introduces the possibility of a race between multiple messages to common endpoints thus giving rise to non-deterministic behavior in the runtime\cite{netzer:spdt96}. If an
+one endpoint to another. This freedom introduces the possibility of a race between multiple messages to common endpoints thus giving rise to non-deterministic behavior in the runtime\ \cite{netzer:spdt96}. If an
 application has non-determinism, it is not possible
 to test and debug such an application without a way to directly (or
 indirectly) control the MCAPI runtime.
@@ -30,35 +30,45 @@ unexpected) send reorderings. The zero-buffer semantics follow
 intuitive message orderings as a send and receive essentially
 rendezvous.
 
-Sharma et al. propose a method of indirectly controlling the MCAPI
-runtime to verify MCAPI programs under zero-buffer semantics, but it
-was later discovered that this method does not completely explore the
-entire execution space of certain kinds of MCAPI programs
-\cite{sharma:fmcad09}. A key insight of the approach, however, is in
-its use of match pairs--couplings for potential sends and receives.
+Sharma et al. propose a method to indirectly control the MCAPI
+runtime to verify MCAPI programs under zero-buffer semantics, so it
+does not verify the full behavior space of the MCAPI program as it
+does not address infinite-buffer semantics
+\cite{sharma:fmcad09}. A key insight from the approach is its direct
+use of match pairs--couplings for potential sends and receives.
+
 Wang \textit{et al.} propose an alternative method for resolving
 non-determinism for program verification using symbolic methods in the context
 of shared memory systems \cite{wang:fse09}. The work observes a
 program trace, builds a partial order from that trace called a
 concurrent trace program (CTP), and then creates an SMT problem from
-the CTP that if satisfied indicates a property violation. Elwakil \textit{et
-al.} extend the work of Wang \textit{et al.} to message passing in zero-buffer semantics, but the
-proposed encoding does not capture all allowed MCAPI program
-executions \cite{elwakil:padtad10}. Further, the method assumes that
-the user is able to provide the exact set of match pairs. Such an
-assumption is not reasonable for large complex program traces.
+the CTP that if satisfied indicates a property violation. 
+
+Elwakil \textit{et al.} extend the work of Wang \textit{et al.} to
+message passing and claim the encoding supports both semantics. A
+careful analysis of the encoding, however, shows it to not work under
+infinite-buffer semantics and to miss behaviors under zero-buffer
+semantics \cite{elwakil:padtad10}. Interestingly, the encoding assumes
+the user provides a precise set of match-pairs as input with the
+program trace, and it then uses those match-pairs in a non-obvious way
+to constraint the happens-before relation in the encoding. The work
+does not discuss how to generate the match-pairs, which is a
+non-trivial input to manually generate for large or complex program
+traces. An early proof claims that the problem of finding a precise
+set of match-pairs given a program trace is NP-complete
+\cite{match-pair-np-complete}.
 
 \examplefigone
 
  This paper presents an SMT encoding for MCAPI program executions that
- works for both zero and infinite buffer semantics. Further, the
- encoding requires fewer terms to capture all possible program
- behavior when compared to other proposed methods.  As a result, the
- SMT encoding in this paper is both correct in that it enumerates all
- possible executions allowed by the MCAPI specification in either zero
- or infinite buffer semantics, and it is efficient since it uses
- dramatically fewer terms in the encoding to reduce the memory and
- running time in the SMT solver. To summarize, the main contributions
+ works for both zero and infinite buffer semantics. The encoding does
+ require an input set of match-pairs as in prior work, but unlike
+ prior work, the match-set can be over-approximated and the encoding
+ is still sound and complete. The encoding requires fewer terms to
+ capture all possible program behavior when compared to other proposed
+ methods making it more efficient in the SMT solver.  To address the
+ problem of generating match-pairs, an algorithm to generate the
+ over-approximated set is given. To summarize, the main contributions
  in this paper are
 
 \begin{enumerate}
@@ -66,30 +76,21 @@ assumption is not reasonable for large complex program traces.
 %\item A trace language framework that simulates and verifies an execution trace of an MCAPI program.
 %\item A modified trace language framework that generates an SMT problem for a single trace in the machine executions.
 \item a correct and efficient SMT encoding of an MCAPI program
-  execution that detects all program errors if the provided match
-  pairs are precise or over approximated under zero or infinite buffer
-  semantics; and
+  execution that detects all program errors under zero or infinite
+  buffer semantics given the input set of potential match-pairs
+  contains at least the precise set of match-pairs; and
 \item an $O(N^2)$ algorithm to generate an over-approximation of
   possible match-pairs, where $N$ is the size of the execution trace
   in lines of code.
 \end{enumerate}
 
 The rest of the paper is organized as follows: Section 2 presents an
-MCAPI program execution in which two program traces exist due to
-non-determinism in the MCAPI runtime. Section 3 defines an SMT
-encoding of an MCAPI program execution that captures non-determinism
-in message order by defining the set of possible match pairs between
-sends and receives on common endpoints. It is proved that an
-over-approximated match set in our SMT encoding of an MCAPI program
-execution can reflect the actual execution traces as the true set
-does. Section 4 provides a solution to the outstanding problem in
-other encodings of generating feasible match pairs to use in the
-encoding. It presents a $O(N^2)$ algorithm that over-approximates the
-precise match set, where $N$ is the size of the execution trace in
-lines of code. Section 5 presents the experimental results that show
-our encoding to be correct and efficient under both zero-buffer and
-infinite-buffer semantics, as other existing encodings omit critical
-program behaviors, require more SMT clauses and only support
-zero-buffer semantics. Section 6 discusses related work, and Section 7
-presents our conclusions and future work.
+MCAPI program illustrating the non-determinism in runtime
+specification. Section 3 defines the SMT encoding using potential
+math-pairs. The encoding is shown to be sound and complete even under
+an over-approximated set of match-pairs. Section 4 provides a solution
+to the outstanding problem of generating feasible match pairs. Section
+5 presents the experimental results that show the encoding to be
+efficient. Section 6 discusses related work. And Section 7 presents
+conclusions and future work.
 

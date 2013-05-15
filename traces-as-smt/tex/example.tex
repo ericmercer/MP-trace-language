@@ -78,13 +78,6 @@ example, the program takes the true branch of the condition on line
 \texttt{08}.  At the end of execution the assertion on line
 \texttt{09} holds and no error is found.
 
-For the example in \figref{fig:mcapi}, if a zero-buffer
-semantics is applied, then the send call on line \texttt{15} cannot match
-with the receive call on line \texttt{02}. This blocked match is because
-the send call on line \texttt{24} must be completed before
-the send call on line \texttt{26} can match with the receive
-call on line \texttt{13}.
-
 \begin{figure}[h]
 \begin{center}
 \setlength{\tabcolsep}{2pt}
@@ -124,7 +117,7 @@ specification indicates that the wait on line \texttt{25} returns once
 the buffer is available. That only means the message is somewhere in
 the MCAPI runtime under the infinite-buffer semantics; it does not
 mean the message is delivered. As such, it is possible for the message
-to be buffered in transit allowing the send from on line \texttt{15}
+to be buffered in transit allowing the send on line \texttt{15}
 to arrive at \textit{e0} first and be received in variable
 \textit{``a''}. Such a scenario is a program execution that results in
 an assertion failure at line \texttt{09}.

@@ -1,16 +1,66 @@
 \section{Experiments and Results}
-To assess the new encoding in this paper, three experiments with results are presented: a comparison to prior SMT encodings on a zero-buffer semantics, a scalability study on the effects of non-determinism in the execution time on infinite buffer semantics, and an evaluation on typical benchmark programs again with infinite buffer semantics. All of the experiments use the Z3 SMT solver (\cite{demoura:tacas08}) and are measured on a 2.40 GHz Intel Quad Core processor with 8 GB memory running Windows 7.
+To assess the new encoding in this paper, three experiments with
+results are presented: a comparison to prior SMT encodings on a
+zero-buffer semantics, a scalability study on the effects of
+non-determinism in the execution time on infinite buffer semantics,
+and an evaluation on typical benchmark programs again with infinite
+buffer semantics. All of the experiments use the Z3 SMT solver
+(\cite{demoura:tacas08}) and are measured on a 2.40 GHz Intel Quad
+Core processor with 8 GB memory running Windows 7.
 
-The initial program trace for the experiments is generated using MCA provided reference solution with fixed input to isolate all non-determinism to how sends and receives are matched in the runtime. This statement means that the experiments only consider one path of control flow through the program. Complete coverage of the program for verification purposes would need to generate input to exercise different control flow paths.  Where appropriate, the time to generate the match-pair sets from the input trace is reported separately. 
+The initial program trace for the experiments is generated using the
+MCA provided reference solution with fixed input. In other words, the
+only non-determinism in the programs is that allowed by the MCAPI
+specification. As such, the experiments only consider
+one path of control flow through the program. Complete coverage of the
+program for verification purposes would need to generate input to
+exercise different control flow paths.  Where appropriate, the time to
+generate the match-pair sets from the input trace is reported
+separately.
 
 \subsection{Comparison to Prior SMT Encoding}
-To the best knowledge of these authors, the current most effective SMT encoding for verification of message passing program traces is an order-based encoding that captures the happens-before relation directly in the SMT problem \cite{elwakil:padtad10}. The encoding only exists for zero-buffer semantics, and the tool to generate the encoding is not publicly available. The authors of the order-based encoding, however, graciously encoded several contrived benchmarks used for correctness testing. These benchmarks are best understood as \emph{toy} examples that plumb the MCAPI semantics to clarify intuition on expected behavior.
+To our best knowledge, the current most effective SMT encoding for
+verification of message passing program traces is the order-based
+encoding that describes the happens-before relation directly in the
+encoding and is only functional for zero-buffer semantics in its
+current form \cite{elwakil:padtad10}. Although the tool to generate
+the encoding is not publicly available, the authors of the order-based
+encoding graciously encoded several contrived benchmarks used for
+correctness testing. These benchmarks are best understood as
+\emph{toy} examples that plumb the MCAPI semantics to clarify
+intuition on expected behavior.
 
-The zero-buffer encoding in this paper is compared directly to the order-based encoding on the contrived benchmarks. The order-based encoding yields incorrect answers for several programs. Where the order-based encoding returns correct answers, the new encoding, on average, requires 70\% fewer clauses, uses half the memory as reported by the SMT solver, and runs eight times faster. The dramatic improvement of the new encoding over the order-based encoding is a direct result of the match-pairs that simplify the happens-before constraints and avoids redundant constraints in the transitive closure of the happens-before relation.
+The zero-buffer encoding in this paper is compared directly to the
+order-based encoding on the contrived benchmarks. The order-based
+encoding yields incorrect answers for several programs. Where the
+order-based encoding returns correct answers, the new encoding, on
+average, requires 70\% fewer clauses, uses half the memory as reported
+by the SMT solver, and runs eight times faster. The dramatic
+improvement of the new encoding over the order-based encoding is a
+direct result of the match-pairs that simplify the happens-before
+constraints and avoids redundant constraints in the transitive closure
+of the happens-before relation.
 
 \subsection{Scalability Study}
 
-The intent of the scalability study is to understand how performance is affected by the number of messages in the program trace and the level of non-determinism in choosing match-pairs where multiple sends are able to match to multiple receives. The programs for this study consist of a simple pattern of a single thread to receive messages and $N$ threads to send messages. The single thread sequentially receives $N$ messages containing integer values and then asserts that every message did not receive a specific value. In other words, a violation is one where each message has a specific value.  The remaining $N$ threads send a message, each containing a different unique integer value, to the single thread that receives. These programs represent the worst-case scenario for non-determinism in a message passing program as any send is able to match with any receive in the runtime, and the assertion is only violated when each send is paired with a specific receive. The SMT solver must search through the multitude of match-pairs, $N \times N$, to find the single precise subset of match-pairs that triggers the violation. In this program structure, there are $N!$ feasible ways to match $N$ sends to $N$ receives.
+The intent of the scalability study is to understand how performance
+is affected by the number of messages in the program trace and the
+level of non-determinism in choosing match-pairs where multiple sends
+are able to match to multiple receives. The programs for this study
+consist of a simple pattern of a single thread to receive messages and
+$N$ threads to send messages. The single thread sequentially receives
+$N$ messages containing integer values and then asserts that every
+message did not receive a specific value. In other words, a violation
+is one where each message has a specific value.  The remaining $N$
+threads send a message, each containing a different unique integer
+value, to the single thread that receives. These programs represent
+the worst-case scenario for non-determinism in a message passing
+program as any send is able to match with any receive in the runtime,
+and the assertion is only violated when each send is paired with a
+specific receive. The SMT solver must search through the multitude of
+match-pairs, $N \times N$, to find the single precise subset of
+match-pairs that triggers the violation. In this program structure,
+there are $N!$ feasible ways to match $N$ sends to $N$ receives.
 
 \begin{table}[h]
 \begin{center}
@@ -30,22 +80,69 @@ The intent of the scalability study is to understand how performance is affected
 \end{center}
 \end{table}
 
-The study takes an initial program of $N = 30$, so 31 threads, and varies $N$ to see how the SMT solver scales. A small $N$ is an easy program while a large $N$ is a hard program. \tableref{table:first} shows how the new encoding scales with hardness. The first column is the number of messages, or $N$, and the second column is the number of feasible match-pair subsets that correctly match every receive to a unique send. As expected, running time and memory consumption increase non-linearly with hardness. 
+The study takes an initial program of $N = 30$, so 31 threads, and
+varies $N$ to see how the SMT solver scales. A small $N$ is an easy
+program while a large $N$ is a hard program. \tableref{table:first}
+shows how the new encoding scales with hardness. The first column is
+the number of messages, or $N$, and the second column is the number of
+feasible match-pair subsets that correctly match every receive to a
+unique send. As expected, running time and memory consumption increase
+non-linearly with hardness.
 
-The case where $N=70$ represents having 70 concurrent messages in flight from 70 different threads of execution. Such a scenario is not entirely uncommon in a high performance computing application, and it appears the new encoding is able to reasonably scale to such a level of concurrency. Elaborate...
+The case where $N=70$ represents having 70 concurrent messages in
+flight from 70 different threads of execution. Such a scenario is not
+entirely uncommon in a high performance computing application, and it
+appears the new encoding is able to reasonably scale to such a level
+of concurrency. The result provides a bound on expected cost for
+analysis given the the message passing behavior in a program. It is
+expected that the analysis of any program with fewer than $70!$
+possible choices of feasible match-pair resolutions will complete in a
+reasonable amount of time.
 
 \subsection{Typical Benchmark Programs}
-The prior section suggested that ... As a final note, the number of messages is not the deciding factor in hardness for the new encoding; rather, hardness is measured by the number of feasible match-sets. As is shown in the next section, some programs are easy, even if there are many messages, while other programs are hard, even though there are only a few messages.
+The results in the prior section suggest that the number of messages
+is not the deciding factor in hardness for the new encoding; rather,
+hardness is measured by the number of feasible match-pair sets. This
+section further explores the observation to show that some programs
+are easy, even if there are many messages, while other programs are
+hard, even though there are only a few messages.
 
-The goal of these experiments is to measure the new encoding on several benchmark programs. MCAPI is a new interface, and to date, the authors are not aware of publicly available programs written against the interface aside from the few toy programs that come with the library distribution. As such, the benchmarks in the experiments come from a variety of sources. 
+The goal of these experiments is to measure the new encoding on
+several benchmark programs. MCAPI is a new interface, and to date, the
+authors are not aware of publicly available programs written against
+the interface aside from the few toy programs that come with the
+library distribution. As such, the benchmarks in the experiments come
+from a variety of sources.
 \begin{compactitem}
-\item \textit{LE} is the leader election problem and is common to benchmarking verification algorithms. 
-\item \textit{Router} is an algorithm to update routing tables. Each router node is in a ring and communicates only with immediate neighbors to update the tables. The program ends when all the routing tables are updated. 
-\item \textit{MultiM} is an extension to an program in MCAPI library distribution \figref{fig:mcapi1}. The extension adds extra iterations to the original program execution to generate longer execution trace. 
-\item \textit{Pktuse} is a benchmark from the MPI test suite \cite{mpptest_benchmark}. The program creates 5 tasks---each of which randomly sends several messages to the other tasks.
+\item \textit{LE} is the leader election problem and is common to
+  benchmarking verification algorithms.
+\item \textit{Router} is an algorithm to update routing tables. Each
+  router node is in a ring and communicates only with immediate
+  neighbors to update the tables. The program ends when all the
+  routing tables are updated.
+\item \textit{MultiM} is an extension to an program in MCAPI library
+  distribution \figref{fig:mcapi1}. The extension adds extra
+  iterations to the original program execution to generate longer
+  execution trace.
+\item \textit{Pktuse} is a benchmark from the MPI test suite
+  \cite{mpptest_benchmark}. The program creates 5 tasks---each of
+  which randomly sends several messages to the other tasks.
 \end{compactitem}
 
-The benchmark programs are intended to cover a spectrum of program properties. As before, the primary measure of hardness in the programs in not the number of messages but rather the size of the match-pair set and the number of feasible subsets.  The \textit{LE} program is the easiest program in the suite. Although it sends 620 messages, there is only a single feasible match-pair set. The programs \textit{Router}, \textit{MultiM}, and \textit{Pktuse} respectively increase in hardness, which again is not related to the total number of messages but rather the total number of feasible match-sets that must be considered. For example, even though \textit{Router} has 200 messages, it is an easier problem that \textit{MultiM} that has 100 messages. The \textit{Pktuse} program does have the most number of messages, 512, and in this case, the largest number of feasible match-pair sets.
+The benchmark programs are intended to cover a spectrum of program
+properties. As before, the primary measure of hardness in the programs
+in not the number of messages but rather the size of the match-pair
+set and the number of feasible subsets.  The \textit{LE} program is
+the easiest program in the suite. Although it sends 620 messages,
+there is only a single feasible match-pair set. The programs
+\textit{Router}, \textit{MultiM}, and \textit{Pktuse} respectively
+increase in hardness, which again is not related to the total number
+of messages but rather the total number of feasible match-sets that
+must be considered. For example, even though \textit{Router} has 200
+messages, it is an easier problem that \textit{MultiM} that has 100
+messages. The \textit{Pktuse} program does have the most number of
+messages, 512, and in this case, the largest number of feasible
+match-pair sets.
 
 \begin{table}[h]
 \begin{center}
@@ -65,7 +162,27 @@ The benchmark programs are intended to cover a spectrum of program properties. A
 \end{center}
 \end{table}
 
-\tableref{table:second} shows the results for the benchmark suite. Other than the metrics used in \tableref{table:first}, the time of generating the encoding and the match pairs is included in the third and fourth columns respectively. Note that the time shown in the third column includes the time in the fourth column. As before, the running time tracks hardness and not the total number of messages. The table also shows the cost of match-pair generation as it dominates the encoding time for the \textit{Pktuse} program. Future work is to address the high-cost of match-pair generation, which the authors believe to be NP-complete. The proof is part of the suggested future work.
+\tableref{table:second} shows the results for the benchmark
+suite. Other than the metrics used in \tableref{table:first}, the time
+of generating the encoding and the match pairs is included in the
+third and fourth columns respectively. Note that the time shown in the
+third column includes the time in the fourth column. As before, the
+running time tracks hardness and not the total number of messages. The
+table also shows the cost of match-pair generation as it dominates the
+encoding time for the \textit{Pktuse} program. Future work is to
+address the high-cost of match-pair generation, which the authors
+believe to be NP-complete \cite{match-pair-np-complete}.
 
-The benchmark suite demonstrates that a message passing program may have a large degree of non-determinism in the run time that is prohibitive to verification approaches that directly enumerate that non-determinism such as a model checker. The SMT encoding, however, pushes the problem to the SMT solver by generating the possible match-pairs and then relying on advances in SMT technology to resolve the non-determinism in a way that violates the assertion. Of course, the SMT problem itself is NP-complete, so performance is only reasonable for small problem instances. The benchmark suite suggests that problem instances with astonishingly large numbers of feasible match pair sets are able to complete in a reasonable amount of time using the new encoding in this paper; though, the time to generate the match-pairs may quickly become prohibitive.
-
+The benchmark suite demonstrates that a message passing program may
+have a large degree of non-determinism in the runtime that is
+prohibitive to verification approaches that directly enumerate 
+non-determinism such as a model checker. The SMT encoding, however,
+pushes the problem to the SMT solver by generating the possible
+match-pairs and then relying on advances in SMT technology to resolve
+the non-determinism in a way that violates the assertion. Of course,
+the SMT problem itself is NP-complete, so performance is only
+reasonable for small problem instances. The benchmark suite suggests
+that problem instances with astonishingly large numbers of feasible
+match pair sets are able to complete in a reasonable amount of time
+using the new encoding in this paper; though, the time to generate the
+match-pairs may quickly become prohibitive.

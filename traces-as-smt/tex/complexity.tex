@@ -1,45 +1,85 @@
 \section{NP Completeness Proof} 
-
+The complexity proof is inspired by the NP-completeness proof for
+memory coherence and consistency by Cantin \emph{et al.} that uses a
+similar reduction from SAT only in the context of shared memory
+\cite{Cantin:2005:CVM:1070608.1070722}. The complexity proof is on a
+new decision problem: \emph{Verifying Assertions in Message Passing}
+(VAMP).
 \begin{definition}
-\textbf{VAMPI}: Verifying User Provided Assertion Violation in an MCAPI program.\\
-INSTANCE: A set of constants D, a set of variables X, a finite set processes P, and a set of partial orders $\prec$ over
-send, receive and assert operations.\\
-QUESTION: Is there a coherent schedule S for the operations of P that violates the user provided assertions?
+\textbf{Verifying Assertions in Message Passing}.
+\begin{compactdesc}
+\item{INSTANCE}: A set of constants $D$, a set of variables $X$, and a
+  finite set $H$ of task histories consisting of send, receive, and
+  assert operations over $X$ and $D$.
+\item{QUESTION}: Is there a feasible schedule $S$ for the operations
+  of $P$ that satisfies all the assertions?
+\end{compactdesc}
 \label{def:np1}
 \end{definition}
 
-\begin{proof}
-\end{proof}
+The VAMP problem is NP-complete. The proof is a reduction from
+SAT. Given an instance $Q$ of SAT consisting of a set of variables $U$
+and set of clauses $C$ over $U$, an instance $V$ of VAMP is
+constructed such that $Q$ has a feasible schedule $S$ that meets all
+the assertions if and only if there is a satisfying truth assignment
+for $Q$.
 
-\begin{figure*}
+The reduction is illustrated in \figref{fig:vampi}. The figure elides
+the explicit calls to wait which directly follow each send and receive
+operation, and it elides the subscript notation as it is redundant in
+the figure.
+
+The reduction relies on non-determinism in the message passing to
+decide the value of each variable in $U$.  The tasks $h_{d_0}$ and
+$h_{d_1}$ repeatedly send the constant value $d_0$ (constant 0) or
+$d_1$ (constant 1) to task $h_C$. The key intuition is that these
+tasks are synchronized with $h_C$ so they essentially wait to send the
+value until asked.
+
+The task $h_C$ sequentially requests and receives $d_0$ and $d_1$
+values for each variable in the SAT instance $Q$. It does not request
+values for a new variable until the current variable is resolved. As
+the values come from two separate tasks upon request, they messages
+race in the runtime and may arrive in either order at $h_C$. As a
+result, the value in each variable is non-deterministically $d_0$ or $d_1$
+
+Once each variable has a
+value, a special task collects the values in a canonical order and
+asserts each clause in $C$.
+
+\begin{figure}
 \begin{center}
 \setlength{\tabcolsep}{2pt}
-\begin{tabular}[t]{|llll|}
+\begin{tabular}[t]{|l|l|l|}
 \hline
-\multicolumn{4}{|l|}{\textbf{SAT:} $\mathit{U\equiv\{u_1,u_2,...,u_m\}}$}\\
-              \multicolumn{4}{|l|}{$\mathit{C\equiv\{c_1,c_2,...,c_n\}}$}\\
-              \multicolumn{4}{|l|}{$\mathit{Q\equiv\{c_1\wedge c_2\wedge ...\wedge c_n\}}$}\\
+\multicolumn{3}{|l|}{\textbf{SAT:} $\mathit{U\equiv\{u_0,u_1,...,u_m\}}$}\\
+              \multicolumn{3}{|l|}{$\mathit{C\equiv\{c_0,c_1,...,c_n\}}$}\\
+              \multicolumn{3}{|l|}{$\mathit{Q\equiv\{c_0\wedge c_1\wedge ...\wedge c_n\}}$}\\
 \hline
-\multicolumn{4}{|l|}{\textbf{VAMPI:} $\mathit{P\equiv\{p_1,p_2,p_3,p_{u_1},...,p_{u_m}\}}$}\\
-                \multicolumn{4}{|l|}{$\mathit{X\equiv\{x_1,...,x_m,x_{c_1+1},...,x_{c_1+m},...,x_{c_n+1},...,x_{c_n+m}\}}$}\\
-                \multicolumn{4}{|l|}{$\mathit{D\equiv\{d_{u_1},...,d_{u_m},\bar{d_{u_1}},...,\bar{d_{u_m}},d_{c_1},...,d_{c_n},\bar{d_{c_1}},...,\bar{d_{c_n}}\}}$}\\
-                \multicolumn{4}{|l|}{$\mathit{D_l\equiv}$ An ordered list of values $\mathit{d_c}$ for each literal $\mathit{l}$, such that $\mathit{l\in c}$}\\
-                \multicolumn{4}{|l|}{$\mathit{\bar{D_l}\equiv}$ An ordered list of values $\mathit{\bar{d_c}}$ for each literal $\mathit{l}$, such that $\mathit{l\notin c}$}\\
-$p_1$&$p_2$&$p_{u_i}$&$p_3$\\
+\multicolumn{3}{|l|}{\textbf{VAMPI:} $\mathit{H\equiv\{h_{d_0},h_{d_1},h_{C}\}}$}\\
+                \multicolumn{3}{|l|}{$\mathit{X\equiv\{u_0,...,u_n,g_0,g_1\}}$}\\
+                \multicolumn{3}{|l|}{$\mathit{D\equiv\{d_0,d_1\}}$}\\
 \hline
-$S_{1,1}(d_{u_1},p_{u_1},r_1)$&$S_{2,1}(\bar{d_{u_1}},p_{u_1},r'_1)$&$R_{u_i,1}(x_i,*,r_i)$&$R_{3,1}(x_{c_1+1},*,r_1)$\\
-...&...&$R_{u_i,2}(x_i,*,r'_i)$&...\\
-$S_{1,m}(d_{u_m},p_{u_m},r_m)$&$S_{2,m}(\bar{d_{u_m}},p_{u_m},r'_m)$&if($x_i=\bar{d_{u_i}}$)\{&$R_{3,m}(x_{c_1+m},*,r_m)$\\
-&&$S_{u_i,4}(D_i[1],p_3,r_{i_1})$&...\\
-&&...&$R_{3,(n-1)*m+1}(x_{c_n+1},*,r_{(n-1)*m+1})$\\
-&&$S_{u_i,3+n}(D_i[n],p_3,r_{i_n})$\}&...\\
-&&if($x_i=d_{u_i}$)\{&$R_{3,n*m}(x_{c_n+m},*,r_{n*m})$\\
-&&$S_{u_i,5+n}(\bar{D_i[1]},p_3,r'_{i_1})$&$\mathit{assert}(\bigvee_{1\leq i\leq m}(x_{c_1+i}=d_{c_1}))$\\
-&&...&...\\
-&&$S_{u_i,4+2n}(\bar{D_i[n]},p_3,r'_{i_n})$\}&$\mathit{assert}(\bigvee_{1\leq i\leq m}(x_{c_n+i}=d_{c_n}))$\\
+$h_{d_0}$ & $h_{d_1}$ & $h_C$ \\
+\hline
+$R(g_{0},*)$   & $R(g_{1},*)$   & $S(d_0,h_{d_0})$ \\
+$S(d_{0},h_C)$ & $S(d_{1},h_C)$ & $S(d_0,h_{d_1})$ \\
+              &                & $R(u_0,*)$        \\
+              &                & $R(u_0,*)$        \\
+\hline
+$R(g_{0},*)$  &  $R(g_{1},*)$   & $S(d_0,h_{d_0})$ \\
+$S(d_{0},h_C)$&  $S(d_{1},h_C)$ & $S(d_0,h_{d_1})$ \\
+              &                & $R(u_1,*)$       \\
+              &                & $R(u_1,*)$       \\
+\hline
+$\ldots$      &  $\ldots$      & $\ldots$                \\
+\hline
+              &                & \textit{assert}($c_0$) \\
+              &                & \textit{assert}($c_1$) \\
+              &                & $\ldots$ \\
 \hline
 \end{tabular}
 \end{center}
 \caption{General SAT to VAMPI reduction}
 \label{fig:vampi}
-\end{figure*}
+\end{figure}

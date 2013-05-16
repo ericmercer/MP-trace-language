@@ -423,24 +423,19 @@ $\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_
 where $\mathtt{W(\&h)}$ is the nearest-enclosing wait that witnesses the
 completion of $\mathtt{R}$ in execution.
 
-Second, for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$, if
-there is a receive $\mathtt{R}$ such that
-
+The second constraint relies on the dependent relation betweeen two match pairs defined in \defref{def:matchrelation}.
+\begin{definition}
+A dependent relation operator denoted as $\rightharpoonup$ on two match pairs $\langle\mathtt{R}, \mathtt{S}\rangle$(left operand) and $\langle\mathtt{R'}, \mathtt{S'}\rangle$(right operand) is satisfied if and only if
 \begin{compactenum}
-\item $\mathtt{R'}$ is a preceding receive over $\mathtt{S}$ in an
-  identical task; or
-
-\item there exists a match pair $\langle\mathtt{R''},
-  \mathtt{S''}\rangle$ such that $\langle\mathtt{R}, \mathtt{S}\rangle
-  \rightarrow \langle\mathtt{R''}, \mathtt{S''}\rangle$ and
-  $\langle\mathtt{R''}, \mathtt{S''}\rangle \rightarrow
-  \langle\mathtt{R'}, \mathtt{S'}\rangle$.
+\item The nearest-enclosing wait $\mathtt{W(\&h)}$ of $\mathtt{R'}$ is issued before the issuing of $\mathtt{S}$ by an identical endpoint; Or
+\item $\exists\langle\mathtt{R''}, \mathtt{S''}\rangle\cdot\langle\mathtt{R}, \mathtt{S}\rangle \rightharpoonup \langle\mathtt{R''}, \mathtt{S''}\rangle\wedge\langle\mathtt{R''}, \mathtt{S''}\rangle \rightharpoonup \langle\mathtt{R'}, \mathtt{S'}\rangle$.
 \end{compactenum}
-
-Then we add the following constraint to the encoding:
-$\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S'}}$
+\label{def:matchrelation}
+\end{definition}
+The second constraint then corresponds to: for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$ that can both match an receive $\mathtt{R}$, if there is a send $\mathtt{S''}$ issued after the issuing of $\mathtt{S'}$ by an identical endpoint, and a receive $\mathtt{R'}$ such that $\langle\mathtt{R}, \mathtt{S}\rangle\rightharpoonup\langle\mathtt{R'}, \mathtt{S''}\rangle$, then we add the following constraint to the encoding: $\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S}}$
 where $\mathtt{W(\&h)}$ is the nearest-enclosing wait that witnesses the
 completion of $\mathtt{R}$ in execution.
+
 
 \subsection{Example}
 
@@ -524,7 +519,7 @@ Since $\langle \mathtt{R}, \mathtt{S}\rangle$ is not a valid match
 pair, match $\mathtt{R}$ and $\mathtt{S}$ requires program order,
 message non-overtaking, or no-multiple match to be violated. In other
 words, the \emph{Happens-Before} constraints encoded in the SMT
-problem are not satisfied. 
+problem are not satisfied.
 
 This is a contradiction: either the SMT solver would not return an
 assignment or the match pair was actually valid.

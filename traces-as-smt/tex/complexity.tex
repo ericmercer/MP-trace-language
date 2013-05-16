@@ -12,7 +12,7 @@ new decision problem: \emph{Verifying Assertions in Message Passing}
   finite set $H$ of task histories consisting of send, receive, and
   assert operations over $X$ and $D$.
 \item{QUESTION}: Is there a feasible schedule $S$ for the operations
-  of $P$ that satisfies all the assertions?
+  of $H$ that satisfy all the assertions?
 \end{compactdesc}
 \label{def:np1}
 \end{definition}
@@ -39,13 +39,15 @@ value until asked.
 The task $h_C$ sequentially requests and receives $d_0$ and $d_1$
 values for each variable in the SAT instance $Q$. It does not request
 values for a new variable until the current variable is resolved. As
-the values come from two separate tasks upon request, they messages
+the values come from two separate tasks upon request, the messages
 race in the runtime and may arrive in either order at $h_C$. As a
-result, the value in each variable is non-deterministically $d_0$ or $d_1$
+result, the value in each variable is non-deterministically $d_0$ or $d_1$.
 
-Once each variable has a
-value, a special task collects the values in a canonical order and
-asserts each clause in $C$.
+After the values of each variable $u_i$ is resolved, the $h_C$ asserts
+the truth of each value. As the clauses are conjunctive, the assertion
+are sequentially evaluated. If a satisfying assignment exists for $Q$,
+then a feasible schedule exists that resolves the values of each
+variable in such a way that every assert holds.
 
 \begin{figure}
 \begin{center}
@@ -83,3 +85,52 @@ $\ldots$      &  $\ldots$      & $\ldots$                \\
 \caption{General SAT to VAMPI reduction}
 \label{fig:vampi}
 \end{figure}
+
+\begin{lemma} \label{lem:sat}
+$V$ is a feasible schedule for $H$ that satisfies all assertions if
+  and only if $Q$ is satisfiable.
+\end{lemma}
+\begin{proof}
+\textbf{V implies Q}: proof by contradiction. Assume that $Q$ is
+unsatisfiable even through there is a feasible schedule $S$ for $V$
+that meets all the assertions. The reduction in \figref{fig:vampi}
+considers all truth values of the variables in $Q$, over every
+combination, by virtue of the non-determinism, and then asserts the
+truth of each of the clauses in $Q$. The complete set of possibilities
+is realized by sending in parallel from $h_{d_0}$ and $h_{d_1}$ the
+two truth valuations for a given variable to $h_C$. As these messages
+may be received in any order, each variable may assume either truth
+value. Further, each variable resolved is an independent choice so all
+combinations of variable valuations must be considered.  This fact is
+a contradiction to the assumption of $Q$ being unsatisfiable as the
+same truth values that meet the assertions would be a satisfying
+assignment in $Q$.
+
+\noindent \textbf{Q implies V}: the proof is symmetric to the previous case in
+proceeds in a like manner.
+\end{proof}
+
+\begin{theorem}[NP-complete]
+VAMP is NP-complete.
+\end{theorem}
+\begin{proof}
+\noindent\textbf{Membership in NP}: A certificate is a schedule
+matching send and receives in each of the histories. The schedule is
+linearly scanned with the histories and checked that it does not
+violate MCAPI semantics. Our extended version constructs an
+operational model of MCAPI semantics that does just such a check given
+a schedule~\cite{extended-version}. The complexity is linear in the
+size of the schedule.
+
+\noindent\textbf{NP-hard}: Polynomial reduction from SAT. The
+correctness of the reduction is established by \lemmaref{lem:sat}.
+The remainder of the proof is the complexity of the reduction. There
+are two tasks to send values $d_0$ and $d_1$ upon request. For each
+variable $u_i \in U$, each of these tasks, $d_0$ and $d_1$, needs two
+operations: one to synchronize with $h_C$ and another to send the
+value: $O(2 * 2 * |U|)$. The task $h_C$ must request values from
+$h_{d_0}$ and $h_{d_1}$ and then receive both those values, it must do
+this for each variable: $O(2 * 2 * |U| + |C|)$.  Once all the values
+are collected, it must them assert each clause: $O(|C|)$. As every
+term is linear, the reduction is linear.
+\end{proof}

@@ -47,6 +47,8 @@ program trace, builds a partial order from that trace called a
 concurrent trace program (CTP), and then creates an SMT problem from
 the CTP that if satisfied indicates a property violation. 
 
+\examplefigone
+
 Elwakil \textit{et al.} extend the work of Wang \textit{et al.} to
 message passing and claim the encoding supports both semantics. A
 careful analysis of the encoding, however, shows it to not work under
@@ -60,8 +62,6 @@ non-trivial input to manually generate for large or complex program
 traces. An early proof claims that the problem of finding a precise
 set of match-pairs given a program trace is NP-complete
 \cite{match-pair-np-complete}.
-
-\examplefigone
 
  This paper presents a proof that resolving non-determinism in message
  passing programs in a way that meets all assertions is

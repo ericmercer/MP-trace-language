@@ -20,19 +20,22 @@ new decision problem: \emph{Verifying Assertions in Message Passing}
 The VAMP problem is NP-complete. The proof is a reduction from
 SAT. Given an instance $Q$ of SAT consisting of a set of variables $U$
 and set of clauses $C$ over $U$, an instance $V$ of VAMP is
-constructed such that $Q$ has a feasible schedule $S$ that meets all
+constructed such that $V$ has a feasible schedule $S$ that meets all
 the assertions if and only if there is a satisfying truth assignment
-for $Q$.
+for $Q$. Feasible in this context means the schedule is allowed by the
+MCAPI semantics.
 
 The reduction is illustrated in \figref{fig:vampi}. The figure elides
 the explicit calls to wait which directly follow each send and receive
 operation, and it elides the subscript notation as it is redundant in
-the figure.
+the figure. The figure also adds the value sent and the variable that
+receives the value to the notation as that information is pertinent to
+the reduction.
 
 The reduction relies on non-determinism in the message passing to
 decide the value of each variable in $U$.  The tasks $h_{d_0}$ and
-$h_{d_1}$ repeatedly send the constant value $d_0$ (constant 0) or
-$d_1$ (constant 1) to task $h_C$. The key intuition is that these
+$h_{d_1}$ repeatedly send the constant value $d_0$ (false valuation) or
+$d_1$ (true valuation) to task $h_C$. The key intuition is that these
 tasks are synchronized with $h_C$ so they essentially wait to send the
 value until asked.
 
@@ -43,8 +46,8 @@ the values come from two separate tasks upon request, the messages
 race in the runtime and may arrive in either order at $h_C$. As a
 result, the value in each variable is non-deterministically $d_0$ or $d_1$.
 
-After the values of each variable $u_i$ is resolved, the $h_C$ asserts
-the truth of each value. As the clauses are conjunctive, the assertion
+After the values of each variable $u_i$ is resolved, the $h_C$ task asserts
+the truth of each clause in the problem instance. As the clauses are conjunctive, the assertions
 are sequentially evaluated. If a satisfying assignment exists for $Q$,
 then a feasible schedule exists that resolves the values of each
 variable in such a way that every assert holds.
@@ -91,23 +94,24 @@ $S$ is a feasible schedule for $H$ that satisfies all assertions if
   and only if $Q$ is satisfiable.
 \end{lemma}
 \begin{proof}
-\textbf{V implies Q}: proof by contradiction. Assume that $Q$ is
-unsatisfiable even though there is a feasible schedule $S$ for $V$
-that meets all the assertions. The reduction in \figref{fig:vampi}
-considers all truth values of the variables in $Q$, over every
-combination, by virtue of the non-determinism, and then asserts the
-truth of each of the clauses in $Q$. The complete set of possibilities
-is realized by sending in parallel from $h_{d_0}$ and $h_{d_1}$ the
-two truth valuations for a given variable to $h_C$. As these messages
-may be received in any order, each variable may assume either truth
-value. Further, each variable resolved is an independent choice so all
-combinations of variable valuations must be considered.  This fact is
-a contradiction to the assumption of $Q$ being unsatisfiable as the
-same truth values that meet the assertions would be a satisfying
-assignment in $Q$.
+\textbf{Feasible schedule for V implies Q is satisfiable}: proof by
+contradiction. Assume that $Q$ is unsatisfiable even though there is a
+feasible schedule $S$ for $V$ that meets all the assertions. The
+reduction in \figref{fig:vampi} considers all truth values of the
+variables in $Q$, over every combination, by virtue of the
+non-determinism, and then asserts the truth of each of the clauses in
+$Q$. The complete set of possibilities is realized by sending in
+parallel from $h_{d_0}$ and $h_{d_1}$ the two truth valuations for a
+given variable to $h_C$. As these messages may be received in any
+order, each variable may assume either truth value. Further, each
+variable resolved is an independent choice so all combinations of
+variable valuations must be considered.  This fact is a contradiction
+to the assumption of $Q$ being unsatisfiable as the same truth values
+that meet the assertions would be a satisfying assignment in $Q$.
 
-\noindent \textbf{Q implies V}: the proof is symmetric to the previous case in
-proceeds in a like manner.
+\noindent \textbf{Q is satisfiable implies feasible schedule for V}:
+the proof is symmetric to the previous case and proceeds in a like
+manner.
 \end{proof}
 
 \begin{theorem}[NP-complete]
@@ -129,7 +133,7 @@ are two tasks to send values $d_0$ and $d_1$ upon request. For each
 variable $u_i \in U$, each of these tasks, $d_0$ and $d_1$, needs two
 operations: one to synchronize with $h_C$ and another to send the
 value: $O(2 * 2 * |U|)$. The task $h_C$ must request values from
-$h_{d_0}$ and $h_{d_1}$ and then receive both those values, it must do
+$h_{d_0}$ and $h_{d_1}$ and then receive both those values; it must do
 this for each variable: $O(2 * 2 * |U| + |C|)$.  Once all the values
 are collected, it must them assert each clause: $O(|C|)$. As every
 term is linear, the reduction is linear.

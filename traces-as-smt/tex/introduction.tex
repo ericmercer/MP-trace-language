@@ -30,12 +30,15 @@ unexpected) send reorderings. The zero-buffer semantics follow
 intuitive message orderings as a send and receive essentially
 rendezvous.
 
-Sharma et al. propose a method to indirectly control the MCAPI
-runtime to verify MCAPI programs under zero-buffer semantics, so it
-does not verify the full behavior space of the MCAPI program as it
-does not address infinite-buffer semantics
-\cite{sharma:fmcad09}. A key insight from the approach is its direct
-use of match pairs--couplings for potential sends and receives.
+Sharma et al. propose a method to indirectly control the MCAPI runtime
+to verify MCAPI programs under zero-buffer semantics
+\cite{sharma:fmcad09}. As the work does not address infinite-buffer
+semantics, it is somewhat limited in its application. The work does
+provide a dynamic partial order reduction for the model checker, but
+such a reduction is not sufficient to control state space explosion in
+the presence of even moderate non-determinism between message sends
+and receives. A key insight from the approach is its direct use of
+match pairs--couplings for potential sends and receives.
 
 Wang \textit{et al.} propose an alternative method for resolving
 non-determinism for program verification using symbolic methods in the context
@@ -51,7 +54,7 @@ infinite-buffer semantics and to miss behaviors under zero-buffer
 semantics \cite{elwakil:padtad10}. Interestingly, the encoding assumes
 the user provides a precise set of match-pairs as input with the
 program trace, and it then uses those match-pairs in a non-obvious way
-to constraint the happens-before relation in the encoding. The work
+to constrain the happens-before relation in the encoding. The work
 does not discuss how to generate the match-pairs, which is a
 non-trivial input to manually generate for large or complex program
 traces. An early proof claims that the problem of finding a precise

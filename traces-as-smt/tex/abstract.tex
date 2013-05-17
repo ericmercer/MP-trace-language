@@ -13,20 +13,20 @@ internals to expose or reproduce errors.  This paper provides a way to
 encode an MCAPI execution as a Satisfiability Modulo Theories (SMT)
 problem, which if satisfiable, yields a feasible execution schedule on
 the same trace, such that it resolves non-determinism in the MCAPI
-runtime in a way that it now fails user provided assertions.  Such
-an encoding is useful for test, debug, and verification of MCAPI
-program execution.  The novelty in the encoding is the direct use of match
-pairs (potential send and receive couplings).  Match-pair encoding for
-MCAPI executions, when compared to other encoding strategies, is
-simpler to reason about, results in significantly fewer terms in the
-SMT problem, and captures feasible behaviors that are ignored in
-previously published techniques. Further, to our knowledge, this is
-the first SMT encoding that is able to run in \textit{infinite-buffer}
-semantics, meaning the runtime has unlimited internal buffering as
-opposed to no internal buffering. Results demonstrate that the SMT
-encoding, restricted to zero-buffer semantics, uses fewer clauses when
-compared to another zero-buffer technique, and it runs faster and uses
-less memory. As a result the encoding scales well for programs with a
-lot of non-determinism in how sends and receives are matched by the
-runtime in the message passing.
+runtime in a way that it now fails user provided assertions. The paper
+proves the problem is NP-complete.  The encoding is useful for test,
+debug, and verification of MCAPI program execution.  The novelty in
+the encoding is the direct use of match pairs (potential send and
+receive couplings).  Match-pair encoding for MCAPI executions, when
+compared to other encoding strategies, is simpler to reason about,
+results in significantly fewer terms in the SMT problem, and captures
+feasible behaviors that are ignored in previously published
+techniques. Further, to our knowledge, this is the first SMT encoding
+that is able to run in \textit{infinite-buffer} semantics, meaning the
+runtime has unlimited internal buffering as opposed to no internal
+buffering. Results demonstrate that the SMT encoding, restricted to
+zero-buffer semantics, uses fewer clauses when compared to another
+zero-buffer technique, and it runs faster and uses less memory. As a
+result the encoding scales well for programs with high levels of
+non-determinism in how sends and receives may potentially match.
 

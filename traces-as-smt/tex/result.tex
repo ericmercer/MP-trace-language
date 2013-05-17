@@ -94,10 +94,11 @@ flight from 70 different threads of execution. Such a scenario is not
 entirely uncommon in a high performance computing application, and it
 appears the new encoding is able to reasonably scale to such a level
 of concurrency. The result provides a bound on expected cost for
-analysis given the the message passing behavior in a program. It is
+analysis given the message passing behavior in a program. It is
 expected that the analysis of any program with fewer than $70!$
 possible choices of feasible match-pair resolutions will complete in a
-reasonable amount of time.
+reasonable amount of time. Regardless, such a high-level concurrency
+seems unlikely in the embedded space to which MCAPI is targeted.
 
 \subsection{Typical Benchmark Programs}
 The results in the prior section suggest that the number of messages
@@ -120,8 +121,8 @@ from a variety of sources.
   router node is in a ring and communicates only with immediate
   neighbors to update the tables. The program ends when all the
   routing tables are updated.
-\item \textit{MultiM} is an extension to an program in MCAPI library
-  distribution \figref{fig:mcapi1}. The extension adds extra
+\item \textit{MultiM} is an extension to an program in the MCAPI library
+  distribution and is similar to the program in \figref{fig:mcapi1}. The extension adds extra
   iterations to the original program execution to generate longer
   execution trace.
 \item \textit{Pktuse} is a benchmark from the MPI test suite

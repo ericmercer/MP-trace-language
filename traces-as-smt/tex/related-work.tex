@@ -16,14 +16,14 @@ verification \cite{mpi}. Intuitively, the POE algorithm, as a model
 checker, enumerates non-determinism in the MPI specification under
 zero-buffer semantics with the goal to detect deadlock. The algorithm
 is not suitable to infinite-buffer semantics as it misses
-behavior. The relatively efficiency, in practice, of the model checker
+behavior. The relative efficiency, in practice, of the model checker
 enumerating non-determinism versus the SMT solver is an open question
 for the POE work.
 
 Key to the POE algorithm is the notion of a
 \textit{intra-happens-before-order}. The order is a partial order over
 MPI events that generalizes to any control flow path through the
-program.  The SMT encoding in this builds the happens-before relation
+program.  The SMT encoding in this paper builds the happens-before relation
 for a given control flow path and does not reason directly over all
 control flow paths in the program. A secondary analysis is needed to
 find program inputs sufficient to enumerate all reachable control flow
@@ -35,7 +35,7 @@ on top of the MCA provided MCAPI runtime \cite{sharma:fmcad09}. MCC
 systematically enumerates all non-determinism in the MCAPI runtime
 under zero-buffer semantics. It employs a novel dynamic partial order
 reduction to avoid enumerating redundant message orders. This work
-claims SMT technology is more efficient in practice resolving
+claims SMT technology is more efficient in practice in resolving
 non-determinism in a away to violate correctness properties.
 
 Wang \emph{et al.} present an SMT encoding for shared memory semantics for a

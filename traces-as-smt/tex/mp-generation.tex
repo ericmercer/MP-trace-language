@@ -73,7 +73,9 @@ non-determinism arising from concurrent sends and receives. Such an
 effort, however, solves the entire problem at once because if you
 simulate the program trace exploring all non-determinism, then you may
 as well verify all runtime choices for property violations at the same
-time. In this section, we present an algorithm that does not require
+time. 
+
+In this section, we present an algorithm that does not require
 an exhaustive enumeration of runtime behavior in simulation. Our
 algorithm over-approximates the match pairs such that match pairs that
 can exist in the runtime are all included and some ``bogus" match
@@ -110,7 +112,7 @@ The list \texttt{list\_r} groups receives by the issuing endpoint. The
 integer field merely records the order in which the receives are
 issued and increases by one on each receive. Similarly, the
 list \texttt{list\_s} groups sends first by the destination endpoint
-and then by the source endpoint. Like \texttt{list\_r} an index
+and then by the source endpoint. Like \texttt{list\_r}, an index
 increases by one to track the issue order. As the input is a
 program execution trace, any sends or receives in loops already have
 unique identifiers.
@@ -154,7 +156,7 @@ $\mathtt{W(\&h4)}$&&\\
 \label{fig:mcapi1}
 \end{figure}
 
-Consider the program in \figref{fig:mcapi1}. The lists \texttt{list\_r} and \texttt{list\_s} for the example are
+Consider the program in \figref{fig:mcapi1}. The lists \texttt{list\_r} and \texttt{list\_s} for the program are
 \begin{equation}
 \footnotesize \begin{array}{l}
 (0\ \rightarrow\ ((0,\ \mathtt{R_{0,1}}),\ (1,\ \mathtt{R_{0,2}}),\ (2,\ \mathtt{R_{0,4}})))\\
@@ -188,8 +190,8 @@ essentially capture message non-overtaking.
 
 The criteria to generate a match pair first requires the send and
 receive to be compatible (check 1), consistent with message
-non-overtaking (check 2), and message non-overtaking does preclude the
-match (check 3). A match is precluded message non-overtaking when a
+non-overtaking (check 2), and that message non-overtaking does not preclude the
+match (check 3). A match is precluded by message non-overtaking when a
 receive cannot possibly match a send because by the time the program
 issues the receive, the send must have already been matched somewhere
 else. The function \texttt{count} gives the number of sends to a

@@ -124,11 +124,15 @@ an assertion failure at line \texttt{09}.
 
 From the discussion above, it is important to consider non-determinism
 in the MCAPI runtime when testing or debugging an MCAPI program
-execution.  The next section presents an encoding algorithm that takes
-an MCAPI program execution with a set of possible send-receive match
-pairs and generates an SMT problem that if satisfied proves that
-non-determinism can be resolved in a way that violates a user provided
-assertion and if unsatisfiable proves the trace correct (meaning the
+execution.  The next section presents a proof that the problem of
+matching sends to receives in a way that meets all assertions is
+NP-complete. The proof justifies the encoding and SMT solver.
+Following the proof, the algorithm to generate the encoding is
+presented. It takes an MCAPI program execution with a set of possible
+send-receive match pairs and generates an SMT problem that if
+satisfied proves that non-determinism can be resolved in a way that
+violates a user provided assertion (the assertions are negated in the
+encoding) and if unsatisfiable proves the trace correct (meaning the
 user assertions hold on the given execution under all possible runtime
 behaviors). The encoding can be solved by an SMT solver such as Yices
 \cite{dutertre:CAV06} or Z3 \cite{demoura:tacas08}.

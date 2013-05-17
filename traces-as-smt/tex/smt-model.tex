@@ -166,34 +166,35 @@ $\langle\mathtt{R_{1,3}}$, $\mathtt{S_{2,7}}\rangle$\\
 
 The new SMT encoding is based on (1) a trace of events during an
 execution of an MCAPI program including control-flow assumptions and
-property assertions, such as \figref{fig:trace1} and (2) a set of
+property assertions, such as \figref{fig:trace1}; and (2) a set of
 possible match pairs. A match pair is the coupling of a receive to a
 particular send.  In the running example, the set admits, for example,
 that $\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$
 or $\mathtt{S_{2,4}}$. This direct use of match-pairs, rather than a
 state-based or indirect use of match-pairs in an order-based
-encoding~\cite{elwakil:padtad10,elwakil:atva10}, is novel.
+encoding, \cite{elwakil:padtad10} and \cite{elwakil:atva10}, is novel.
 
 The purpose of the SMT encoding is to force the SMT solver to resolve
 the match pairs for the system in such a way that the final values of
 program variables meet the assumptions on control flow but violate
 some assertion. In essence, the SMT solver completes a partial order
-on events into a total order that determines the final match pair
+on operations into a total order that determines the final match pair
 relationships.
 
 \subsection{Definitions} \label{sec:smt-defns}
 
 The encoding needs to express the partial order imposed by the MCAPI
 semantics as SMT constraints. The partial order is based on a
-\emph{Happens-Before} relation over events:
+\emph{Happens-Before} relation over operations such as send, receive,
+wait, or assert:
 
 \begin{definition}[Happens-Before]
 The \emph{Happens-Before} $(\mathtt{HB})$ relation, denoted as
-$\mathrm{\prec_\mathtt{HB}}$, is a partial order over events.
+$\mathrm{\prec_\mathtt{HB}}$, is a partial order over operations.
 \label{def:hb}
 \end{definition}
 
-Given two events, $A$ and $B$, if $A$ must complete before $B$ in a
+Given two operations, $A$ and $B$, if $A$ must complete before $B$ in a
 valid program execution, then $A$ $\mathrm{\prec_{\mathtt{HB}}}$ $B$
 will be an SMT constraint.
 
@@ -202,7 +203,7 @@ order to specify the constraints from the program source, each program operation
 
 \begin{definition}[Wait] \label{def:event}
 The occurrence of a wait operation, \texttt{W}, is captured by a
-single variable, $\mathit{order}_\mathtt{W}$, that constraints when
+single variable, $\mathit{order}_\mathtt{W}$, that constrains when
 the wait occurs.
 \end{definition}
 
@@ -229,7 +230,7 @@ The most complex operation in MCAPI is a receive. Since receives are
 inherently asynchronous, it is not possible to represent them
 atomically. Instead, we need to associate each receive with a wait
 that marks where in the program the receive operation is guaranteed to be
-complete. The MCAPI runtime semantics allow a single wait to witness the completion of of many receives due to \emph{the message
+complete. The MCAPI runtime semantics allow a single wait to witness the completion of many receives due to \emph{the message
   non-overtaking property}. A wait that witnesses the completion of
 one or more receives is the \emph{nearest-enclosing wait}.
 
@@ -258,7 +259,7 @@ witnesses the completion of the receive $\mathtt{R_{0,1}}$ and
 $\mathtt{R_{0,2}}$ in Task 0. Thus, $\mathtt{W{(\&h2)}}$ is their
 nearest-enclosing wait.
 
-The encoding requires that every receive operation have an
+The encoding requires that every receive operation have a
 nearest-enclosing wait as it makes match-pair decisions at the wait
 operation. The requirement is not a limitation of the encoding, as
 accessing a buffer from a receive that does not have a
@@ -290,7 +291,7 @@ The definitions so far merely establish the pertinent information
 about each event in the trace as SMT variables. It is necessary to now express
 constraints on those variables.
 
-The most trivial kind of constraint are those for control-flow
+The most trivial kind of constraints are those for control-flow
 assumptions.
 
 \begin{definition}[Assumption] \label{def:assm}
@@ -300,7 +301,7 @@ Every assumption $\mathtt{A}$ is added as an SMT assertion.
 It may seem strange to turn \emph{assumptions} into
 \emph{assertions}, but from a constraint perspective, the assumption
 that we have already observed some property (during control-flow) is
-equivalent to instructing the SMT solver to treat it is inviolate
+equivalent to instructing the SMT solver to treat it as inviolate
 truth, or assertion.
 
 The next level of constraint complexity comes from property
@@ -455,8 +456,8 @@ corresponding wait operations, receives from a common endpoint follow
 program order, and sends happen before corresponding wait
 operations. To encode the zero-buffer semantics, the constraint
 $\mathit{event}_\mathtt{W(\&h1)}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{event}_\mathtt{S_{1,5}}$
-is added because the received is forced to complete before another
-send is issued to the runtime.
+would need to be added to force the receive to complete before another
+send is issued.
 
 \subsection{Correctness}
 
@@ -485,9 +486,9 @@ given to each of the $\textit{order}_{e}$ variables. In other words,
 we can view the SMT solver as returning traces and not assignments.
 
 We assume a semantics for traces that gives their behavior as either
-having an assertion violation or being correct \footnote{In fact, our
+having an assertion violation or being correct: \footnote{In fact, our
   extended technical report~\cite{extended-version} gives such a
-  semantics.}:
+  semantics.}
 
 \begin{definition}[Semantics]
 For all programs, $p$, and traces $t$, $\mathcal{SEM}(p, t)$ is either
@@ -540,13 +541,13 @@ two make identical conclusions.
 
 However, these theorems obscure an important problem: how do we know
 which match pair set to use? Soundness assumes we have one, while
-completeness merely asserts that one exists. While \secref{sec:mp-gen}
+completeness merely asserts that one exists. Although \secref{sec:mp-gen}
 discusses our generation algorithm, we prove here an additional
 theorem that asserts that any conservative over-approximation of match
 pair sets is safe.
 
 \begin{theorem}[Approximation]
-Give two match-pair sets $m$ and $m'$, $m \subseteq m' \Rightarrow \mathcal{SOL}(\mathcal{SMT}(p, m))
+Give two match pair sets $m$ and $m'$, $m \subseteq m' \Rightarrow \mathcal{SOL}(\mathcal{SMT}(p, m))
   \sqsubseteq \mathcal{SOL}(\mathcal{SMT}(p, m'))$, where
   $\mathbb{UNSAT} \sqsubseteq \sigma$.
 \end{theorem}

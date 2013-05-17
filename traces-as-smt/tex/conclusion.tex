@@ -33,4 +33,10 @@ to backtrack to generate a new execution trace. The goal is to use the
 trace verification to construct a better partial order reduction in
 the model checker.
 
-
+Finally, given the importance of high performance computing, future
+work looks to extend the encoding to account for MPI collective
+operations. This direction is motivated by the results where the
+encoding seems to scale to significant levels of concurrency. It
+should be possible to express MPI collectives as additional
+constraints in the encoding and apply the technique to MPI programs
+directly.

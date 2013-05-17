@@ -9,27 +9,6 @@ SMT encoding in this paper pushes that complexity to the SMT solver
 and leverages recent advances in SMT technology to find a satisfying
 assignment.
 
-Vakkalanka \emph{et al.} define POE, a dynamic partial order algorithm for
-MPI programs \cite{sarvani:fm09, flanagan:popl05}. As MPI is similar
-to MCAPI, though more expressive, the algorithm is relevant to MCAPI
-verification \cite{mpi}. Intuitively, the POE algorithm, as a model
-checker, enumerates non-determinism in the MPI specification under
-zero-buffer semantics with the goal to detect deadlock. The algorithm
-is not suitable to infinite-buffer semantics as it misses
-behavior. The relative efficiency, in practice, of the model checker
-enumerating non-determinism versus the SMT solver is an open question
-for the POE work.
-
-Key to the POE algorithm is the notion of a
-\textit{intra-happens-before-order}. The order is a partial order over
-MPI events that generalizes to any control flow path through the
-program.  The SMT encoding in this paper builds the happens-before relation
-for a given control flow path and does not reason directly over all
-control flow paths in the program. A secondary analysis is needed to
-find program inputs sufficient to enumerate all reachable control flow
-paths in order to apply the SMT encoding to complete program
-verification.
-
 Sharma \emph{et al.} present an dynamic model checker for MCAPI programs built
 on top of the MCA provided MCAPI runtime \cite{sharma:fmcad09}. MCC
 systematically enumerates all non-determinism in the MCAPI runtime
@@ -46,6 +25,40 @@ verified using SMT technology. Elwakil \emph{et al.} extend the encoding to
 message passing programs using the MCAPI semantics
 \cite{elwakil:atva10,elwakil:padtad10}. The comparison to the encoding
 in this work is already discussed previously.
+
+An important body of work is being pursued for MPI program
+verification \cite{siegel-zirkel:2012:loops,
+  siegel-zirkel:2011:ppopp,siegel-gopalakrishnan:2011:vmcai,siegel:2007:tutorial,DBLP:conf/ptw/VoVG09,sarvani:fm09,flanagan:popl05}.
+Highlights include an extension to the SPIN model checker for MPI
+programs, symbolic execution tools for MPI programs including new
+approaches to computing loop invariants, and various dynamic
+verification tools for MPI programs (which are very similar to model
+checkers). Although MPI is more expressive than MCAPI, the correctness
+properties in MCAPI are similar to those in MPI. More importantly, the
+encoding in this work should be applicable to MPI programs that do not
+include collective operations. An important aspect of future work is
+to extend the encoding to collectives. 
+
+\begin{comment}
+Vakkalanka \emph{et al.} define POE, a dynamic partial order algorithm for
+MPI programs \cite{sarvani:fm09, }.  Intuitively, the POE algorithm, as a model
+checker, enumerates non-determinism in the MPI specification under
+zero-buffer semantics with the goal to detect deadlock. The algorithm
+is not suitable to infinite-buffer semantics as it misses
+behavior. The relative efficiency, in practice, of the model checker
+enumerating non-determinism versus the SMT solver is an open question
+for the POE work.
+
+Key to the POE algorithm is the notion of a
+\textit{intra-happens-before-order}. The order is a partial order over
+MPI events that generalizes to any control flow path through the
+program.  The SMT encoding in this paper builds the happens-before relation
+for a given control flow path and does not reason directly over all
+control flow paths in the program. A secondary analysis is needed to
+find program inputs sufficient to enumerate all reachable control flow
+paths in order to apply the SMT encoding to complete program
+verification.
+\end{comment}
 
 There is a rich body of literature for SMT/SAT based Bounded Model
 Checking. Burckhardt \emph{et al.} exhaustively check all executions of a

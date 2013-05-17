@@ -50,30 +50,30 @@ the CTP that if satisfied indicates a property violation.
 \examplefigone
 
 Elwakil \textit{et al.} extend the work of Wang \textit{et al.} to
-message passing and claim the encoding supports both semantics. A
+message passing and claim the encoding supports both infinite and zero buffer semantics. A
 careful analysis of the encoding, however, shows it to not work under
 infinite-buffer semantics and to miss behaviors under zero-buffer
 semantics \cite{elwakil:padtad10}. Interestingly, the encoding assumes
-the user provides a precise set of match-pairs as input with the
-program trace, and it then uses those match-pairs in a non-obvious way
+the user provides a precise set of match pairs as input with the
+program trace, and it then uses those match pairs in a non-obvious way
 to constrain the happens-before relation in the encoding. The work
-does not discuss how to generate the match-pairs, which is a
+does not discuss how to generate the match pairs, which is a
 non-trivial input to manually generate for large or complex program
 traces. An early proof claims that the problem of finding a precise
-set of match-pairs given a program trace is NP-complete
+set of match pairs given a program trace is NP-complete
 \cite{match-pair-np-complete}.
 
  This paper presents a proof that resolving non-determinism in message
  passing programs in a way that meets all assertions is
  NP-complete. The paper then presents an SMT encoding for MCAPI
  program executions that works for both zero and infinite buffer
- semantics. The encoding does require an input set of match-pairs as
+ semantics. The encoding does require an input set of match pairs as
  in prior work, but unlike prior work, the match-set can be
  over-approximated and the encoding is still sound and complete. The
  encoding requires fewer terms to capture all possible program
  behavior when compared to other proposed methods making it more
  efficient in the SMT solver.  To address the problem of generating
- match-pairs, an algorithm to generate the over-approximated set is
+ match pairs, an algorithm to generate the over-approximated set is
  given. To summarize, the main contributions in this paper are
 
 \begin{enumerate}
@@ -83,19 +83,19 @@ set of match-pairs given a program trace is NP-complete
 \item a proof that the problem of matching sends to receives in a way that meets assertions is NP-complete;
 \item a correct and efficient SMT encoding of an MCAPI program
   execution that detects all program errors under zero or infinite
-  buffer semantics given the input set of potential match-pairs
-  contains at least the precise set of match-pairs; and
+  buffer semantics given the input set of potential match pairs
+  contains at least the precise set of match pairs; and
 \item an $O(N^2)$ algorithm to generate an over-approximation of
-  possible match-pairs, where $N$ is the size of the execution trace
+  possible match pairs, where $N$ is the size of the execution trace
   in lines of code.
 \end{enumerate}
 
 The rest of the paper is organized as follows: Section 2 presents an
-MCAPI program illustrating the non-determinism in runtime
+MCAPI program illustrating the non-determinism in the runtime
 specification. Section 3 is the proof that the problem is
 NP-complete. Section 4 defines the SMT encoding using potential
 math-pairs. The encoding is shown to be sound and complete even under
-an over-approximated set of match-pairs. Section 5 provides a solution
+an over-approximated set of match pairs. Section 5 provides a solution
 to the outstanding problem of generating feasible match pairs. Section
 6 presents the experimental results that show the encoding to be
 efficient. Section 7 discusses related work. And Section 8 presents

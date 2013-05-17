@@ -80,9 +80,9 @@
 \small
 \begin{alltt}
 20 initialize(NODE_2,&v,&s);
-21 t2=create_endpoint(PORT_2,&s);
-22 t0=get_endpoint(NODE_0,PORT_0,&s);
-23 t1=get_endpoint(NODE_1,PORT_1,&s);
+21 e2=create_endpoint(PORT_2,&s);
+22 e0=get_endpoint(NODE_0,PORT_0,&s);
+23 e1=get_endpoint(NODE_1,PORT_1,&s);
 
 24 msg_send_i(e2,e0,"4",2,N,&h5,&s);
 25 wait(&h5,&size,&s,MCAPI_INF);

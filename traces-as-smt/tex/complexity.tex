@@ -46,7 +46,7 @@ the values come from two separate tasks upon request, the messages
 race in the runtime and may arrive in either order at $h_C$. As a
 result, the value in each variable is non-deterministically $d_0$ or $d_1$.
 
-After the values of each variable $u_i$ is resolved, the $h_C$ task asserts
+After the value of each variable $u_i$ is resolved, the $h_C$ task asserts
 the truth of each clause in the problem instance. As the clauses are conjunctive, the assertions
 are sequentially evaluated. If a satisfying assignment exists for $Q$,
 then a feasible schedule exists that resolves the values of each
@@ -62,7 +62,7 @@ variable in such a way that every assert holds.
               \multicolumn{3}{|l|}{$\mathit{Q\equiv\{c_0\wedge c_1\wedge ...\wedge c_n\}}$}\\
 \hline
 \multicolumn{3}{|l|}{\textbf{VAMPI:} $\mathit{H\equiv\{h_{d_0},h_{d_1},h_{C}\}}$}\\
-                \multicolumn{3}{|l|}{$\mathit{X\equiv\{u_0,...,u_n,g_0,g_1\}}$}\\
+                \multicolumn{3}{|l|}{$\mathit{X\equiv\{u_0,...,u_m,g_0,g_1\}}$}\\
                 \multicolumn{3}{|l|}{$\mathit{D\equiv\{d_0,d_1\}}$}\\
 \hline
 $h_{d_0}$ & $h_{d_1}$ & $h_C$ \\
@@ -118,7 +118,7 @@ manner.
 VAMP is NP-complete.
 \end{theorem}
 \begin{proof}
-\noindent\textbf{Membership in NP}: A certificate is a schedule
+\noindent\textbf{Membership in NP}: a certificate is a schedule
 matching send and receives in each of the histories. The schedule is
 linearly scanned with the histories and checked that it does not
 violate MCAPI semantics. Our extended version constructs an
@@ -126,7 +126,7 @@ operational model of MCAPI semantics that does just such a check given
 a schedule~\cite{extended-version}. The complexity is linear in the
 size of the schedule.
 
-\noindent\textbf{NP-hard}: Polynomial reduction from SAT. The
+\noindent\textbf{NP-hard}: polynomial reduction from SAT. The
 correctness of the reduction is established by \lemmaref{lem:sat}.
 The remainder of the proof is the complexity of the reduction. There
 are two tasks to send values $d_0$ and $d_1$ upon request. For each
@@ -134,7 +134,7 @@ variable $u_i \in U$, each of these tasks, $d_0$ and $d_1$, needs two
 operations: one to synchronize with $h_C$ and another to send the
 value: $O(2 * 2 * |U|)$. The task $h_C$ must request values from
 $h_{d_0}$ and $h_{d_1}$ and then receive both those values; it must do
-this for each variable: $O(2 * 2 * |U| + |C|)$.  Once all the values
+this for each variable: $O(2 * 2 * |U|)$.  Once all the values
 are collected, it must them assert each clause: $O(|C|)$. As every
 term is linear, the reduction is linear.
 \end{proof}

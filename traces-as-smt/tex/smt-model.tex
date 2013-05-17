@@ -137,14 +137,11 @@
 \texttt{02 $\mathit{order_\mathtt{R_{0,5}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h2)}}$}\\
 \texttt{03 $\mathit{order_\mathtt{R_{0,2}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{R_{0,5}}}$}\\
 \texttt{04 $\mathit{order_\mathtt{R_{1,3}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h3)}}$}\\
-\texttt{05 $\mathit{order_\mathtt{S_{1,5}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h4)}}$}\\
-\texttt{06 $\mathit{order_\mathtt{S_{2,4}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h5)}}$}\\
-\texttt{07 $\mathit{order_\mathtt{S_{2,7}}}$ $\mathtt{\prec_\mathtt{HB}}$ $\mathit{order_\mathtt{W(\&h6)}}$}\\
-\texttt{08} \texttt{($\mathit{assert}$ (> b 0))}\\
-\texttt{09} \texttt{($\mathit{assert}$ (not (= a 4)))}\\
-\texttt{10} $\langle\mathtt{R_{0,2}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,2}}$,$\mathtt{S_{1,5}}\rangle$\\
-\texttt{11} $\langle\mathtt{R_{0,5}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,5}}$,$\mathtt{S_{1,5}}\rangle$\\
-\texttt{12} $\langle\mathtt{R_{1,3}}$,$\mathtt{S_{2,7}}\rangle$
+\texttt{05} \texttt{($\mathit{assert}$ (> b 0))}\\
+\texttt{06} \texttt{($\mathit{assert}$ (not (= a 4)))}\\
+\texttt{07} $\langle\mathtt{R_{0,2}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,2}}$,$\mathtt{S_{1,5}}\rangle$\\
+\texttt{08} $\langle\mathtt{R_{0,5}}$,$\mathtt{S_{2,4}}\rangle\vee\langle\mathtt{R_{0,5}}$,$\mathtt{S_{1,5}}\rangle$\\
+\texttt{09} $\langle\mathtt{R_{1,3}}$,$\mathtt{S_{2,7}}\rangle$
 \end{tabular}
 \end{lrbox}
 
@@ -170,8 +167,8 @@ property assertions, such as \figref{fig:trace1}; and (2) a set of
 possible match pairs. A match pair is the coupling of a receive to a
 particular send.  In the running example, the set admits, for example,
 that $\mathtt{R_{0,2}}$ can be matched with either $\mathtt{S_{1,5}}$
-or $\mathtt{S_{2,4}}$. This direct use of match-pairs, rather than a
-state-based or indirect use of match-pairs in an order-based
+or $\mathtt{S_{2,4}}$. This direct use of match pairs, rather than a
+state-based or indirect use of match pairs in an order-based
 encoding, \cite{elwakil:padtad10} and \cite{elwakil:atva10}, is novel.
 
 The purpose of the SMT encoding is to force the SMT solver to resolve
@@ -256,16 +253,16 @@ same task issued earlier are complete as well.
 
 \figref{fig:nw} shows that the wait $\mathtt{W{(\&h2)}}$
 witnesses the completion of the receive $\mathtt{R_{0,1}}$ and
-$\mathtt{R_{0,2}}$ in Task 0. Thus, $\mathtt{W{(\&h2)}}$ is their
+$\mathtt{R_{0,2}}$ in task 0. Thus, $\mathtt{W{(\&h2)}}$ is their
 nearest-enclosing wait.
 
 The encoding requires that every receive operation have a
-nearest-enclosing wait as it makes match-pair decisions at the wait
+nearest-enclosing wait as it makes match pair decisions at the wait
 operation. The requirement is not a limitation of the encoding, as
 accessing a buffer from a receive that does not have a
 nearest-enclosing wait is an error. Rather, the wait is a convenience
 in the encoding to mark where a receive actually takes place. The same
-requirement can be made for sends for correctness, but is not required
+requirement can be made for sends for correctness but is not required
 for the encoding as send buffering is handled differently than receive
 buffering.  The encoding effectively ignores wait operations for sends
 as will be seen.
@@ -285,7 +282,7 @@ A receive operation $\mathtt{R}$ is modeled by a five-tuple of variables:
 \end{compactenum}
 \end{definition}
 
-\subsection{Assumptions, Assertions, and Match-pairs}
+\subsection{Assumptions, Assertions, and match pairs}
 
 The definitions so far merely establish the pertinent information
 about each event in the trace as SMT variables. It is necessary to now express
@@ -332,9 +329,9 @@ $\mathtt{R}$ and a send $\mathtt{S}$ corresponds to the constraints:
 \end{compactenum}
 \end{definition}
 
-The encoding is given a set of potential match-pairs over all the
+The encoding is given a set of potential match pairs over all the
 sends and receives in the program trace. The constraints from these
-match pairs are not simply unioned. If we were to do that, then we
+match pairs are not simply joined in a conjunctions. If we were to do that, then we
 would be constraining the system such that a single receive must be
 paired with all possible sends in a feasible execution rather than a
 single send. Therefore, we combine all the constraints for a given
@@ -349,7 +346,7 @@ are match pairs, then $\bigvee_{i}^{n} \langle\mathtt{R},
 \end{definition}
 
 This encoding of the input ensures that the SMT solver can only use
-compatible send/receive pairs and ensures that sends happen ``before''
+compatible send/receive pairs and ensures that sends happen before 
 nearest-enclosing waits on receives.
 
 \subsection{Program Order Constraints}
@@ -360,15 +357,15 @@ in program order in a single task (step 1); similarly for receives
 (step 2); receives occur before their nearest-enclosing wait (step 3);
 and, that sends are received in the order they are sent (step 4).
 
-\paragraph*{Step 1} For each task, if there are multiple send
+\paragraph*{Step 1} For each task, if there are sequential send
 operations, say $\mathtt{S}$ and $\mathtt{S^\prime}$, from that task
 to a common endpoint, $e_\mathtt{S} = e_\mathtt{S^\prime}$, then those
 sends must follow program order: $\mathit{order}_\mathtt{S}$
 $\prec_\mathtt{HB}$ $\mathit{order}_\mathtt{S^\prime}$.
 
-\paragraph*{Step 2} For each task, if there are multiple receive
-operations, say $\mathtt{R}$ and $\mathtt{R^\prime}$, from that task
-to a common endpoint, $e_\mathtt{S} = e_\mathtt{S^\prime}$, then those
+\paragraph*{Step 2} For each task, if there are sequential receive
+operations, say $\mathtt{R}$ and $\mathtt{R^\prime}$, in that task
+on a common endpoint, $e_\mathtt{R} = e_\mathtt{R^\prime}$, then those
 receives must follow program order: $\mathit{order}_\mathtt{R}$
 $\prec_\mathtt{HB}$ $\mathit{order}_\mathtt{R^\prime}$.
 
@@ -383,8 +380,8 @@ $\mathit{order}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{order}_\mathtt{S
 then those sends must be received in the same order:
 $M_{\mathtt{S}}\ \mathrm{\prec_{\mathtt{HB}}}\ M_{\mathtt{S'}}$.
 
-For example, consider two tasks where Task 0 sends two messages to
-Task 1 as shown in \figref{fig:step4}.
+For example, consider two tasks where task 0 sends two messages to
+task 1 as shown in \figref{fig:step4}.
 
 \begin{figure}[h]
 \[
@@ -400,8 +397,8 @@ Task 1 as shown in \figref{fig:step4}.
 \caption{Send Ordering Example} \label{fig:step4}
 \end{figure}
 
-The \texttt{M} variables from the sends will be assigned to the orders
-for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ by the match-pairs
+The $\mathit{M_\mathtt{S}}$ variables from the sends will be assigned to the orders
+for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ by the match pairs
 selected by the SMT solver. The constraints added in this step force
 the send to be received in program order using the \texttt{HB}
 relation which for this example yields
@@ -410,8 +407,8 @@ $\cfgnt{M}_\mathtt{S_{0,1}}\ \mathrm{\prec_\mathtt{HB}}\ \cfgnt{M}_\mathtt{S_{0,
 \subsection{Zero Buffer Semantics}
 
 The constraints presented so far correspond to an infinite-buffer
-semantics, because we do not constrain how many messages may be ``in
-transit'' at once. We can add additional, orthogonal, constraints to
+semantics, because we do not constrain how many messages may be in
+transit at once. We can add additional, orthogonal, constraints to
 further restrict behavior and enforce a zero-buffer semantics. There are
 two kinds of such constraints.
 
@@ -420,22 +417,22 @@ $\mathtt{S'}$ such that
 $\mathit{order}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{order}_\mathtt{S'}$,
 and $\mathtt{S}$ and $\mathtt{S'}$ can both match a receive
 $\mathtt{R}$, then we add the following constraint to the encoding:
-$\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S'}}$
-where $\mathtt{W(\&h)}$ is the nearest-enclosing wait that witnesses the
+$\mathit{order}_{\mathtt{W}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S'}}$
+where $\mathtt{W}$ is the nearest-enclosing wait that witnesses the
 completion of $\mathtt{R}$ in execution.
 
-The second constraint relies on the dependent relation betweeen two match pairs defined in \defref{def:matchrelation}.
+The second constraint relies on a dependence relation between two match pairs.
 \begin{definition}
-A dependent relation operator denoted as $\rightharpoonup$ on two match pairs $\langle\mathtt{R}, \mathtt{S}\rangle$(left operand) and $\langle\mathtt{R'}, \mathtt{S'}\rangle$(right operand) is satisfied if and only if
+To match pairs are dependent, denoted as $\langle\mathtt{R}, \mathtt{S}\rangle$ $\rightharpoonup$ $\langle\mathtt{R'}, \mathtt{S'}\rangle$, if and only if
 \begin{compactenum}
-\item The nearest-enclosing wait $\mathtt{W(\&h)}$ of $\mathtt{R'}$ is issued before the issuing of $\mathtt{S}$ by an identical endpoint; Or
-\item $\exists\langle\mathtt{R''}, \mathtt{S''}\rangle\cdot\langle\mathtt{R}, \mathtt{S}\rangle \rightharpoonup \langle\mathtt{R''}, \mathtt{S''}\rangle\wedge\langle\mathtt{R''}, \mathtt{S''}\rangle \rightharpoonup \langle\mathtt{R'}, \mathtt{S'}\rangle$.
+\item the nearest-enclosing wait $\mathtt{W}$ of $\mathtt{R'}$ issues before $\mathtt{S}$ on an identical endpoint; or
+\item $\exists\langle\mathtt{R''} \mathtt{S''}\rangle$ such that $\langle\mathtt{R}, \mathtt{S}\rangle \rightharpoonup \langle\mathtt{R''}, \mathtt{S''}\rangle\wedge\langle\mathtt{R''}, \mathtt{S''}\rangle \rightharpoonup \langle\mathtt{R'}, \mathtt{S'}\rangle$.
 \end{compactenum}
 \label{def:matchrelation}
 \end{definition}
-The second constraint then corresponds to: for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$ that can both match an receive $\mathtt{R}$, if there is a send $\mathtt{S''}$ issued after the issuing of $\mathtt{S'}$ by an identical endpoint, and a receive $\mathtt{R'}$ such that $\langle\mathtt{R}, \mathtt{S}\rangle\rightharpoonup\langle\mathtt{R'}, \mathtt{S''}\rangle$, then we add the following constraint to the encoding: $\mathit{order}_{\mathtt{W(\&h)}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S}}$
-where $\mathtt{W(\&h)}$ is the nearest-enclosing wait that witnesses the
-completion of $\mathtt{R}$ in execution.
+With the dependence relation, the second set of constraints for the zero-buffer semantics is give as: for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$ that can both match an receive $\mathtt{R}$, if there is a send $\mathtt{S''}$ issued after the issuing of $\mathtt{S'}$ by an identical endpoint, and a receive $\mathtt{R'}$ such that $\langle\mathtt{R}, \mathtt{S}\rangle\rightharpoonup\langle\mathtt{R'}, \mathtt{S''}\rangle$, then we add the following constraint to the encoding: $\mathit{order}_{\mathtt{W}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S}}$
+where $\mathtt{W}$ is the nearest-enclosing wait that witnesses the
+completion of $\mathtt{R}$.
 
 
 \subsection{Example}
@@ -449,13 +446,12 @@ completion of $\mathtt{R}$ in execution.
 
 \figref{fig:smt-encode} shows the encoding of \figref{fig:mcapi} as an
 SMT problem. We elide the basic definition of the variables discussed
-in \secref{sec:smt-defns}. Lines \texttt{08} through \texttt{12} give
-the assumptions, assertions, and match-pairs. The first seven lines
+in \secref{sec:smt-defns}. Lines \texttt{05} through \texttt{09} give
+the assumptions, assertions, and match pairs. The first four lines
 reflect the program order constraints: receives happen before
-corresponding wait operations, receives from a common endpoint follow
-program order, and sends happen before corresponding wait
-operations. To encode the zero-buffer semantics, the constraint
-$\mathit{event}_\mathtt{W(\&h1)}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{event}_\mathtt{S_{1,5}}$
+corresponding wait operations and receives from a common endpoint follow
+program order. There are no constraints between sends because there are no sequential sends from a common endpoint to a common endpoint. To encode the zero-buffer semantics, the constraint
+$\mathit{order}_\mathtt{W(\&h1)}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{order}_\mathtt{S_{1,5}}$
 would need to be added to force the receive to complete before another
 send is issued.
 

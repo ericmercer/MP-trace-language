@@ -78,7 +78,7 @@ time.
 In this section, we present an algorithm that does not require
 an exhaustive enumeration of runtime behavior in simulation. Our
 algorithm over-approximates the match pairs such that match pairs that
-can exist in the runtime are all included and some ``bogus" match
+can exist in the runtime are all included and some bogus match
 pairs that cannot exist in the runtime may or may not be included.
 
 %With this set of match pairs, our solution provides a $\mathrm{CEGAR}$ loop to solve the SMT encoding for the MCAPI program we are trying to solve. If there is not any bogus match pair in the generated set of match pairs, our solution can capture the true behavior of the system. If there is some bogus match pairs, our solution returns an error trace for the SMT problem. To test if the error is in real execution or not, our solution provides an ``oracle'' that takes this trace as input and simulates it. If the ``oracle'' can simulate the trace, we stop the $\mathrm{CEGAR}$ loop and guarantee of finding an error. If it is impossible for the ``oracle'' to simulate the trace, we prune the bogus match pairs founded by the ``oracle'', generate a new SMT problem with a new set of match pairs, and repeat the $\mathrm{CEGAR}$ loop.
@@ -172,8 +172,8 @@ Consider the program in \figref{fig:mcapi1}. The lists \texttt{list\_r} and \tex
 \label{equation:snd_e}
 \end{equation}
 The sends $\mathtt{S_{1,1}}$, $\mathtt{S_{1,3}}$, and
-$\mathtt{S_{2,1}}$ have Task 0 as an identical destination
-endpoint. The send $\mathtt{S_{0,3}}$ has Task 1 as the destination
+$\mathtt{S_{2,1}}$ have task 0 as an identical destination
+endpoint. The send $\mathtt{S_{0,3}}$ has task 1 as the destination
 endpoint. The list \texttt{list\_s} in (\ref{equation:snd_e}) reflects
 this partition.  Receive $\mathtt{R_{0,1}}$ is the first receive
 operation in endpoint 0. This fact is again reflected
@@ -218,7 +218,7 @@ feasible because it is not possible to order $\mathtt{S_{1,3}}$ before
 $\mathtt{R_{0,2}}$ since $\mathtt{R_{1,2}}$ can only match with
 $\mathtt{S_{0,3}}$ that must occur after
 $\mathtt{R_{0,2}}$. Fortunately, a satisfying solution is only
-possible using feasible match pairs. Non-feasible match-pairs
+possible using feasible match pairs. Non-feasible match pairs
 merely result in extra clauses in the encoding and potentially slow
 down the SMT solver.
 

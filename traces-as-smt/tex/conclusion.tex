@@ -1,2 +1,42 @@
-\section{Conclusions}
-We have presented a trace language that can describe a CTP with a single trace on the same CTP. By executing a CTP with the language syntax, it can enter the final state that indicates whether the execution is correct or not. Also, we have defined an SMT problem that encodes the specific CTP, in which the match pair is defined to describe the transition of send and receive actions. Then we have proved the consistency of a trace language semantic and an SMT problem for a single trace given the same CTP. By expanding the set of match pair, we have proved that SMT problem can further imply more execution traces for a CTP. Thus, given a precise set of match pair, we can model all possible traces through an SMT problem. Finally, we provide a method of over-approximating the set of match pair that can lead to a refinement loop for finding errors.  
+\section{Conclusions and Future Work}
+The paper presents a proof that the problem of resolving
+non-determinism in message passing in a way that meets asserts is
+NP-complete. The paper then presents an SMT encoding of an MCAPI
+program execution that uses match pairs directly rather than the
+state-based or order-based encoding in the prior work. The encoding is
+generated from a given execution trace and a set of potential match
+pairs that can be over-approximated. The encoding takes extra care in
+the forming the SMT problem to preclude bogus match pairs in any
+over-approximation of the match pair input set. Critically, the
+encoding is the first to correctly capture the non-deterministic
+behaviors of an MCAPI program execution under infinite-buffer
+semantics.
+
+The paper further defines an algorithm with $O(N^2)$ time complexity
+to over-approximate the true set of match pairs, where $N$ is the
+total number of code lines of the program. A comparison to prior work,
+\cite{elwakil:padtad10}, for a set of ``toy" examples under
+zero-buffer semanics shows the new encoding capable and efficient in
+capturing correct behaviors of an MCAPI program execution. Experiments
+further show that the encoding scales to programs with significant levels of
+non-determinism in how sends are match to receives.
+
+The results show that a large match-pair set does affect the runtime
+performance of the encoding in the SMT problem even if the encoding is
+sound under an over-approximation. Future work explores new methods
+for generating a much more precise set of match pairs. The encoding is
+dependent on an input execution trace of the program. Future work
+explores integrating the encoding into a model checker. The model
+checker generates a program trace that is encoded and verified. The
+result is then used to inform the model checker as to where it needs
+to backtrack to generate a new execution trace. The goal is to use the
+trace verification to construct a better partial order reduction in
+the model checker.
+
+Finally, given the importance of high performance computing, future
+work looks to extend the encoding to account for MPI collective
+operations. This direction is motivated by the results where the
+encoding seems to scale to significant levels of concurrency. It
+should be possible to express MPI collectives as additional
+constraints in the encoding and apply the technique to MPI programs
+directly.

@@ -1,2 +1,90 @@
 \section{Related Work}
-Chao Wang et al. provided a symbolic algorithm that detects errors in all feasible permutations of statements in an execution trace \cite{wang:fse09}. They partition a concurrent program into a set of concurrent trace program (CTP), which we used in our work. Sharma et al. provided a verification tool, MCC, for verifying the MCAPI programs, but it was later discovered that this method does not completely explore the entire execution space of certain kinds of MCAPI programs \cite{sharma:fmcad09}. Elwakil et al. created a similar work with ours \cite{elwakil:atva10,elwakil:padtad10}. We compared two works in the previous section, where their encoding does not always model all feasible execution traces and it lacks the efficiency for solving the SMT problem. 
+Morse \emph{et al.} provided a formal modeling paradigm that is callable from
+the C language for the MCAPI interface \cite{morse:vmcai12}. This
+model correctly captures the behavior of the interface and can be
+applied to model checking C programs that use the API. The work is a
+direct application of model checking and directly enumerates the
+non-determinism in the runtime to construct an exhaustive proof. The
+SMT encoding in this paper pushes that complexity to the SMT solver
+and leverages recent advances in SMT technology to find a satisfying
+assignment.
+
+Sharma \emph{et al.} present an dynamic model checker for MCAPI programs built
+on top of the MCA provided MCAPI runtime \cite{sharma:fmcad09}. MCC
+systematically enumerates all non-determinism in the MCAPI runtime
+under zero-buffer semantics. It employs a novel dynamic partial order
+reduction to avoid enumerating redundant message orders. This work
+claims SMT technology is more efficient in practice in resolving
+non-determinism in a away to violate correctness properties.
+
+Wang \emph{et al.} present an SMT encoding for shared memory semantics for a
+given input trace from a multi-threaded program \cite{wang:fse09}. As
+mentioned previously, the program is partitioned into several
+concurrent trace programs, and the encoding for each program is
+verified using SMT technology. Elwakil \emph{et al.} extend the encoding to
+message passing programs using the MCAPI semantics
+\cite{elwakil:atva10,elwakil:padtad10}. The comparison to the encoding
+in this work is already discussed previously.
+
+An important body of work is being pursued for MPI program
+verification \cite{siegel-zirkel:2012:loops,
+  siegel-zirkel:2011:ppopp,siegel-gopalakrishnan:2011:vmcai,siegel:2007:tutorial,DBLP:conf/ptw/VoVG09,sarvani:fm09,flanagan:popl05}.
+Highlights include an extension to the SPIN model checker for MPI
+programs, symbolic execution tools for MPI programs including new
+approaches to computing loop invariants, and various dynamic
+verification tools for MPI programs. Although MPI is more expressive than MCAPI, the correctness
+properties in MCAPI are similar to those in MPI. More importantly, the
+encoding in this work should be applicable to MPI programs that do not
+include collective operations. An important aspect of future work is
+to extend the encoding to collectives. 
+
+\begin{comment}
+Vakkalanka \emph{et al.} define POE, a dynamic partial order algorithm for
+MPI programs \cite{sarvani:fm09, }.  Intuitively, the POE algorithm, as a model
+checker, enumerates non-determinism in the MPI specification under
+zero-buffer semantics with the goal to detect deadlock. The algorithm
+is not suitable to infinite-buffer semantics as it misses
+behavior. The relative efficiency, in practice, of the model checker
+enumerating non-determinism versus the SMT solver is an open question
+for the POE work.
+
+Key to the POE algorithm is the notion of a
+\textit{intra-happens-before-order}. The order is a partial order over
+MPI events that generalizes to any control flow path through the
+program.  The SMT encoding in this paper builds the happens-before relation
+for a given control flow path and does not reason directly over all
+control flow paths in the program. A secondary analysis is needed to
+find program inputs sufficient to enumerate all reachable control flow
+paths in order to apply the SMT encoding to complete program
+verification.
+\end{comment}
+
+There is a rich body of literature for SMT/SAT based Bounded Model
+Checking. Burckhardt \emph{et al.} exhaustively check all executions of a
+test program by translating the program implementation into SAT
+formulas \cite{burckhardt:pldi07}. The approach relies on
+counter-examples from the solvers the refine the encoding. The SMT
+encoding in this work is able to directly resolve the match-pair set
+over-approximation directly without needing to check a
+counter-example.
+
+Dubrovin \emph{et al.} give a method to translate an asynchronous system into
+a transition formula over three partial order semantics
+\cite{heljanko:scp}. The encoding adds constraints to compress the
+search space and decrease the bound on the program unwinding. The
+encoding in this paper operates on a program execution and does not
+need to resolve a bound.
+
+Kahlon \emph{et al.} presented a partial order reduction, \textit{MPOR}, that
+operates in the bounded model checking space \cite{kahlon:cav09}.  It
+guarantees that exactly one execution is calculated per each
+Mazurkiewicz trace to reduce the search space. It would be interesting
+to see if MPOR is able to extend to message passing semantics. Other
+work in bounded model checking explores heap-manipulating programs and
+challenges in sequential systems code \cite{lahiri:popl08, lahiri:cav11}.
+
+The application of static analysis is another interesting thread of
+research to test or debug message passing programs with some work in
+the MPI domain \cite{zhang:ppopp07, greg:cgo09, gray:lctes11}. The
+work is important as it lays the foundation for refining match-pair
+sets to only include those that cannot be statically pruned.

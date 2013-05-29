@@ -76,14 +76,13 @@
 \input{example-defs}
 \input{introduction}
 \input{example}
-\input{complexity}
 \input{trace-lang}
-\input{smt-model}
+%\input{smt-model}
 \input{result}
 \input{mp-generation}
 \input{related-work}
 \input{conclusion}
-
+\input{future-work}
 
 \bibliographystyle{splncs03}
 \bibliography{../bib/paper}

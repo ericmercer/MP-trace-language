@@ -563,7 +563,7 @@ A sequential trace of a CTP in the grammar is a list of trace entries
 (\traceentry).  A trace entry is a pair consisting of a program location (\ploc) and either a queue movement list (\movebot) or a symbol ($\bot$). An example
 of a trace can be seen in the bottom of \figref{fig:mcapi} in the
 second column by following the sequential order in the first column
-which starts on program location \texttt{20} of task 2.  Notice that whenever the
+which starts on program location \texttt{2\_0} of task 2.  Notice that whenever the
 trace reaches a wait command on a receive action, the trace includes
 a queue movement list where the destination is listed followed by the source. Messages are delivered from the source queue to the destination queue. In other words, the trace resolves any non-determinism in scheduling or
 message buffering that is present in the CTP.

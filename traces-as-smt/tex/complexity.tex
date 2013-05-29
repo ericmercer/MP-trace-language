@@ -1,0 +1,140 @@
+\section{NP Completeness Proof}
+The complexity proof is inspired by the NP-completeness proof for
+memory coherence and consistency by Cantin \emph{et al.} that uses a
+similar reduction from SAT only in the context of shared memory
+\cite{Cantin:2005:CVM:1070608.1070722}. The complexity proof is on a
+new decision problem: \emph{Verifying Assertions in Message Passing}
+(VAMP).
+\begin{definition}
+\textbf{Verifying Assertions in Message Passing}.
+\begin{compactdesc}
+\item{INSTANCE}: A set of constants $D$, a set of variables $X$, and a
+  finite set $H$ of task histories consisting of send, receive, and
+  assert operations over $X$ and $D$.
+\item{QUESTION}: Is there a feasible schedule $S$ for the operations
+  of $H$ that satisfy all the assertions?
+\end{compactdesc}
+\label{def:np1}
+\end{definition}
+
+The VAMP problem is NP-complete. The proof is a reduction from
+SAT. Given an instance $Q$ of SAT consisting of a set of variables $U$
+and set of clauses $C$ over $U$, an instance $V$ of VAMP is
+constructed such that $V$ has a feasible schedule $S$ that meets all
+the assertions if and only if there is a satisfying truth assignment
+for $Q$. Feasible in this context means the schedule is allowed by the
+MCAPI semantics.
+
+The reduction is illustrated in \figref{fig:vampi}. The figure elides
+the explicit calls to wait which directly follow each send and receive
+operation, and it elides the subscript notation as it is redundant in
+the figure. The figure also adds the value sent and the variable that
+receives the value to the notation as that information is pertinent to
+the reduction.
+
+The reduction relies on non-determinism in the message passing to
+decide the value of each variable in $U$.  The tasks $h_{d_0}$ and
+$h_{d_1}$ repeatedly send the constant value $d_0$ (false valuation) or
+$d_1$ (true valuation) to task $h_C$. The key intuition is that these
+tasks are synchronized with $h_C$ so they essentially wait to send the
+value until asked.
+
+The task $h_C$ sequentially requests and receives $d_0$ and $d_1$
+values for each variable in the SAT instance $Q$. It does not request
+values for a new variable until the current variable is resolved. As
+the values come from two separate tasks upon request, the messages
+race in the runtime and may arrive in either order at $h_C$. As a
+result, the value in each variable is non-deterministically $d_0$ or $d_1$.
+
+After the value of each variable $u_i$ is resolved, the $h_C$ task asserts
+the truth of each clause in the problem instance. As the clauses are conjunctive, the assertions
+are sequentially evaluated. If a satisfying assignment exists for $Q$,
+then a feasible schedule exists that resolves the values of each
+variable in such a way that every assert holds.
+
+\begin{figure}
+\begin{center}
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}[t]{|l|l|l|}
+\hline
+\multicolumn{3}{|l|}{\textbf{SAT:} $\mathit{U\equiv\{u_0,u_1,...,u_m\}}$}\\
+              \multicolumn{3}{|l|}{$\mathit{C\equiv\{c_0,c_1,...,c_n\}}$}\\
+              \multicolumn{3}{|l|}{$\mathit{Q\equiv\{c_0\wedge c_1\wedge ...\wedge c_n\}}$}\\
+\hline
+\multicolumn{3}{|l|}{\textbf{VAMPI:} $\mathit{H\equiv\{h_{d_0},h_{d_1},h_{C}\}}$}\\
+                \multicolumn{3}{|l|}{$\mathit{X\equiv\{u_0,...,u_m,g_0,g_1\}}$}\\
+                \multicolumn{3}{|l|}{$\mathit{D\equiv\{d_0,d_1\}}$}\\
+\hline
+$h_{d_0}$ & $h_{d_1}$ & $h_C$ \\
+\hline
+$R(g_{0},*)$   & $R(g_{1},*)$   & $S(d_0,h_{d_0})$ \\
+$S(d_{0},h_C)$ & $S(d_{1},h_C)$ & $S(d_0,h_{d_1})$ \\
+              &                & $R(u_0,*)$        \\
+              &                & $R(u_0,*)$        \\
+\hline
+$R(g_{0},*)$  &  $R(g_{1},*)$   & $S(d_0,h_{d_0})$ \\
+$S(d_{0},h_C)$&  $S(d_{1},h_C)$ & $S(d_0,h_{d_1})$ \\
+              &                & $R(u_1,*)$       \\
+              &                & $R(u_1,*)$       \\
+\hline
+$\ldots$      &  $\ldots$      & $\ldots$                \\
+\hline
+              &                & \textit{assert}($c_0$) \\
+              &                & \textit{assert}($c_1$) \\
+              &                & $\ldots$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{General SAT to VAMPI reduction}
+\label{fig:vampi}
+\end{figure}
+
+\begin{lemma} \label{lem:sat}
+$S$ is a feasible schedule for $H$ that satisfies all assertions if
+  and only if $Q$ is satisfiable.
+\end{lemma}
+\begin{proof}
+\textbf{Feasible schedule for V implies Q is satisfiable}: proof by
+contradiction. Assume that $Q$ is unsatisfiable even though there is a
+feasible schedule $S$ for $V$ that meets all the assertions. The
+reduction in \figref{fig:vampi} considers all truth values of the
+variables in $Q$, over every combination, by virtue of the
+non-determinism, and then asserts the truth of each of the clauses in
+$Q$. The complete set of possibilities is realized by sending in
+parallel from $h_{d_0}$ and $h_{d_1}$ the two truth valuations for a
+given variable to $h_C$. As these messages may be received in any
+order, each variable may assume either truth value. Further, each
+variable resolved is an independent choice so all combinations of
+variable valuations must be considered.  This fact is a contradiction
+to the assumption of $Q$ being unsatisfiable as the same truth values
+that meet the assertions would be a satisfying assignment in $Q$.
+
+\noindent \textbf{Q is satisfiable implies feasible schedule for V}:
+the proof is symmetric to the previous case and proceeds in a like
+manner.
+\end{proof}
+
+\begin{theorem}[NP-complete]
+VAMP is NP-complete.
+\end{theorem}
+\begin{proof}
+\noindent\textbf{Membership in NP}: a certificate is a schedule
+matching send and receives in each of the histories. The schedule is
+linearly scanned with the histories and checked that it does not
+violate MCAPI semantics. The next section constructs an
+operational model of MCAPI semantics that does just such a check given
+a schedule. The complexity is linear in the
+size of the schedule.
+
+\noindent\textbf{NP-hard}: polynomial reduction from SAT. The
+correctness of the reduction is established by \lemmaref{lem:sat}.
+The remainder of the proof is the complexity of the reduction. There
+are two tasks to send values $d_0$ and $d_1$ upon request. For each
+variable $u_i \in U$, each of these tasks, $d_0$ and $d_1$, needs two
+operations: one to synchronize with $h_C$ and another to send the
+value: $O(2 * 2 * |U|)$. The task $h_C$ must request values from
+$h_{d_0}$ and $h_{d_1}$ and then receive both those values; it must do
+this for each variable: $O(2 * 2 * |U|)$.  Once all the values
+are collected, it must them assert each clause: $O(|C|)$. As every
+term is linear, the reduction is linear.
+\end{proof}

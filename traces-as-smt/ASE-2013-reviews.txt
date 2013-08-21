@@ -1,0 +1,61 @@
+* Yu: page 10, second column: 'sends are *match* to receives'
+
+* Eric and Jay: Formalize the NP-reduction proof (table and prose are not
+  sufficient)
+
+* Yu: Fig. 7 looks strange. It is neither in logic nor in SMT syntax. I
+  suggest the 'assert' keywords should be removed.
+
+* Yu: why bother pruning "impossible" match pairs through the proposed
+  algorithm? Even the crudest over-approximation should suffice to
+  obtain the desired result. Please comment.
+
+* Yu: If the end points change (e.g., with the value received before by
+  the same task) or the sent data are dependent on the previously
+  received data, the encoded constraints might be invalid. I have this
+  concern because this point is not addressed in Section IV, and the
+  example constraints in Fig.7 do not provide the sources of the data
+  "a" and "b", which would require some level of static data flow
+  analysis.
+
+* Yu: It seems that "Elwakil's approach" is a very close work and it takes
+  a similar idea with the main difference on how the match pairs are
+  generated. If this is true, the paper would need to provide a strong
+  evidence that generating the matching pairs is an important problem
+  here, e.g., for soundness or efficiency. Section VI A does describe
+  a comparison with "Elwakil's approach", i.e., "70% fewer clauses,
+  uses half the memory, and eight times faster". However, such
+  statements are not convincing without any details of the
+  experimental data and the setup.
+
+* Optional: The evaluated subjects are either toy programs or small benchmarks,
+  and are not persuasive to demonstrate the practicality of the
+  proposed approach.
+
+* Optional: Move all the constraints for the encoding to one place in a table or
+  figure rather than spread across multiple pages
+
+
+Author Kit:
+
+* Yu:Read and follow the Author Instructions.
+  http://www.conference-publishing.com/Instructions.php?Event=ASE13MAIN
+
+* Yu: Submit the camera-ready version of your paper using the following URL:
+  http://www.conference-publishing.com/submission.php?Event=ASE13MAIN&Paper=724a770b1fea735eb9fb2bdc744d354c7f0026c6
+  If your e-mail client breaks the URL into several lines,
+  please copy&paste the URL piecewise to your browser's URL field.
+  Before you submit, please make sure that the meta data match exactly the data on your paper.
+
+  For the submission deadline, please consult the conference web site.
+
+* DONE-Eric-21-Aug-2013: Complete the copyright/permission form for your paper to the IEEE using the following URL:
+  http://www.conference-publishing.com/copyrightIEEE.php?Event=ASE13MAIN&Paper=724a770b1fea735eb9fb2bdc744d354c7f0026c6
+
+* Eric: Register at least one author for the event where you present this paper.
+
+* Yu: Submit the URL to a preprint of your article at:
+  http://www.conference-publishing.com/submissionPreprintURL?Event=ASE13MAIN&Paper=724a770b1fea735eb9fb2bdc744d354c7f0026c6
+
+* Yu: Submit the URL of a supplementary web page for your article at:
+  http://www.conference-publishing.com/submissionInfoURL?Event=ASE13MAIN&Paper=724a770b1fea735eb9fb2bdc744d354c7f0026c6

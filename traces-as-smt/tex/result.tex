@@ -23,7 +23,7 @@ To our best knowledge, the current most effective SMT encoding for
 verification of message passing program traces is the order-based
 encoding that describes the happens-before relation directly in the
 encoding and is only functional for zero-buffer semantics in its
-current form \cite{elwakil:padtad10}. Although the tool to generate
+current form \cite{elwakil:padtad10}. This encoding uses very complicate way of defining the program orders and possible match pairs thus generates more clauses that are considered by the SMT solver.  Although the tool to generate
 the encoding is not publicly available, the authors of the order-based
 encoding graciously encoded several contrived benchmarks used for
 correctness testing. These benchmarks are best understood as
@@ -176,7 +176,7 @@ believe to be NP-complete \cite{match-pair-np-complete}.
 
 The benchmark suite demonstrates that a message passing program may
 have a large degree of non-determinism in the runtime that is
-prohibitive to verification approaches that directly enumerate 
+prohibitive to verification approaches that directly enumerate
 non-determinism such as a model checker. The SMT encoding, however,
 pushes the problem to the SMT solver by generating the possible
 match pairs and then relying on advances in SMT technology to resolve

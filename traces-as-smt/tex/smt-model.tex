@@ -223,7 +223,7 @@ A send operation $\mathtt{S}$, is a four-tuple of variables:
 \end{compactenum}
 \end{definition}
 
-The most complex operation in MCAPI is a receive. Since receives are
+The endpoints do not change and the transmitted values are constants in an SMT encoding mainly because this static topology has already been evaluated in an existing execution trace once the trace was obtained. The most complex operation in MCAPI is a receive. Since receives are
 inherently asynchronous, it is not possible to represent them
 atomically. Instead, we need to associate each receive with a wait
 that marks where in the program the receive operation is guaranteed to be

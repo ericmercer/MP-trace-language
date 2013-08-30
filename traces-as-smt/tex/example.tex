@@ -5,7 +5,7 @@ consisting of a handful of calls when dealing with concurrency. Consider
 the MCAPI program execution in \figref{fig:mcapi} that includes three
 tasks that use send (\texttt{mcapi\_msg\_sen\\d\_i}) and receive
 (\texttt{mcapi\_msg\_recv\_i}) calls to communicate with each other.
-Line numbers appear in the first column for each task with the first digit being the task ID, and the
+Line numbers appear in the first column for each task with the first digit being the task ID. The
 declarations of the local variables are omitted for space. 
 
 Picking up
@@ -25,7 +25,7 @@ send or receive buffer is able to be used. Given the scenario, a developer
 might ask the question: \emph{``What are the possible values of
 \texttt{a} and \texttt{b} after the scenario completes?''}
 
-\begin{figure}[h]
+\begin{figure}[b]
 \begin{center}
 \setlength{\tabcolsep}{2pt}
 \scriptsize \begin{tabular}[t]{l}
@@ -64,9 +64,9 @@ as follows: for each command $\mathtt{O_{i,j}(k,\&h)}$, $\mathtt{O \in
   \{S,R\}}$ or $\mathtt{W(\&h)}$, $\mathtt{i}$ represents the task ID,
 $\mathtt{j}$ represents the source line number, $\mathtt{k}$
 represents the destination endpoint, and $\mathtt{h}$ represents the
-command handler. A specific destination task ID is indicated in the
-notation when a trace is fully resolved, otherwise ``*" notation
-indicates that a receive has yet to be matched to a specific send. The
+command handler. A specific destination task ID is in the
+notation when a trace is fully resolved, otherwise ``*" 
+indicates that a receive has yet to be matched to a send. The
 lines in the trace indicate the context switch where a new task
 executes.
 
@@ -80,7 +80,7 @@ example, the program takes the true branch of the condition on line
 \texttt{08}.  At the end of execution the assertion on line
 \texttt{09} holds and no error is found.
 
-\begin{figure}[h]
+\begin{figure}[t]
 \begin{center}
 \setlength{\tabcolsep}{2pt}
 \scriptsize \begin{tabular}[t]{l}
@@ -109,7 +109,7 @@ example, the program takes the true branch of the condition on line
 \label{fig:trace2}
 \end{figure}
 
-There is another feasible trace for the example shown in
+There is another feasible trace shown in
 \figref{fig:trace2} which is reachable under the infinite-buffer
 semantics. In this trace, the variable \textit{a} contains $1$ instead
 of $4$, since the message \textit{``1''} is sent to \textit{e0} after
@@ -117,8 +117,8 @@ sending the message \textit{``Go''} to \textit{e1} as it is possible
 for the send on line \texttt{24} to be buffered in transit. The MCAPI
 specification indicates that the wait on line \texttt{25} returns once
 the buffer is available. That only means the message is somewhere in
-the MCAPI runtime under the infinite-buffer semantics; it does not
-mean the message is delivered. As such, it is possible for the message
+the runtime and not
+that the message is delivered. As such, it is possible for the message
 to be buffered in transit allowing the send on line \texttt{15}
 to arrive at \textit{e0} first and be received in variable
 \textit{``a''}. Such a scenario is a program execution that results in

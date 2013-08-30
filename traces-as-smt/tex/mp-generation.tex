@@ -79,7 +79,8 @@ In this section, we present an algorithm that does not require
 an exhaustive enumeration of runtime behavior in simulation. Our
 algorithm over-approximates the match pairs such that match pairs that
 can exist in the runtime are all included and some bogus match
-pairs that cannot exist in the runtime may or may not be included. This algorithm does well in restricting the size of bogus match pairs where each one is a non-deterministic choice that costs an SMT solver more runtime and system memory.
+pairs that cannot exist in the runtime may or may not be included. This algorithm does well in restricting the size of bogus match pairs where each one is a non-deterministic choice that costs an SMT solver more runtime and system memory. Generating a precise set of match-pairs is NP-complete
+\cite{match-pair-np-complete}.
 
 %With this set of match pairs, our solution provides a $\mathrm{CEGAR}$ loop to solve the SMT encoding for the MCAPI program we are trying to solve. If there is not any bogus match pair in the generated set of match pairs, our solution can capture the true behavior of the system. If there is some bogus match pairs, our solution returns an error trace for the SMT problem. To test if the error is in real execution or not, our solution provides an ``oracle'' that takes this trace as input and simulates it. If the ``oracle'' can simulate the trace, we stop the $\mathrm{CEGAR}$ loop and guarantee of finding an error. If it is impossible for the ``oracle'' to simulate the trace, we prune the bogus match pairs founded by the ``oracle'', generate a new SMT problem with a new set of match pairs, and repeat the $\mathrm{CEGAR}$ loop.
  %We then input this over-approximated set of match pair to a CEGAR loop for further verification. Either error is found during one iteration and the process stops, or the current set of match pair is prune to a more precise one for the next iteration.
@@ -186,7 +187,7 @@ returns the issue order of that receive in the \texttt{list\_r}
 structure. Similarly, the function \texttt{index(s)} takes the
 destination and source endpoints in the send and returns the issue
 order of that send in the \texttt{list\_s} structure. These indexes
-essentially capture message non-overtaking.
+help track message non-overtaking.
 
 The criteria to generate a match pair first requires the send and
 receive to be compatible (check 1), consistent with message
@@ -228,6 +229,6 @@ lines of code of the program. Traversing the list of receives and the
 list of sends takes $O(mn)$ to complete, where $m$ is the total number
 of sends and $n$ is the total number of receives. As $m + n \le N$,
 the algorithm takes $O(N + mn) \leq O(N + N^2) \approx O(N^2)$ to
-complete.
+complete. 
 
 %As discussed in the previous section, an over-approximated match set can give the same solution as a complete set does. As our match pair generation algorithm over-approximates the true set of match pairs allowed by the runtime for an MCAPI program trace, when used with our SMT encoding it cannot result in false positives (i.e.,  errors arising from match pairs that cannot happen in any implementation of the MCAPI specification).

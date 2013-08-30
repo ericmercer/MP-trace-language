@@ -23,7 +23,7 @@ To our best knowledge, the current most effective SMT encoding for
 verification of message passing program traces is the order-based
 encoding that describes the happens-before relation directly in the
 encoding and is only functional for zero-buffer semantics in its
-current form \cite{elwakil:padtad10}. This encoding uses very complicate way of defining the program orders and possible match pairs thus generates more clauses that are considered by the SMT solver.  Although the tool to generate
+current form \cite{elwakil:padtad10}. The order-based encoding is more complex than the encoding in this paper and  generates more clauses for the SMT solver.  Although the tool to generate
 the encoding is not publicly available, the authors of the order-based
 encoding graciously encoded several contrived benchmarks used for
 correctness testing. These benchmarks are best understood as
@@ -62,7 +62,7 @@ match pairs, $N \times N$, to find the single precise subset of
 match pairs that triggers the violation. In this program structure,
 there are $N!$ feasible ways to match $N$ sends to $N$ receives.
 
-\begin{table}[h]
+\begin{table}[t]
 \begin{center}
 \scriptsize
 \caption{Scaling as a function of non-determinism \label{table:first}}
@@ -121,7 +121,7 @@ from a variety of sources.
   router node is in a ring and communicates only with immediate
   neighbors to update the tables. The program ends when all the
   routing tables are updated.
-\item \textit{MultiM} is an extension to an program in the MCAPI library
+\item \textit{MultiM} is an extension to a program in the MCAPI library
   distribution and is similar to the program in \figref{fig:mcapi1}. The extension adds extra
   iterations to the original program execution to generate longer
   execution trace.
@@ -145,7 +145,7 @@ messages. The \textit{Pktuse} program does have the most number of
 messages, 512, and in this case, the largest number of feasible
 match pair sets.
 
-\begin{table}[h]
+\begin{table}[t]
 \begin{center}
 \setlength{\tabcolsep}{2pt}
 \scriptsize
@@ -170,9 +170,7 @@ third and fourth columns respectively. Note that the time shown in the
 third column includes the time in the fourth column. As before, the
 running time tracks hardness and not the total number of messages. The
 table also shows the cost of match pair generation as it dominates the
-encoding time for the \textit{Pktuse} program. Future work is to
-address the high-cost of match pair generation, which the authors
-believe to be NP-complete \cite{match-pair-np-complete}.
+encoding time for the \textit{Pktuse} program (an item for future work).
 
 The benchmark suite demonstrates that a message passing program may
 have a large degree of non-determinism in the runtime that is

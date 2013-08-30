@@ -380,9 +380,6 @@ $\mathit{order}_\mathtt{S}\ \mathrm{\prec_\mathtt{HB}}\ \mathit{order}_\mathtt{S
 then those sends must be received in the same order:
 $M_{\mathtt{S}}\ \mathrm{\prec_{\mathtt{HB}}}\ M_{\mathtt{S'}}$.
 
-For example, consider two tasks where task 0 sends two messages to
-task 1 as shown in \figref{fig:step4}.
-
 \begin{figure}[h]
 \[
 \begin{array}{l|l}
@@ -397,6 +394,8 @@ task 1 as shown in \figref{fig:step4}.
 \caption{Send Ordering Example} \label{fig:step4}
 \end{figure}
 
+For example, consider two tasks where task 0 sends two messages to
+task 1 as shown in \figref{fig:step4}.
 The $\mathit{M_\mathtt{S}}$ variables from the sends will be assigned to the orders
 for $\mathtt{R_{1,1}}$ and $\mathtt{R_{1,2}}$ by the match pairs
 selected by the SMT solver. The constraints added in this step force
@@ -430,7 +429,7 @@ To match pairs are dependent, denoted as $\langle\mathtt{R}, \mathtt{S}\rangle$ 
 \end{compactenum}
 \label{def:matchrelation}
 \end{definition}
-With the dependence relation, the second set of constraints for the zero-buffer semantics is give as: for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$ that can both match an receive $\mathtt{R}$, if there is a send $\mathtt{S''}$ issued after the issuing of $\mathtt{S'}$ by an identical endpoint, and a receive $\mathtt{R'}$ such that $\langle\mathtt{R}, \mathtt{S}\rangle\rightharpoonup\langle\mathtt{R'}, \mathtt{S''}\rangle$, then we add the following constraint to the encoding: $\mathit{order}_{\mathtt{W}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S}}$
+With the dependence relation, the second set of constraints for the zero-buffer semantics is given as: for each pair of sends $\mathtt{S}$ and $\mathtt{S'}$ that can both match a receive $\mathtt{R}$, if there is a send $\mathtt{S''}$ issued after the issuing of $\mathtt{S'}$ by an identical endpoint, and a receive $\mathtt{R'}$ such that $\langle\mathtt{R}, \mathtt{S}\rangle\rightharpoonup\langle\mathtt{R'}, \mathtt{S''}\rangle$, then we add the following constraint to the encoding: $\mathit{order}_{\mathtt{W}}\ \mathrm{\prec_{\mathtt{HB}}}\ \mathit{order}_{\mathtt{S}}$
 where $\mathtt{W}$ is the nearest-enclosing wait that witnesses the
 completion of $\mathtt{R}$.
 

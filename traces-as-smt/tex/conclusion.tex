@@ -1,18 +1,18 @@
 \section{Conclusions and Future Work}
-The paper presents a proof that the problem of resolving
+This paper presents a proof that the problem of resolving
 non-determinism in message passing in a way that meets asserts is
 NP-complete. The paper then presents an SMT encoding of an MCAPI
 program execution that uses match pairs directly rather than the
 state-based or order-based encoding in the prior work. The encoding is
 generated from a given execution trace and a set of potential match
 pairs that can be over-approximated. The encoding takes extra care in
-the forming the SMT problem to preclude bogus match pairs in any
+forming the SMT problem to preclude bogus match pairs in any
 over-approximation of the match pair input set. Critically, the
 encoding is the first to correctly capture the non-deterministic
 behaviors of an MCAPI program execution under infinite-buffer
 semantics.
 
-The paper further defines an algorithm with $O(N^2)$ time complexity
+This paper further defines an algorithm with $O(N^2)$ time complexity
 to over-approximate the true set of match pairs, where $N$ is the
 total number of code lines of the program. A comparison to prior work,
 \cite{elwakil:padtad10}, for a set of ``toy" examples under

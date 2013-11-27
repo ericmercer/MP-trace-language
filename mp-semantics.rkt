@@ -1,7 +1,7 @@
 #lang racket
 
 (require redex/reduction-semantics
-         (only-in unstable/match ==))
+         (only-in unstable/match))
 
 (provide (all-defined-out))
 
@@ -21,10 +21,7 @@
   (move-⊥ move-list
           ⊥)
   (move-list ((dst src) ... ⊥))
-  
-  (trace (trace-entry ...))
-  (trace-entry (ploc move-⊥))
-  
+ 
   (aid-⊥ aid
          ⊥)
 
@@ -93,9 +90,9 @@
           infeasable ;assumption failed
           error)     ;impossible to execute
   
-  (machine-state (h eta aid-map pending-s pending-r q-set ctp trace status last smt))
+  (machine-state (h eta aid-map pending-s pending-r q-set ctp status))
   (queue-state (pending-s q-set move-⊥ status))
-  (expr-state (h eta aid-map pending-s pending-r q-set e status k last smt))
+  (expr-state (h eta aid-map pending-s pending-r q-set e status k))
   (k ret
      (assert * -> k)
      (assume * -> k)
@@ -106,12 +103,8 @@
   ; Add last to the state and update appropriately...just before smt...
    (ep-⊥ ep
          ⊥)
-  (last ([ep ep-⊥ aid] ...))
+  ;(last ([ep ep-⊥ aid] ...))
   
-  (smt (defs asrts)
-       )
-  (defs (any ...))
-  (asrts (any ...))
   )
 
 ;
@@ -142,39 +135,39 @@
    (--> (h eta aid-map pending-s pending-r q-set
            (thread_0 ... 
             ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥)
-            thread_2 ...)
-           ([ploc_0 move-⊥] trace-entry_1 ...) status last smt)
-        (h_pr eta_pr aid-map_pr pending-s_prpr pending-r_pr q-set_prpr 
+            thread_2 ...) status)
+        (h_pr eta_pr aid-map_pr pending-s_pr pending-r_pr q-set_pr 
               (thread_0 ... ([ploc_1 cmd_1] ... ⊥) thread_2 ...)
-              (trace-entry_1 ...) status_prpr last_pr smt_prpr)
-        "Machine Step for queue movement"
-        (where (pending-s_pr q-set_pr move-⊥_pr status_pr)
-               ,(apply-reduction-relation** queue-reductions
-                                            (term (pending-s q-set move-⊥ status))))
+               status_pr)
+        ;"Machine Step for queue movement"
+        ;(where (pending-s_pr q-set_pr move-⊥_pr status_pr)
+        ;       ,(apply-reduction-relation** queue-reductions
+         ;                                   (term (pending-s q-set move-⊥ status))))
+        (where false (check-pending-send cmd_0 pending-r aid-map pending-s))
        ; "Machine Step"
-        (where (h_pr eta_pr aid-map_pr pending-s_prpr pending-r_pr q-set_prpr
-                     e status_prpr ret last_pr smt_pr)
+        (where (h_pr eta_pr aid-map_pr pending-s_pr pending-r_pr q-set_pr
+                     e status_pr ret)
                ,(apply-reduction-relation** expr-reductions
-                                            (term (h eta aid-map pending-s_pr
-                                                     pending-r q-set_pr cmd_0
-                                                     status_pr ret last smt))))
-        (where smt_prpr (add-po smt_pr ploc_0 ploc_1 ...)))
+                                            (term (h eta aid-map pending-s
+                                                     pending-r q-set cmd_0
+                                                     status ret))))
+        )
    
+   (--> (h eta aid-map pending-s pending-r q-set
+           (thread_0 ... 
+            ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥)
+            thread_2 ...) status)
+        (h_pr eta_pr aid-map pending-s pending-r q-set 
+              (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥) thread_2 ...)
+               status)
+        "Machine Step for queue movement"
+        ;(where (pending-s_pr q-set_pr move-⊥_pr status_pr)
+        ;       ,(apply-reduction-relation** queue-reductions
+         ;                                   (term (pending-s q-set move-⊥ status))))
+        (where true (check-pending-send cmd_0 pending-r aid-map pending-s))
+       ; "Machine Step"
+        )
    ))
-
-
-(define queue-reductions
-  (reduction-relation
-   lang
-   #:domain queue-state
-   
-   (--> (pending-s q-set ((dst src) (dst_0 src_0) ... ⊥) status)
-        (pending-s_pr q-set_pr ((dst_0 src_0) ... ⊥) status_pr)
-        "Process queue movement"
-        (where (pending-s_pr aid v status_pr) (remove-send src dst pending-s status))
-        (where q-set_pr (add-send-pr dst aid v q-set status_pr)))
-   
-))
    
 
 (define expr-reductions
@@ -182,78 +175,70 @@
    lang
    #:domain expr-state
    
-   (--> (h eta aid-map pending-s pending-r q-set x status k last smt)
-        (h eta aid-map pending-s pending-r q-set v status k last smt)
+   (--> (h eta aid-map pending-s pending-r q-set x status k)
+        (h eta aid-map pending-s pending-r q-set v status k)
         "Lookup Variable"
         (where v (h-lookup h (eta-lookup eta x))))
    
-   (--> (h eta aid-map pending-s pending-r q-set (op e_0 e) status k last smt)
-        (h eta aid-map pending-s pending-r q-set e_0 status (op * e -> k) last smt)
+   (--> (h eta aid-map pending-s pending-r q-set (op e_0 e) status k)
+        (h eta aid-map pending-s pending-r q-set e_0 status (op * e -> k))
         "Expr l-operand")
-   (--> (h eta aid-map  pending-s pending-r q-set v status (op * e -> k) last smt)
-        (h eta aid-map  pending-s pending-r q-set e status (op v * -> k) last smt)
+   (--> (h eta aid-map  pending-s pending-r q-set v status (op * e -> k))
+        (h eta aid-map  pending-s pending-r q-set e status (op v * -> k))
         "Expr r-operand")
-   (--> (h eta aid-map pending-s pending-r q-set v_r status (op v_l * -> k) last smt)
-        (h eta aid-map pending-s pending-r q-set v_res status k last smt)
+   (--> (h eta aid-map pending-s pending-r q-set v_r status (op v_l * -> k))
+        (h eta aid-map pending-s pending-r q-set v_res status k)
         "Binary Operation Eval"
         (where v_res (apply-op op v_l v_r)))
    
-   (--> (h eta aid-map pending-s pending-r q-set (assume e) status k last
-           (defs (any ...)))
-        (h eta aid-map pending-s pending-r q-set e status (assume * -> k ) last
-           (defs (e any ...)))
+   (--> (h eta aid-map pending-s pending-r q-set (assume e) status k)
+        (h eta aid-map pending-s pending-r q-set e status (assume * -> k ))
         "Assume Pull Out Expr")
-   (--> (h eta aid-map pending-s pending-r q-set v status (assume * -> k) last smt) 
-        (h eta aid-map pending-s pending-r q-set v status_pr k last smt) 
+   (--> (h eta aid-map pending-s pending-r q-set v status (assume * -> k)) 
+        (h eta aid-map pending-s pending-r q-set v status_pr k) 
         "Assume Cmd"
         (where status_pr (check-assume v status)))
    
    ;;Negate expression and add it to the SMT assertions.
-   (--> (h eta aid-map pending-s pending-r q-set (assert e) status k last
-            (defs (any ...)))
-        (h eta aid-map pending-s pending-r q-set e status (assert * -> k) last
-           (defs ((not e) any ...)))
+   (--> (h eta aid-map pending-s pending-r q-set (assert e) status k)
+        (h eta aid-map pending-s pending-r q-set e status (assert * -> k))
         "Assert Pull Out Expr")
-   (--> (h eta aid-map pending-s pending-r q-set v status (assert * -> k) last smt) 
-        (h eta aid-map pending-s pending-r q-set v status_pr k last smt)
+   (--> (h eta aid-map pending-s pending-r q-set v status (assert * -> k)) 
+        (h eta aid-map pending-s pending-r q-set v status_pr k)
         "Assert Eval"
         (where status_pr (check-assert v status)))
    
-   (--> (h eta aid-map pending-s pending-r q-set (x := e) status k last
-           (defs (any ...)))
-        (h eta aid-map pending-s pending-r q-set e status (x := * -> k) last
-           (defs ((= x e) any ...)))
+   (--> (h eta aid-map pending-s pending-r q-set (x := e) status k)
+        (h eta aid-map pending-s pending-r q-set e status (x := * -> k))
         "Assign Pull Out Expr")
-   (--> (h eta aid-map pending-s pending-r q-set v status (x := * -> k) last smt)
-        (h_pr eta aid-map pending-s pending-r q-set v status k last smt)
+   (--> (h eta aid-map pending-s pending-r q-set v status (x := * -> k))
+        (h_pr eta aid-map pending-s pending-r q-set v status k)
         "Assign Expr"
         (where h_pr (h-extend* h [(eta-lookup eta x) -> v])))
    
    ;;Adds sendi cmd to aid-map and pending-s. - VALIDATED
    (--> (h eta ([aid_x ep_x] ...) pending-s pending-r q-set
-           (sendi aid src dst x ploc number) status k last ((any_d ...) (any_a ...)))
+           (sendi aid src dst x ploc number) status k)
         (h eta ([aid src] [aid_x ep_x] ...) pending-s_pr pending-r q-set
-           true status k last ((any_0 any_d ...) (any_1 any_a ...)))
+           true status k)
         "Sendi Cmd x -> v"
         (where v (h-lookup h (eta-lookup eta x)))
-        (where any_0 (define aid :: send))
-        (where any_1 (make-send aid src dst x ploc number))
         (where pending-s_pr (add-send pending-s [aid -> src dst v])))
    
    ;;Adds recvi cmd to aid-map and pending-r. - VALIDATED
    (--> (h eta ([aid_x ep_x] ...) pending-s pending-r q-set
-           (recvi aid dst x ploc) status k last ((any_d ...) (any_a ...)))
+           (recvi aid dst x ploc) status k)
         (h eta ([aid dst] [aid_x ep_x] ...) pending-s pending-r_pr q-set 
-           true status k last ((any_0 any_d ...) (any_1 any_a ...)))
+           true status k)
         "Recvi Cmd0"
-        (where pending-r_pr (add-recv pending-r [aid -> dst x]))
-        (where any_0 (define aid :: recv))
-        (where any_1 (make-recv aid dst x ploc)))
+        (where pending-r_pr (add-recv pending-r [aid -> dst x])))
    
-   (--> (h eta aid-map pending-s pending-r q-set (wait aid) status k last smt)
-        (h eta aid-map pending-s pending-r q-set true status k last smt)
+   ;;aid returns false in function find-recv meaning it is not a recv but a send 
+   (--> (h eta aid-map pending-s pending-r q-set (wait aid) status k)
+        (h eta aid-map pending-s pending-r q-set true status k)
         "Sendi Wait Cmd"
         (where false (find-recv pending-r aid) ))
+       
    
    ;;Match on the receive wait
    ;; TODO: add the last structure to the state and update the smt problem and last as
@@ -270,22 +255,31 @@
    ; 2)add to smt structure
    ; 3)find-recv checks if aid_r is the recv command
    (--> (h eta aid-map pending-s pending-r q-set (wait aid_r) 
-           status k last (defs (any_a ...)))
+           status k)
         (h_pr eta aid-map_pr pending-s pending-r_pr q-set_pr true 
-              status_pr k last_pr
-              (defs ((HB (select aid-⊥_s-last match_po) (select aid_s match_po))
-                     (MATCH aid_r aid_s) any_a ...)))
+              status_pr k)
 ;        (h eta aid-map_0 pending-s pending-r q-set true 
 ;              status k
 ;              (defs ((MATCH aid_r ) any_a ...)))
         "Recvi Wait Cmd"
             ;; get recv and corresponding send command, mark each send in front of the destination send (by set variable "mark" to 1)
+        ;;check if aid_r is a receive
         (where true (find-recv pending-r aid_r) )
-        (where (aid-map_0 dst_r) (get-ep aid-map aid_r)) 
-        (where (h_pr aid_s pending-r_pr q-set_pr status_pr) 
-               (get-mark-remove h eta pending-r q-set dst_r aid_r status))
+        ;;remove this receive from pending-r    
+        (where (variable pending-r_pr) (remove-pending-recv aid_r pending-r))
+        ;;get this receive from aid-map
+        (where (aid-map_0 dst) (get-ep aid-map aid_r)) 
+        ;;randomly find a send in pending-s, remove it from pending-s  --needs to be improved for "randomize"
+        (where (aid_s value pending-s_pr)
+               (find-available-send dst pending-s))
+        ;;match the receive and the send by assign variable x a value v  
+        (where h_pr
+               (h-extend* h [(eta-lookup eta variable) -> value]))
+        ;(where (h_pr aid_s pending-r_pr q-set_pr status_pr) 
+         ;      (get-mark-remove h eta pending-r q-set dst_r aid_r status))
+        ;;remove this send from aid-map
         (where (aid-map_pr src_s) (get-ep aid-map_0 aid_s))
-        (where (last_pr aid-⊥_s-last) (get-last-send/replace last src_s dst_r aid_s))
+        ;(where (last_pr aid-⊥_s-last) (get-last-send/replace last src_s dst_r aid_s))
         )
    ))
 
@@ -340,6 +334,15 @@
    (storelike-lookup any_0 any_t)
    (side-condition (not (equal? (term any_k) (term any_t))))])
 
+
+;;does `() mean an empty list
+(define-metafunction lang
+  storelike-outer : any -> (any any)
+  [(storelike-outer mt) `((term error) (term error))]
+  [(storelike-outer (any_0 [any_t -> any_ans])) `((term any_ans) (term any_t))]
+  [(storelike-outer (any_0 [any_t -> '()])) 
+   (storelike-outer any_0)])
+
 (define (id-<= a b)
   (string<=? (symbol->string a) (symbol->string b)))
 
@@ -370,6 +373,21 @@
   h-extend* : h [loc -> v] ... -> h
   [(h-extend* h [loc -> v] ...)
    ,(storelike-extend* <= (term h) (term ([loc -> v] ...)))])
+
+(define-metafunction lang
+  pending-r-extend* : pending-r [dst -> recv-set] ... -> pending-r
+  [(pending-r-extend* pending-r [dst -> recv-set] ...)
+   ,(storelike-extend* <= (term pending-r) (term ([dst -> recv-set] ...)))])
+
+(define-metafunction lang
+  from-set-extend* : from-set [src -> send-set] ... -> from-set
+  [(from-set-extend* from-set [src -> send-set] ...)
+   ,(storelike-extend* <= (term from-set) (term ([src -> send-set] ...)))])
+
+(define-metafunction lang
+  pending-s-extend* : pending-s [dst -> from-set] ... -> pending-s
+  [(pending-s-extend* pending-s [dst -> from-set] ...)
+   ,(storelike-extend* <= (term pendings) (term ([dst -> from-set] ...)))])
 
 (define-metafunction lang
   eta-lookup : eta x -> loc
@@ -421,12 +439,21 @@
     [`(,s [,k ->,value]) `((,s) ,k ,value)]
     [`([,k -> ,value]) `(,empty ,k ,value)]))
 
+(define (remove-by-key set key)
+  (match set
+    [`(,s [,k ->,value]) 
+     (if (equal? k key) `((,s) ,k ,value) 
+                         (remove-by-key s key))]
+    [`([,k -> ,value])
+     (if (equal? k key) `(,empty ,k ,value) 
+                        `(([,k -> ,value]) 'null 'null))]))
 
 
 (define-metafunction lang
   get-ep : aid-map aid -> (aid-map ep) 
   [(get-ep ([aid_x ep_x] ... [aid_y ep_y] [aid_z ep_z] ...) aid_y)
    (([aid_x ep_x] ... [aid_z ep_z] ...) ep_y)])
+
 
 ;
 (define-metafunction lang
@@ -455,6 +482,46 @@
       (if (equal? res 'null)
           (term false)
           (term true)))]) 
+
+
+(define-metafunction lang
+   check-pending-send : cmd pending-r aid-map pending-s -> bool
+   [(check-pending-send (assume e) pending-r aid-map pending-s) ,(term false)]
+   [(check-pending-send (assert e) pending-r aid-map pending-s) ,(term false)]
+   [(check-pending-send (x := e) pending-r aid-map pending-s) ,(term false)]
+   [(check-pending-send (sendi aid src dst e ploc number) pending-r aid-map pending-s) ,(term false)]
+   [(check-pending-send (recvi aid dst x ploc) pending-r aid-map pending-s) ,(term false)]
+   [(check-pending-send (wait aid) pending-r ([aid_x ep_x] ... [aid ep] [aid_y ep_y] ...) pending-s) 
+    ,(let ([res (get-key (term pending-r) (term aid))])
+      (if (equal? res 'null)
+          (term false)
+          (let ([available-sends (get-value (term pending-s) (term ep))])
+             (if (equal? available-sends 'null)
+             (term true)
+             (term false))))) 
+   ]
+   )
+
+(define-metafunction lang
+  remove-pending-recv : dst aid pending-r -> (x pending-r_pr)
+  [(remove-pending-recv dst aid pending-r)
+   ,(let ([recv-set (get-value (term pending-r) (term dst))])
+      (let ([rmd-recv-set (remove-by-key recv-set (term aid))])
+        `(,(caddr rmd-recv-set) ,(term (pending-r-extend*  pending-r [(term dst) -> ,(car rmd-recv-set)]))))
+      )])
+
+
+;;TODO: finding "randomsrc" instead of "firstsrc"
+(define-metafunction lang
+  find-available-send : dst pending-s -> (aid v pending-s)
+  [(find-available-send dst pending-s)
+   ,(let ([sendTodst-list (get-value (term pending-s) (term dst))])
+      (let ([firstsrc-list (term (storelike-outer (term sendTodst-list)))])
+        (let ([rmd-send-set (remove-first (car firstsrc-list))])
+          `(,(cadr rmd-send-set) ,(caddr rmd-send-set) ,(term (pending-s-extend*  pending-s [(term dst) -> ,(term (from-set-extend*  from-set [(cadr firstsrc-list) -> ,(car rmd-send-set)]))])))
+          ))
+      )])
+          
 
 (define-metafunction lang
   add-recv : pending-r (aid -> dst x) -> pending-r

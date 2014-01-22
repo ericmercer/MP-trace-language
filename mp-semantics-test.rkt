@@ -45,9 +45,43 @@
 (define mstate2a
   (term (((mt (0 -> 0)) (1 -> 0)) ((mt (b -> 0)) (a -> 1)) ((recvA 1)) mt (mt (1 -> ((recvA -> a)))) mt (((t0_0 (b := 5)) (t0_1 (sendi send1 0 1 b t0_1 1)) (t0_2 (wait send1)) ⊥) ((t1_1 (wait recvA)) (t1_2 (assert (= a 5))) ⊥)) success)))
 
+
+(define mstate5a
+  (term (((mt [0 -> 5]) [1 -> 0])
+         ((mt [b -> 0]) [a -> 1])
+         ([recvA 1] [send1 0])
+         (mt [1 -> (mt [0 -> ([send1 -> 5])])])
+         (mt [1 -> ([recvA -> a])])
+         mt
+         ((⊥)
+          ([t1_1 (wait recvA)]
+           [t1_2 (assert (= a 5))]
+           ⊥))
+         success
+         )))
+
+(define mstate6a
+  (term (((mt [0 -> 5]) [1 -> 5])
+         ((mt [b -> 0]) [a -> 1])
+         ()
+         (mt [1 -> (mt [0 -> ()])])
+         (mt [1 -> ()])
+         (mt [1 -> ()])
+         ((⊥)
+          ([t1_2 (assert (= a 5))]
+           ⊥))
+         success 
+         )))
+
 (test-predicate (redex-match lang machine-state) (term ,mstate1a))
+(test-predicate (redex-match lang machine-state) (term ,mstate2a))
+(test-predicate (redex-match lang machine-state) (term ,mstate5a))
+
+(test--> machine-reductions
+         (term ,mstate5a)
+         (term ,mstate6a))
 
 ; Initial included tests
-(test--> machine-reductions
-         (term ,mstate1a)
-         (term ,mstate2a))
+;(test--> machine-reductions
+         ;(term ,mstate1a)
+        ; (term ,mstate2a))

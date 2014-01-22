@@ -100,10 +100,9 @@
      (op * e -> k)
      (op v * -> k)
      )
-  ; Add last to the state and update appropriately...just before smt...
+
    (ep-⊥ ep
          ⊥)
-  ;(last ([ep ep-⊥ aid] ...))
   
   )
 
@@ -124,14 +123,7 @@
   (reduction-relation
    lang
    #:domain machine-state
-   
-   ; The HB relations and definitions enable the SMT solver
-   ; to generate a total order on the error traces. If you remove
-   ; the orders, then you need to resolve the partial order to
-   ; create an actual error trace.
-   
-   ; first reduce the queue state if the trace-entry is a queue movement command
-   ; second reduce the expr state
+
    (--> (h eta aid-map pending-s pending-r q-set
            (thread_0 ... 
             ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥)
@@ -139,10 +131,6 @@
         (h_pr eta_pr aid-map_pr pending-s_pr pending-r_pr q-set_pr 
               (thread_0 ... ([ploc_1 cmd_1] ... ⊥) thread_2 ...)
                status_pr)
-        ;"Machine Step for queue movement"
-        ;(where (pending-s_pr q-set_pr move-⊥_pr status_pr)
-        ;       ,(apply-reduction-relation** queue-reductions
-         ;                                   (term (pending-s q-set move-⊥ status))))
         (where false (check-pending-send cmd_0 pending-r aid-map pending-s))
        ; "Machine Step"
         (where (h_pr eta_pr aid-map_pr pending-s_pr pending-r_pr q-set_pr
@@ -160,10 +148,7 @@
         (h_pr eta_pr aid-map pending-s pending-r q-set 
               (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥) thread_2 ...)
                status)
-        "Machine Step for queue movement"
-        ;(where (pending-s_pr q-set_pr move-⊥_pr status_pr)
-        ;       ,(apply-reduction-relation** queue-reductions
-         ;                                   (term (pending-s q-set move-⊥ status))))
+        "Machine Step for checking pending send"
         (where true (check-pending-send cmd_0 pending-r aid-map pending-s))
        ; "Machine Step"
         )
@@ -199,7 +184,7 @@
         "Assume Cmd"
         (where status_pr (check-assume v status)))
    
-   ;;Negate expression and add it to the SMT assertions.
+   ;;Negate expression.
    (--> (h eta aid-map pending-s pending-r q-set (assert e) status k)
         (h eta aid-map pending-s pending-r q-set e status (assert * -> k))
         "Assert Pull Out Expr")
@@ -239,47 +224,25 @@
         "Sendi Wait Cmd"
         (where false (find-recv pending-r aid) ))
        
-   
-   ;;Match on the receive wait
-   ;; TODO: add the last structure to the state and update the smt problem and last as
-   ;;       1) Add to smt (MATCH aid_r0 aid_s0) -- done
-   ;;       2) Get and remove from last [src_r dst_r aid_s_last] and [dst_r aid_r_last] last
-   ;;       3) Add to smt (HB (select aid_s_last match_p0) (select aid_s match_po)) -- done
-   ;;       4) Add to last [src_r dst_r aid_s] and {dst_r aid_r]
-   ;;       5) Complete any prior matches, if needed...
-   ;; TODO: update all the other rules to ignore last (largely)
-   
-   
-   ; Step of match: 
-   ; 1)get the aid_r from pending-r, mark the corresponding send in q-set with "1"(visited)
-   ; 2)add to smt structure
-   ; 3)find-recv checks if aid_r is the recv command
    (--> (h eta aid-map pending-s pending-r q-set (wait aid_r) 
            status k)
         (h_pr eta aid-map_pr pending-s pending-r_pr q-set_pr true 
               status_pr k)
-;        (h eta aid-map_0 pending-s pending-r q-set true 
-;              status k
-;              (defs ((MATCH aid_r ) any_a ...)))
         "Recvi Wait Cmd"
-            ;; get recv and corresponding send command, mark each send in front of the destination send (by set variable "mark" to 1)
         ;;check if aid_r is a receive
         (where true (find-recv pending-r aid_r) )
-        ;;remove this receive from pending-r    
-        (where (variable pending-r_pr) (remove-pending-recv aid_r pending-r))
         ;;get this receive from aid-map
-        (where (aid-map_0 dst) (get-ep aid-map aid_r)) 
+        (where (aid-map_0 dst) (get-ep aid-map aid_r))
+        ;;remove this receive from pending-r    
+        (where (variable pending-r_pr) (remove-pending-recv dst aid_r pending-r)) 
         ;;randomly find a send in pending-s, remove it from pending-s  --needs to be improved for "randomize"
         (where (aid_s value pending-s_pr)
                (find-available-send dst pending-s))
         ;;match the receive and the send by assign variable x a value v  
         (where h_pr
                (h-extend* h [(eta-lookup eta variable) -> value]))
-        ;(where (h_pr aid_s pending-r_pr q-set_pr status_pr) 
-         ;      (get-mark-remove h eta pending-r q-set dst_r aid_r status))
         ;;remove this send from aid-map
         (where (aid-map_pr src_s) (get-ep aid-map_0 aid_s))
-        ;(where (last_pr aid-⊥_s-last) (get-last-send/replace last src_s dst_r aid_s))
         )
    ))
 
@@ -455,6 +418,8 @@
    (([aid_x ep_x] ... [aid_z ep_z] ...) ep_y)])
 
 
+
+
 ;
 (define-metafunction lang
   get-recv : pending-r dst -> (pending-r [aid -> x])
@@ -507,7 +472,7 @@
   [(remove-pending-recv dst aid pending-r)
    ,(let ([recv-set (get-value (term pending-r) (term dst))])
       (let ([rmd-recv-set (remove-by-key recv-set (term aid))])
-        `(,(caddr rmd-recv-set) ,(term (pending-r-extend*  pending-r [(term dst) -> ,(car rmd-recv-set)]))))
+        `(,(caddr rmd-recv-set) ,(term (pending-r-extend*  pending-r [(dst) -> ,(car rmd-recv-set)]))))
       )])
 
 

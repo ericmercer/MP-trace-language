@@ -40,8 +40,7 @@
            [t1_1 (wait recvA)]
            [t1_2 (assert (= a 5))]
            ⊥))
-         ((t0_0 ⊥) (t0_1 ⊥) (t0_2 ⊥) (t1_0 ⊥) (t1_1 ((1 0) ⊥)) (t1_2 ⊥))
-         success () (()()))))
+         success)))
 
 ;(test-term-equal (get-last-send/replace () 0 1 send1) (([0 1 send1]) ⊥))
 ;(test-term-equal (get-last-send/replace ([0 1 send0]) 0 1 send1) (([0 1 send1]) send0))

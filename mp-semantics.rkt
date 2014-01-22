@@ -472,7 +472,7 @@
   [(remove-pending-recv dst aid pending-r)
    ,(let ([recv-set (get-value (term pending-r) (term dst))])
       (let ([rmd-recv-set (remove-by-key recv-set (term aid))])
-        `(,(caddr rmd-recv-set) ,(term (pending-r-extend*  pending-r [(dst) -> ,(car rmd-recv-set)]))))
+        `(,(caddr rmd-recv-set) ,(term (pending-r-extend*  pending-r [,(term dst) -> ,(car rmd-recv-set)]))))
       )])
 
 

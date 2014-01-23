@@ -145,7 +145,7 @@
            (thread_0 ... 
             ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥)
             thread_2 ...) status)
-        (h_pr eta_pr aid-map pending-s pending-r q-set 
+        (h eta aid-map pending-s pending-r q-set 
               (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥) thread_2 ...)
                status)
         "Machine Step for checking pending send"
@@ -226,8 +226,8 @@
        
    (--> (h eta aid-map pending-s pending-r q-set (wait aid_r) 
            status k)
-        (h_pr eta aid-map_pr pending-s pending-r_pr q-set_pr true 
-              status_pr k)
+        (h eta aid-map_pr pending-s_pr pending-r_pr q-set true 
+              status k)
         "Recvi Wait Cmd"
         ;;check if aid_r is a receive
         (where true (find-recv pending-r aid_r) )
@@ -303,8 +303,7 @@
   storelike-outer : any -> (any any)
   [(storelike-outer mt) `((term error) (term error))]
   [(storelike-outer (any_0 [any_t -> any_ans])) `((term any_ans) (term any_t))]
-  [(storelike-outer (any_0 [any_t -> '()])) 
-   (storelike-outer any_0)])
+  [(storelike-outer (any_0 [any_t -> '()])) (storelike-outer any_0)])
 
 (define (id-<= a b)
   (string<=? (symbol->string a) (symbol->string b)))
@@ -350,7 +349,7 @@
 (define-metafunction lang
   pending-s-extend* : pending-s [dst -> from-set] ... -> pending-s
   [(pending-s-extend* pending-s [dst -> from-set] ...)
-   ,(storelike-extend* <= (term pendings) (term ([dst -> from-set] ...)))])
+   ,(storelike-extend* <= (term pending-s) (term ([dst -> from-set] ...)))])
 
 (define-metafunction lang
   eta-lookup : eta x -> loc
@@ -369,6 +368,11 @@
   (match set
     ['mt 'null]
     [`(,s [,k -> ,value]) (if (equal? k key) value (get-value s key))]))
+
+(define (get-first set)
+  (match set
+    ['mt 'null]
+    [`(,s [,k -> ,value]) `(,value ,k)]))
 
 ; get the key given a value for the set
 (define (get-key set key)
@@ -481,9 +485,9 @@
   find-available-send : dst pending-s -> (aid v pending-s)
   [(find-available-send dst pending-s)
    ,(let ([sendTodst-list (get-value (term pending-s) (term dst))])
-      (let ([firstsrc-list (term (storelike-outer (term sendTodst-list)))])
+      (let ([firstsrc-list (get-first  sendTodst-list)])
         (let ([rmd-send-set (remove-first (car firstsrc-list))])
-          `(,(cadr rmd-send-set) ,(caddr rmd-send-set) ,(term (pending-s-extend*  pending-s [(term dst) -> ,(term (from-set-extend*  from-set [(cadr firstsrc-list) -> ,(car rmd-send-set)]))])))
+          `(,(cadr rmd-send-set) ,(caddr rmd-send-set) ,(term (pending-s-extend*  pending-s [,(term dst) -> ,(term (from-set-extend*  ,sendTodst-list [,(cadr firstsrc-list) -> ,(car rmd-send-set)]))])))
           ))
       )])
           

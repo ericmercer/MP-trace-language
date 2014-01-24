@@ -226,7 +226,7 @@
        
    (--> (h eta aid-map pending-s pending-r q-set (wait aid_r) 
            status k)
-        (h eta aid-map_pr pending-s_pr pending-r_pr q-set true 
+        (h eta aid-map_pr pending-s pending-r_pr q-set true 
               status k)
         "Recvi Wait Cmd"
         ;;check if aid_r is a receive
@@ -415,12 +415,29 @@
      (if (equal? k key) `(,empty ,k ,value) 
                         `(([,k -> ,value]) 'null 'null))]))
 
+(define (remove-pending-send set dst src)
+  (match set
+    ['mt 'mt]
+    [`(,s [,d ->,fromset]) 
+     (if (equal? d dst) `(,s [,d ->,(remove-fromset fromset src)])
+                        `(,(remove-pending-send s dst src) [,d ->,fromset]))]))
+
+(define (remove-fromset set src)
+  (match set
+    ['mt 'mt]
+    [`(,s [,sr ->,pending-sends])
+     (if (equal? sr src) `(,s [,sr ->,(remove-first-send pending-sends)])
+                         `(,(remove-fromset s src) [,sr ->,pending-sends]))]))
+
+(define (remove-first-send set)
+  (match set
+    [`(,s [,k ->,value]) s]))
+
 
 (define-metafunction lang
   get-ep : aid-map aid -> (aid-map ep) 
   [(get-ep ([aid_x ep_x] ... [aid_y ep_y] [aid_z ep_z] ...) aid_y)
    (([aid_x ep_x] ... [aid_z ep_z] ...) ep_y)])
-
 
 
 
@@ -476,7 +493,8 @@
   [(remove-pending-recv dst aid pending-r)
    ,(let ([recv-set (get-value (term pending-r) (term dst))])
       (let ([rmd-recv-set (remove-by-key recv-set (term aid))])
-        `(,(caddr rmd-recv-set) ,(term (pending-r-extend*  pending-r [,(term dst) -> ,(car rmd-recv-set)]))))
+        `(,(caddr rmd-recv-set) 
+          ,(term (pending-r-extend*  pending-r [,(term dst) -> ,(car rmd-recv-set)]))))
       )])
 
 
@@ -487,9 +505,16 @@
    ,(let ([sendTodst-list (get-value (term pending-s) (term dst))])
       (let ([firstsrc-list (get-first  sendTodst-list)])
         (let ([rmd-send-set (remove-first (car firstsrc-list))])
-          `(,(cadr rmd-send-set) ,(caddr rmd-send-set) ,(term (pending-s-extend*  pending-s [,(term dst) -> ,(term (from-set-extend*  ,sendTodst-list [,(cadr firstsrc-list) -> ,(car rmd-send-set)]))])))
-          ))
+          (let ([new-pending-s (remove-pending-send (term pending-s) (term dst) (cadr rmd-send-set))])
+          `(,(cadr rmd-send-set) ,(caddr rmd-send-set) ,new-pending-s
+           ;,(term (pending-s-extend*  pending-s [,(term dst) -> [,(cadr firstsrc-list) -> (mt (0 -> ()))]
+           ;,(term (from-set-extend*  ,sendTodst-list [,(cadr firstsrc-list) -> ,(car rmd-send-set)]))
+           ;]))
+           )
+          )))
       )])
+
+
           
 
 (define-metafunction lang

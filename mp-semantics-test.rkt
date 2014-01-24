@@ -69,9 +69,13 @@
          )))
 
 
+
+
+
 (test--> machine-reductions
          (term ,mstate5a)
-         (term ,mstate6a))
+         (term ,mstate7a))
+
 
 
 

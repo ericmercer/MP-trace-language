@@ -414,27 +414,33 @@
   (match set
     ['mt 'mt]
     [`(,s [,d ->,fromset]) 
-     (if (equal? d dst) `(,s [,d ->,(remove-fromset fromset src)])
-                        `(,(remove-pending-send s dst src) [,d ->,fromset]))]
-    [`('mt [,d ->,fromset]) 
-     (if (equal? d dst) `('mt [,d ->,(remove-fromset fromset src)])
-                        `('mt [,d ->,fromset]))]
+     (if (equal? d dst) 
+         (let ([new-pending-fromset (remove-fromset fromset src)])
+           (if (equal? new-pending-fromset 'mt)
+               s
+               `(,s [,d ->,new-pending-fromset])           
+         ))
+        `(,(remove-pending-send s dst src) [,d ->,fromset]))]
     ))
 
 (define (remove-fromset set src)
   (match set
     ['mt 'mt]
     [`(,s [,sr ->,pending-sends])
-     (if (equal? sr src) `(,s [,sr ->,(remove-first-send pending-sends)])
-                         `(,(remove-fromset s src) [,sr ->,pending-sends]))]
-    [`('mt [,sr ->,pending-sends])
-     (if (equal? sr src) `('mt [,sr ->,(remove-first-send pending-sends)])
-                         `('mt [,sr ->,pending-sends]))]))
+     (if (equal? sr src) 
+         (let ([new-pending-ss (remove-first-send pending-sends)])
+           (if (equal? (get-size new-pending-ss) 0)
+               s
+               `(,s [,sr ->,new-pending-ss])           
+         ))
+        `(,(remove-fromset s src) [,sr ->,pending-sends]))]
+))
 
 (define (remove-first-send set)
   (match set
     [`(,s [,k ->,value]) `(,s)]
-    [`([,k ->,value]) `()]))
+    [`([,k ->,value]) `()]
+    [`() `()]))
 
 (define (remove-pending-receive pending-rs dst aid)
   (match pending-rs

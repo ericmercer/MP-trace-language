@@ -1,4 +1,4 @@
- #lang racket
+  #lang racket
 (require redex/reduction-semantics
          "mp-semantics.rkt")
 
@@ -33,7 +33,6 @@
          ([recvA 1] [send1 0])
          (mt [1 -> (mt [0 -> ([send1 -> 5])])])
          (mt [1 -> ([recvA -> a])])
-         mt
          ((⊥)
           ([t1_1 (wait recvA)]
            [t1_2 (assert (= a 5))]
@@ -41,27 +40,13 @@
          success
          )))
 
+
 (define mstate6a
-  (term (((mt (0 -> 5)) (1 -> 0)) 
-         ((mt (b -> 0)) (a -> 1)) 
-         ((recvA 1) (send1 0)) 
-         (mt (1 -> (mt (0 -> ((send1 -> 5)))))) 
-         (mt (1 -> ((recvA -> a)))) 
-         mt 
-         ((⊥) 
-          ((t1_2 (assert (= a 5))) 
-           ⊥)) 
-         success
-         )))
-
-
-(define mstate7a
   (term (((mt [0 -> 5]) [1 -> 5])
          ((mt [b -> 0]) [a -> 1])
          ()
          (mt [1 -> (mt [0 -> ()])])
-         (mt [1 -> ()])
-         (mt [1 -> ()])
+         mt
          ((⊥)
           ([t1_2 (assert (= a 5))]
            ⊥))
@@ -69,12 +54,11 @@
          )))
 
 
-
-
-
 (test--> machine-reductions
          (term ,mstate5a)
-         (term ,mstate7a))
+         (term ,mstate6a))
+
+
 
 
 

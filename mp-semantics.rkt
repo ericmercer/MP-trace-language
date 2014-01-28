@@ -135,17 +135,17 @@
                                                      status ret))))
         )
    
-   ;(--> (h eta aid-map pending-s pending-r q-set
-    ;       (thread_0 ... 
-     ;       ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥)
-      ;      thread_2 ...) status)
-      ;  (h eta aid-map pending-s pending-r q-set 
-      ;        (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥) thread_2 ...)
-      ;         status)
-      ;  "Machine Step for checking pending send"
-      ;  (where true (check-pending-send cmd_0 pending-r aid-map pending-s))
-       ; "Machine Step"
-      ;  )
+   (--> (h eta aid-map pending-s pending-r q-set
+           (thread_0 ... 
+            ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥)
+            thread_2 ...) status)
+        (h eta aid-map pending-s pending-r q-set 
+              (thread_0 ... ([ploc_0 cmd_0] [ploc_1 cmd_1] ... ⊥) thread_2 ...)
+               status)
+        "Machine Step for checking pending send"
+        (where true (check-pending-send cmd_0 pending-r aid-map pending-s))
+        ;"Machine Step"
+        )
    ))
    
 
